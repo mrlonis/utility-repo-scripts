@@ -10,7 +10,7 @@ PYLINTRC_FORMAT_MAX_LINE_LENGTH_KEY = "max-line-length"
 
 SAMPLE_PYLINTRC = f"""[{PYLINTRC_MASTER_SECTION_KEY}]
 
-# mrlonis Custom Settings
+# Custom Settings
 
 # Disable requirement for module (C0114), class (C0115), and function (C0116) docstring
 disable = C0114, C0115, C0116

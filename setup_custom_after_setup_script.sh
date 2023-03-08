@@ -8,7 +8,7 @@ source "$script_dir"/scripts/process_cli_options.sh "$@"
 
 # Custom after setup script
 echo "$dash_separator Custom After Setup Script $dash_separator"
-custom_script_name=".mrlonis_after_setup.sh"
+custom_script_name=".python_after_setup.sh"
 if [ -f "$HOME/$custom_script_name" ]; then
 	echo "Running custom after setup script $HOME/$custom_script_name"
 	if [ "$debug" = 1 ]; then
@@ -20,7 +20,7 @@ else
 	echo "Update this script to customize your virtual environments after creation"
 	{
 		echo "#!$SHELL"
-		echo "# This script will run after the setup script in mrlonis python repos"
+		echo "# This script will run after the setup script in your python repos"
 		echo "# Update this script to add extra python packages that you may need for your environment"
 		echo "# such as common editor packages"
 		echo ""

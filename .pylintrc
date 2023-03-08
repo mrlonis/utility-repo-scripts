@@ -1,6 +1,6 @@
 [MASTER]
 
-# mrlonis Custom Settings
+# Custom Settings
 
 # Disable requirement for module (C0114), class (C0115), and function (C0116) docstring
 disable = C0114, C0115, C0116

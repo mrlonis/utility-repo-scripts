@@ -1,10 +1,10 @@
-# Introduction
+# utility-repo-scripts
 
-This repository holds common scripts used throughout all `mrlonis` python projects
+This repository holds common scripts for use in python repositories. The main script of note is [setup_python_app.sh](./setup_python_app.sh).
 
 ## Table of Contents
 
-- [Introduction](#introduction)
+- [utility-repo-scripts](#utility-repo-scripts)
   - [Table of Contents](#table-of-contents)
   - [Usage](#usage)
     - [How Python is Determined](#how-python-is-determined)
@@ -29,7 +29,7 @@ This repository holds common scripts used throughout all `mrlonis` python projec
       - [shellcheck VS Code Extension](#shellcheck-vs-code-extension)
     - [Ruby](#ruby)
       - [Markdownlint](#markdownlint)
-    - [brew pyenv](#brew-pyenv)
+    - [(Optional) pyenv](#optional-pyenv)
 
 ## Usage
 
@@ -74,7 +74,7 @@ export WORKON_HOME="$HOME/SOME/CUSTOM/PATH/FOR/VIRTUAL/ENVIRONMENTS"
 
 This `WORKON_HOME` variable is used by [virtualenvwrapper](https://virtualenvwrapper.readthedocs.io/en/latest/install.html#basic-installation) to determine where to look for virtual environments when invoking `workon <project-name>`.
 
-[Back to Top](#introduction)
+[Back to Top](#utility-repo-scripts)
 
 ### CLI Flags
 
@@ -85,7 +85,7 @@ The `setup` script accepts a few flags to customize the setup process:
 | Flag                               | Description                                                                     | Default                 | Valid Values                        |
 | :--------------------------------- | :------------------------------------------------------------------------------ | :---------------------- | :---------------------------------- |
 | `-d` or `--debug`                  | Enables or disables debug echo statements                                       | `False`                 |                                     |
-| `-v` or `--package_manager`        | Specifies which package manager to use                                          | `pip`                   | [`pip`, `pip-tools`, `poetry`]      |
+| `--package_manager`                | Specifies which package manager to use                                          | `pip`                   | [`pip`, `pip-tools`, `poetry`]      |
 | `-r` or `--rebuild_venv`           | Specifies whether or not to delete and re-create the virtual environment or not | `False`                 |                                     |
 | `--python_version`                 | Specifies the python version to use                                             | `3.8`                   | [`3.8`, `3.9`, `3.10`, `3.11`]      |
 | `--is_package`                     | Specifies whether or not the project is a package                               | `False`                 |                                     |
@@ -102,7 +102,7 @@ The `setup` script accepts a few flags to customize the setup process:
 | `--line_length`                    | Specifies the line length to use for various settings                           | `125`                   | `Any non-zero positive integer`     |
 | `--pre_commit_pylint_entry_prefix` | Specifies the prefix to use for the `pylint` pre-commit hook entry              | `utility-repo-scripts/` |                                     |
 
-[Back to Top](#introduction)
+[Back to Top](#utility-repo-scripts)
 
 ### Supported Package Managers
 
@@ -124,7 +124,7 @@ source utility-repo-scripts/setup_python_app.sh \
     --line_length=125
 ```
 
-[Back to Top](#introduction)
+[Back to Top](#utility-repo-scripts)
 
 ##### pip: Dev, Test & Prod Requirements
 
@@ -157,7 +157,7 @@ As shown in the example files above, if you run `./setup` in your project, the r
 
 This is because the `-r requirements-test.txt` line in `requirements-dev.txt` and the `-r requirements.txt` line in `requirements-test.txt` will ensure that the dependencies in `requirements-test.txt` and `requirements.txt` are also installed when calling the command `pip install -r requirements-dev.txt`.
 
-[Back to Top](#introduction)
+[Back to Top](#utility-repo-scripts)
 
 #### pip-tools
 
@@ -179,7 +179,7 @@ source utility-repo-scripts/setup_python_app.sh \
     --line_length=125
 ```
 
-[Back to Top](#introduction)
+[Back to Top](#utility-repo-scripts)
 
 ##### pip-tools: Setup
 
@@ -198,7 +198,7 @@ Since the newly created virtual environment might not have `pip-tools`:
 
 You can now run `./setup` to setup your project.
 
-[Back to Top](#introduction)
+[Back to Top](#utility-repo-scripts)
 
 ##### pip-tools: Dev, Test & Prod Requirements
 
@@ -238,7 +238,7 @@ The version 2 of the `setup` script looks for the compiled output of the above c
 - If only `test` and `prod` requirements are found, the resulting command the `setup` script would run is `pip-sync requirements-test.txt requirements.txt`.
 - If only `prod` requirements are found, the resulting command the `setup` script would run is `pip-sync requirements.txt`.
 
-[Back to Top](#introduction)
+[Back to Top](#utility-repo-scripts)
 
 ##### pip-tools: Rebuilding Virtual Environment
 
@@ -270,7 +270,7 @@ To then easily run and re-build the virtual environment on the fly without modif
 ./setup 1
 ```
 
-[Back to Top](#introduction)
+[Back to Top](#utility-repo-scripts)
 
 #### poetry
 
@@ -292,7 +292,7 @@ source utility-repo-scripts/setup_python_app.sh \
     --line_length=125
 ```
 
-[Back to Top](#introduction)
+[Back to Top](#utility-repo-scripts)
 
 ##### Poetry: Setup
 
@@ -312,7 +312,7 @@ poetry add <dependency>
 
 For more information about `Poetry`, view the [Poetry documentation](https://python-poetry.org/docs/).
 
-[Back to Top](#introduction)
+[Back to Top](#utility-repo-scripts)
 
 ##### poetry: Rebuilding Virtual Environment
 
@@ -344,14 +344,14 @@ To then easily run and re-build the virtual environment on the fly without modif
 ./setup 1
 ```
 
-[Back to Top](#introduction)
+[Back to Top](#utility-repo-scripts)
 
 ## Testing
 
 To test this repo, run the following command:
 
 ```shell
-pytest --cov -n auto
+poetry run pytest --cov -n auto
 ```
 
 ## Linting
@@ -369,7 +369,7 @@ poetry run bandit -c pyproject.toml -r .
 
 The following section details recommended `brew` packages to install. **Note:** These packages are required for the `pre-commit` to function.
 
-[Back to Top](#introduction)
+[Back to Top](#utility-repo-scripts)
 
 ### shfmt
 
@@ -385,7 +385,7 @@ and then run the following command to format all shell files in the repo:
 shfmt -l -w setup_python_app.sh
 ```
 
-[Back to Top](#introduction)
+[Back to Top](#utility-repo-scripts)
 
 ### shellcheck
 
@@ -401,13 +401,13 @@ and then run the following command to lint a shell file changing out the file na
 shellcheck setup_python_app.sh
 ```
 
-[Back to Top](#introduction)
+[Back to Top](#utility-repo-scripts)
 
 #### shellcheck VS Code Extension
 
 To get integrated shellcheck linting in VS Code, install the [shellcheck extension](https://marketplace.visualstudio.com/items?itemName=timonwong.shellcheck)
 
-[Back to Top](#introduction)
+[Back to Top](#utility-repo-scripts)
 
 ### Ruby
 
@@ -425,7 +425,7 @@ gem update --system
 gem install mdl
 ```
 
-[Back to Top](#introduction)
+[Back to Top](#utility-repo-scripts)
 
 #### Markdownlint
 
@@ -433,9 +433,9 @@ gem install mdl
 gem install mdl
 ```
 
-[Back to Top](#introduction)
+[Back to Top](#utility-repo-scripts)
 
-### brew pyenv
+### (Optional) pyenv
 
 To install `pyenv`, run the following command:
 
@@ -443,4 +443,4 @@ To install `pyenv`, run the following command:
 brew install pyenv pyenv-virtualenv
 ```
 
-[Back to Top](#introduction)
+[Back to Top](#utility-repo-scripts)
