@@ -1,0 +1,22 @@
+#!/bin/bash
+rebuild_venv="$1"
+rebuild_venv="${rebuild_venv:-0}"
+source setup_python_app.sh \
+	--debug \
+	--package_manager="poetry" \
+	--rebuild_venv="$rebuild_venv" \
+	--python_version="3.8" \
+	--include_jumanji_house \
+	--include_prettier \
+	--include_isort \
+	--isort_profile="black" \
+	--python_formatter="black" \
+	--pylint_enabled \
+	--flake8_enabled \
+	--pydocstyle_enabled \
+	--pycodestyle_enabled \
+	--bandit_enabled \
+	--pytest_enabled \
+	--overwrite_vscode_launch \
+	--line_length=110 \
+	--pre_commit_pylint_entry_prefix=""

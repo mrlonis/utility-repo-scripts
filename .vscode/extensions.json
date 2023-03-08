@@ -1,0 +1,21 @@
+{
+  "recommendations": [
+    "ms-python.autopep8",
+    "boto3typed.boto3-ide",
+    "bungcip.better-toml",
+    "ms-python.black-formatter",
+    "streetsidesoftware.code-spell-checker",
+    "editorconfig.editorconfig",
+    "ms-python.flake8",
+    "visualstudioexptteam.vscodeintellicode",
+    "visualstudioexptteam.intellicode-api-usage-examples",
+    "ms-python.isort",
+    "yzhang.markdown-all-in-one",
+    "davidanson.vscode-markdownlint",
+    "esbenp.prettier-vscode",
+    "ms-python.vscode-pylance",
+    "ms-python.pylint",
+    "ms-python.python",
+    "timonwong.shellcheck"
+  ]
+}

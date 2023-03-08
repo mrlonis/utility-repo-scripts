@@ -1,0 +1,62 @@
+[build-system]
+requires = [ "poetry-core" ]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+name = "utility-repo-scripts"
+version = "0.1.0"
+description = ""
+authors = [ "Matthew Lonis <mattlonis@gmail.com>" ]
+readme = "README.md"
+packages = [{include = "utility_repo_scripts"}]
+
+[tool.poetry.dependencies]
+python = "^3.8.1"
+configupdater = "^3.1.1"
+ruamel-yaml = "^0.17.21"
+tomlkit = "^0.11.6"
+
+[tool.poetry.group.test.dependencies]
+bandit = { version = "^1.7.4", extras = [ "toml" ] }
+flake8 = "^6.0.0"
+greenlet = "^2.0.2"
+mypy = "^1.1.1"
+pycodestyle = "^2.10.0"
+pydocstyle = "^6.3.0"
+pylama = { version = "^8.4.1", extras = [ "all" ] }
+pylint = "^2.16.4"
+pylint-junit = "^0.3.2"
+pytest = "^7.2.2"
+pytest-cov = "^4.0.0"
+pytest-xdist = { version = "^3.2.0", extras = [ "psutil" ] }
+tomli = "^2.0.1"
+
+[tool.poetry.group.dev.dependencies]
+autopep8 = "^2.0.2"
+black = "^23.1.0"
+isort = "^5.12.0"
+pip-tools = "^6.12.3"
+pre-commit = "^3.1.1"
+tox = "^4.4.6"
+yapf = "^0.32.0"
+
+[tool.bandit]
+exclude_dirs = ["tests", "utility-repo-scripts"]
+
+[tool.black]
+line-length = 110
+
+[tool.isort]
+line_length = 110
+profile = "black"
+
+[tool.pydocstyle]
+inherit = false
+match = ".*.py"
+
+[tool.pytest.ini_options]
+addopts = "--ignore=./utility-repo-scripts/**"
+log_cli = false
+log_cli_level = "WARNING"
+log_cli_format = "%(asctime)s [%(levelname)8s] %(message)s (%(filename)s:%(lineno)s)"
+log_cli_date_format = "%Y-%m-%d %H:%M:%S"

@@ -1,0 +1,24 @@
+[run]
+branch = True
+include =
+    ./src/*
+omit =
+    ./.idea/*
+    ./.pytest_cache/*
+    ./.vscode/*
+    ./htmlcov/*
+    ./junit/*
+    ./tests/*
+    */__pycache__/*
+concurrency = thread,greenlet
+[report]
+precision = 2
+show_missing = True
+skip_empty = True
+sort = Name
+[html]
+directory = ./htmlcov
+skip_empty = True
+title = utility-repo-scripts Coverage Report
+[xml]
+output = ./junit/coverage.xml

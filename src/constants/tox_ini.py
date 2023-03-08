@@ -1,0 +1,26 @@
+"""tox.ini file constants."""
+# region tox.ini Constants
+from src.constants.shared import DEFAULT_LINE_LENGTH, REPO_NAME
+
+TOX_INI_FILENAME = "tox.ini"
+TOX_PYCODESTYLE_KEY = "pycodestyle"
+TOX_COUNT_KEY = "count"
+TOX_COUNT_VALUE = True
+TOX_EXCLUDE_KEY = "exclude"
+TOX_EXCLUDE_VALUE = f".svn,CVS,.bzr,.hg,.git,__pycache__,.tox,{REPO_NAME}"
+TOX_INDENT_SIZE_KEY = "indent-size"
+TOX_INDENT_SIZE_VALUE = 4
+TOX_MAX_DOC_LENGTH_KEY = "max-doc-length"
+TOX_MAX_LINE_LENGTH_KEY = "max-line-length"
+TOX_STATISTICS_KEY = "statistics"
+TOX_STATISTICS_VALUE = True
+
+SAMPLE_TOX_INI = f"""[{TOX_PYCODESTYLE_KEY}]
+{TOX_COUNT_KEY} = {TOX_COUNT_VALUE}
+{TOX_EXCLUDE_KEY} = {TOX_EXCLUDE_VALUE}
+{TOX_INDENT_SIZE_KEY} = {TOX_INDENT_SIZE_VALUE}
+{TOX_MAX_DOC_LENGTH_KEY} = {DEFAULT_LINE_LENGTH}
+{TOX_MAX_LINE_LENGTH_KEY} = {DEFAULT_LINE_LENGTH}
+{TOX_STATISTICS_KEY} = {TOX_STATISTICS_VALUE}
+"""
+# endregion
