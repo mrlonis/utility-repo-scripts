@@ -5,6 +5,7 @@ script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
 # Process CLI Arguments
 debug=0
 source "$script_dir"/scripts/process_cli_options.sh "$@"
+source "$script_dir"/scripts/functions.sh "$@" # Loads find_site_package function
 
 # Configure pyproject.toml
 [ ! -f "pyproject.toml" ] && pyproject_toml_exists=0 || pyproject_toml_exists=1
@@ -13,31 +14,9 @@ if [ "$debug" = 1 ]; then
 	echo "pyproject_toml_exists: $pyproject_toml_exists"
 fi
 
-find_site_package() {
-	package_name="$1"
-	pypi_name="$2"
-	package_location=$(python -c "import $package_name; print($package_name.__file__)")
-	if [ "$debug" = 1 ]; then
-		echo "$package_location"
-	fi
-
-	if [ "$package_location" = "" ]; then
-		if [ "$debug" = 1 ]; then
-			echo "$pypi_name not found"
-			echo "Installing $pypi_name temporarily for pre-commit setup"
-		fi
-		pip install "$pypi_name"
-		existed=0
-	else
-		if [ "$debug" = 1 ]; then
-			echo "$pypi_name found"
-		fi
-		existed=1
-	fi
-}
-
 # Install toml if it doesn't exist
 find_site_package tomlkit tomlkit
+existed=${existed:-0} # Load existed from find_site_package function if it exists
 tomlkit_installed="$existed"
 if [ "$debug" = 1 ]; then
 	echo "tomlkit_installed: $tomlkit_installed"
