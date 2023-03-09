@@ -368,14 +368,9 @@ def test_process_pre_commit_config_yapf_python_formatter():
 # Testing python_linter options
 def test_process_pre_commit_config_no_python_linter():
     """Test the process_pre_commit_config function with all python linters disabled."""
-    pylint_enabled = False
-    flake8_enabled = False
-
     result = process_pre_commit_config(
         pre_commit_config=cast(CommentedMap, {}),
         include_jumanji_house=True,
-        pylint_enabled=pylint_enabled,
-        flake8_enabled=flake8_enabled,
         test=True,
         debug=True,
     )
@@ -390,13 +385,9 @@ def test_process_pre_commit_config_no_python_linter():
 
 def test_process_pre_commit_config_flake8_python_linter():
     """Test the process_pre_commit_config function with the flake8_enabled option set to True."""
-    pylint_enabled = False
-    flake8_enabled = True
-
     result = process_pre_commit_config(
         pre_commit_config=cast(CommentedMap, {}),
-        pylint_enabled=pylint_enabled,
-        flake8_enabled=flake8_enabled,
+        flake8_enabled=True,
         test=True,
         debug=True,
     )
@@ -414,13 +405,9 @@ def test_process_pre_commit_config_flake8_python_linter():
 
 def test_process_pre_commit_config_pylint_python_linter():
     """Test the process_pre_commit_config function with the pylint_enabled option set to True."""
-    pylint_enabled = True
-    flake8_enabled = False
-
     result = process_pre_commit_config(
         pre_commit_config=cast(CommentedMap, {}),
-        pylint_enabled=pylint_enabled,
-        flake8_enabled=flake8_enabled,
+        pylint_enabled=True,
         test=True,
         debug=True,
     )
@@ -453,9 +440,6 @@ def test_process_pre_commit_config_pylint_python_linter():
 
 def test_process_pre_commit_config_pylint_python_linter_with_existing_pylint():
     """Test the process_pre_commit_config function with the pylint_enabled option set to True."""
-    pylint_enabled = True
-    flake8_enabled = False
-
     result = process_pre_commit_config(
         pre_commit_config=cast(
             CommentedMap,
@@ -478,8 +462,7 @@ def test_process_pre_commit_config_pylint_python_linter_with_existing_pylint():
                 ]
             },
         ),
-        pylint_enabled=pylint_enabled,
-        flake8_enabled=flake8_enabled,
+        pylint_enabled=True,
         test=True,
         debug=True,
     )
@@ -513,9 +496,6 @@ def test_process_pre_commit_config_pylint_python_linter_with_existing_pylint():
 
 def test_process_pre_commit_config_no_python_linter_with_existing_pylint():
     """Test the process_pre_commit_config function with the pylint_enabled option set to True."""
-    pylint_enabled = False
-    flake8_enabled = False
-
     result = process_pre_commit_config(
         pre_commit_config=cast(
             CommentedMap,
@@ -538,8 +518,6 @@ def test_process_pre_commit_config_no_python_linter_with_existing_pylint():
                 ]
             },
         ),
-        pylint_enabled=pylint_enabled,
-        flake8_enabled=flake8_enabled,
         test=True,
         debug=True,
     )
@@ -554,9 +532,6 @@ def test_process_pre_commit_config_no_python_linter_with_existing_pylint():
 
 def test_process_pre_commit_config_no_python_linter_with_existing_pylint_and_other_local():
     """Test the process_pre_commit_config function with the pylint_enabled option set to True."""
-    pylint_enabled = False
-    flake8_enabled = False
-
     result = process_pre_commit_config(
         pre_commit_config=cast(
             CommentedMap,
@@ -586,8 +561,6 @@ def test_process_pre_commit_config_no_python_linter_with_existing_pylint_and_oth
                 ]
             },
         ),
-        pylint_enabled=pylint_enabled,
-        flake8_enabled=flake8_enabled,
         test=True,
         debug=True,
     )
@@ -619,9 +592,6 @@ def test_process_pre_commit_config_no_python_linter_with_existing_pylint_and_oth
 
 def test_process_pre_commit_config_pylint_python_linter_with_existing_local():
     """Test the process_pre_commit_config function with the pylint_enabled option set to True."""
-    pylint_enabled = True
-    flake8_enabled = False
-
     result = process_pre_commit_config(
         pre_commit_config=cast(
             CommentedMap,
@@ -642,8 +612,7 @@ def test_process_pre_commit_config_pylint_python_linter_with_existing_local():
                 ]
             },
         ),
-        pylint_enabled=pylint_enabled,
-        flake8_enabled=flake8_enabled,
+        pylint_enabled=True,
         test=True,
         debug=True,
     )
@@ -685,15 +654,9 @@ def test_process_pre_commit_config_pylint_python_linter_with_existing_local():
 
 def test_process_pre_commit_config_pydocstyle_python_linter():
     """Test the process_pre_commit_config function with the pylint_enabled option set to True."""
-    pylint_enabled = False
-    flake8_enabled = False
-    pydocstyle_enabled = True
-
     result = process_pre_commit_config(
         pre_commit_config=cast(CommentedMap, {}),
-        pylint_enabled=pylint_enabled,
-        flake8_enabled=flake8_enabled,
-        pydocstyle_enabled=pydocstyle_enabled,
+        pydocstyle_enabled=True,
         test=True,
         debug=True,
     )
@@ -711,15 +674,12 @@ def test_process_pre_commit_config_pydocstyle_python_linter():
 
 def test_process_pre_commit_config_all_python_linter():
     """Test the process_pre_commit_config function when all linters are enabled."""
-    pylint_enabled = True
-    flake8_enabled = True
-    pydocstyle_enabled = True
-
     result = process_pre_commit_config(
         pre_commit_config=cast(CommentedMap, {}),
-        pylint_enabled=pylint_enabled,
-        flake8_enabled=flake8_enabled,
-        pydocstyle_enabled=pydocstyle_enabled,
+        pylint_enabled=True,
+        flake8_enabled=True,
+        pydocstyle_enabled=True,
+        bandit_enabled=True,
         test=True,
         debug=True,
     )
@@ -747,5 +707,6 @@ def test_process_pre_commit_config():
         pylint_enabled=True,
         flake8_enabled=True,
         pydocstyle_enabled=True,
+        bandit_enabled=True,
         test=True,
     )

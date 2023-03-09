@@ -233,8 +233,8 @@ def process_pre_commit_config(
     pylint_enabled: bool = False,
     flake8_enabled: bool = False,
     pydocstyle_enabled: bool = False,
-    pre_commit_pylint_entry_prefix: str = f"{REPO_NAME}/",
     bandit_enabled: bool = False,
+    pre_commit_pylint_entry_prefix: str = f"{REPO_NAME}/",
 ):
     """Do processing of the .pre-commit-config.yaml file."""
     # pylint: disable=too-many-arguments
