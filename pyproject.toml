@@ -24,7 +24,7 @@ mypy = "^1.1.1"
 pycodestyle = "^2.10.0"
 pydocstyle = "^6.3.0"
 pylama = { version = "^8.4.1", extras = [ "all" ] }
-pylint = "^2.16.4"
+pylint = "^2.17.0"
 pylint-junit = "^0.3.2"
 pytest = "^7.2.2"
 pytest-cov = "^4.0.0"
