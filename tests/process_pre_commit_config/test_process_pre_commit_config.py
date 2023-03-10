@@ -28,7 +28,7 @@ from src.constants.pre_commit_config import (
 )
 from src.constants.pylintrc import PYLINTRC_FILENAME
 from src.constants.shared import REPO_NAME
-from src.process_pre_commit_config import process_pre_commit_config
+from src.process_pre_commit_config import PreCommitConfigProcessor
 
 PYLINT_PROPER_ENTRY = f"{REPO_NAME}/ensure_venv.sh"
 PYLINT_IMPROPER_ENTRY = "ensure_venv.sh"
@@ -49,7 +49,9 @@ def _find_repo(pre_commit_config: Dict[str, Any], repo_url: str):
 # Testing pre-commit base hooks
 def test_process_pre_commit_config_include_base_hooks():
     """Test the process_pre_commit_config function with everything False."""
-    result = process_pre_commit_config(pre_commit_config=cast(CommentedMap, {}), test=True, debug=True)
+    result = PreCommitConfigProcessor(
+        pre_commit_config=cast(CommentedMap, {}), test=True, debug=True
+    ).process_pre_commit_config()
     assert result is not None
 
     repo = _find_repo(pre_commit_config=result, repo_url=PRE_COMMIT_REPO_URL)
@@ -73,7 +75,7 @@ def test_process_pre_commit_config_include_base_hooks():
 
 def test_process_pre_commit_config_include_base_hooks_retain_existing_fields():
     """Test the process_pre_commit_config function with everything False with existing data."""
-    result = process_pre_commit_config(
+    result = PreCommitConfigProcessor(
         pre_commit_config=cast(
             CommentedMap,
             {
@@ -92,7 +94,7 @@ def test_process_pre_commit_config_include_base_hooks_retain_existing_fields():
         ),
         test=True,
         debug=True,
-    )
+    ).process_pre_commit_config()
     assert result is not None
 
     repo = _find_repo(pre_commit_config=result, repo_url=PRE_COMMIT_REPO_URL)
@@ -122,12 +124,12 @@ def test_process_pre_commit_config_include_jumanji_house():
     """Test the process_pre_commit_config function with the include_jumanji_house option set to True."""
     include_jumanji_house = True
 
-    result = process_pre_commit_config(
+    result = PreCommitConfigProcessor(
         pre_commit_config=cast(CommentedMap, {}),
         include_jumanji_house=include_jumanji_house,
         test=True,
         debug=True,
-    )
+    ).process_pre_commit_config()
     assert result is not None
 
     repo = _find_repo(pre_commit_config=result, repo_url=JUMANJI_HOUSE_REPO_URL)
@@ -159,7 +161,7 @@ def test_process_pre_commit_config_include_jumanji_house_with_existing_data():
     """Test the process_pre_commit_config function with the include_jumanji_house option set to True."""
     include_jumanji_house = True
 
-    result = process_pre_commit_config(
+    result = PreCommitConfigProcessor(
         pre_commit_config=cast(
             CommentedMap,
             {
@@ -181,7 +183,7 @@ def test_process_pre_commit_config_include_jumanji_house_with_existing_data():
         include_jumanji_house=include_jumanji_house,
         test=True,
         debug=True,
-    )
+    ).process_pre_commit_config()
     assert result is not None
 
     repo = _find_repo(pre_commit_config=result, repo_url=JUMANJI_HOUSE_REPO_URL)
@@ -218,13 +220,13 @@ def test_process_pre_commit_config_dont_include_jumanji_house():
     """Test the process_pre_commit_config function with the include_jumanji_house option set to False."""
     include_jumanji_house = False
 
-    result = process_pre_commit_config(
+    result = PreCommitConfigProcessor(
         pre_commit_config=cast(CommentedMap, {}),
         include_jumanji_house=include_jumanji_house,
         include_prettier=True,
         test=True,
         debug=True,
-    )
+    ).process_pre_commit_config()
     assert result is not None
 
     repo = _find_repo(pre_commit_config=result, repo_url=JUMANJI_HOUSE_REPO_URL)
@@ -236,9 +238,9 @@ def test_process_pre_commit_config_include_prettier():
     """Test the process_pre_commit_config function with the include_prettier option set to True."""
     include_prettier = True
 
-    result = process_pre_commit_config(
+    result = PreCommitConfigProcessor(
         pre_commit_config=cast(CommentedMap, {}), include_prettier=include_prettier, test=True, debug=True
-    )
+    ).process_pre_commit_config()
     assert result is not None
 
     repo = _find_repo(pre_commit_config=result, repo_url=PRETTIER_REPO_URL)
@@ -249,13 +251,13 @@ def test_process_pre_commit_config_dont_include_prettier():
     """Test the process_pre_commit_config function with the include_prettier option set to False."""
     include_prettier = False
 
-    result = process_pre_commit_config(
+    result = PreCommitConfigProcessor(
         pre_commit_config=cast(CommentedMap, {}),
         include_jumanji_house=True,
         include_prettier=include_prettier,
         test=True,
         debug=True,
-    )
+    ).process_pre_commit_config()
     assert result is not None
 
     repo = _find_repo(pre_commit_config=result, repo_url=PRETTIER_REPO_URL)
@@ -267,9 +269,9 @@ def test_process_pre_commit_config_include_isort():
     """Test the process_pre_commit_config function with the include_isort option set to True."""
     include_isort = True
 
-    result = process_pre_commit_config(
+    result = PreCommitConfigProcessor(
         pre_commit_config=cast(CommentedMap, {}), include_isort=include_isort, test=True, debug=True
-    )
+    ).process_pre_commit_config()
     assert result is not None
 
     repo = _find_repo(pre_commit_config=result, repo_url=ISORT_REPO_URL)
@@ -280,13 +282,13 @@ def test_process_pre_commit_config_dont_include_isort():
     """Test the process_pre_commit_config function with the include_isort option set to False."""
     include_isort = False
 
-    result = process_pre_commit_config(
+    result = PreCommitConfigProcessor(
         pre_commit_config=cast(CommentedMap, {}),
         include_jumanji_house=True,
         include_isort=include_isort,
         test=True,
         debug=True,
-    )
+    ).process_pre_commit_config()
     assert result is not None
 
     repo = _find_repo(pre_commit_config=result, repo_url=ISORT_REPO_URL)
@@ -298,13 +300,13 @@ def test_process_pre_commit_config_no_python_formatter():
     """Test the process_pre_commit_config function with the python_formatter option set to an empty string."""
     python_formatter = ""
 
-    result = process_pre_commit_config(
+    result = PreCommitConfigProcessor(
         pre_commit_config=cast(CommentedMap, {}),
         include_jumanji_house=True,
         python_formatter=python_formatter,
         test=True,
         debug=True,
-    )
+    ).process_pre_commit_config()
     assert result is not None
 
     repo = _find_repo(pre_commit_config=result, repo_url=AUTOPEP8_REPO_URL)
@@ -321,9 +323,9 @@ def test_process_pre_commit_config_autopep8_python_formatter():
     """Test the process_pre_commit_config function with the python_formatter option set to autopep8."""
     python_formatter = "autopep8"
 
-    result = process_pre_commit_config(
+    result = PreCommitConfigProcessor(
         pre_commit_config=cast(CommentedMap, {}), python_formatter=python_formatter, test=True, debug=True
-    )
+    ).process_pre_commit_config()
     assert result is not None
 
     repo = _find_repo(pre_commit_config=result, repo_url=BLACK_REPO_URL)
@@ -337,9 +339,9 @@ def test_process_pre_commit_config_black_python_formatter():
     """Test the process_pre_commit_config function with the python_formatter option set to black."""
     python_formatter = "black"
 
-    result = process_pre_commit_config(
+    result = PreCommitConfigProcessor(
         pre_commit_config=cast(CommentedMap, {}), python_formatter=python_formatter, test=True, debug=True
-    )
+    ).process_pre_commit_config()
     assert result is not None
 
     repo = _find_repo(pre_commit_config=result, repo_url=AUTOPEP8_REPO_URL)
@@ -353,9 +355,9 @@ def test_process_pre_commit_config_yapf_python_formatter():
     """Test the process_pre_commit_config function with the python_formatter option set to yapf."""
     python_formatter = "yapf"
 
-    result = process_pre_commit_config(
+    result = PreCommitConfigProcessor(
         pre_commit_config=cast(CommentedMap, {}), python_formatter=python_formatter, test=True, debug=True
-    )
+    ).process_pre_commit_config()
     assert result is not None
 
     repo = _find_repo(pre_commit_config=result, repo_url=AUTOPEP8_REPO_URL)
@@ -368,12 +370,12 @@ def test_process_pre_commit_config_yapf_python_formatter():
 # Testing python_linter options
 def test_process_pre_commit_config_no_python_linter():
     """Test the process_pre_commit_config function with all python linters disabled."""
-    result = process_pre_commit_config(
+    result = PreCommitConfigProcessor(
         pre_commit_config=cast(CommentedMap, {}),
         include_jumanji_house=True,
         test=True,
         debug=True,
-    )
+    ).process_pre_commit_config()
     assert result is not None
 
     repo = _find_repo(pre_commit_config=result, repo_url=FLAKE8_REPO_URL)
@@ -385,12 +387,12 @@ def test_process_pre_commit_config_no_python_linter():
 
 def test_process_pre_commit_config_flake8_python_linter():
     """Test the process_pre_commit_config function with the flake8_enabled option set to True."""
-    result = process_pre_commit_config(
+    result = PreCommitConfigProcessor(
         pre_commit_config=cast(CommentedMap, {}),
         flake8_enabled=True,
         test=True,
         debug=True,
-    )
+    ).process_pre_commit_config()
     assert result is not None
 
     repo = _find_repo(pre_commit_config=result, repo_url=FLAKE8_REPO_URL)
@@ -405,12 +407,12 @@ def test_process_pre_commit_config_flake8_python_linter():
 
 def test_process_pre_commit_config_pylint_python_linter():
     """Test the process_pre_commit_config function with the pylint_enabled option set to True."""
-    result = process_pre_commit_config(
+    result = PreCommitConfigProcessor(
         pre_commit_config=cast(CommentedMap, {}),
         pylint_enabled=True,
         test=True,
         debug=True,
-    )
+    ).process_pre_commit_config()
     assert result is not None
 
     repo = _find_repo(pre_commit_config=result, repo_url=FLAKE8_REPO_URL)
@@ -440,7 +442,7 @@ def test_process_pre_commit_config_pylint_python_linter():
 
 def test_process_pre_commit_config_pylint_python_linter_with_existing_pylint():
     """Test the process_pre_commit_config function with the pylint_enabled option set to True."""
-    result = process_pre_commit_config(
+    result = PreCommitConfigProcessor(
         pre_commit_config=cast(
             CommentedMap,
             {
@@ -465,7 +467,7 @@ def test_process_pre_commit_config_pylint_python_linter_with_existing_pylint():
         pylint_enabled=True,
         test=True,
         debug=True,
-    )
+    ).process_pre_commit_config()
     assert result is not None
 
     repo = _find_repo(pre_commit_config=result, repo_url=FLAKE8_REPO_URL)
@@ -496,7 +498,7 @@ def test_process_pre_commit_config_pylint_python_linter_with_existing_pylint():
 
 def test_process_pre_commit_config_no_python_linter_with_existing_pylint():
     """Test the process_pre_commit_config function with the pylint_enabled option set to True."""
-    result = process_pre_commit_config(
+    result = PreCommitConfigProcessor(
         pre_commit_config=cast(
             CommentedMap,
             {
@@ -520,7 +522,7 @@ def test_process_pre_commit_config_no_python_linter_with_existing_pylint():
         ),
         test=True,
         debug=True,
-    )
+    ).process_pre_commit_config()
     assert result is not None
 
     repo = _find_repo(pre_commit_config=result, repo_url=FLAKE8_REPO_URL)
@@ -532,7 +534,7 @@ def test_process_pre_commit_config_no_python_linter_with_existing_pylint():
 
 def test_process_pre_commit_config_no_python_linter_with_existing_pylint_and_other_local():
     """Test the process_pre_commit_config function with the pylint_enabled option set to True."""
-    result = process_pre_commit_config(
+    result = PreCommitConfigProcessor(
         pre_commit_config=cast(
             CommentedMap,
             {
@@ -563,7 +565,7 @@ def test_process_pre_commit_config_no_python_linter_with_existing_pylint_and_oth
         ),
         test=True,
         debug=True,
-    )
+    ).process_pre_commit_config()
     assert result is not None
 
     repo = _find_repo(pre_commit_config=result, repo_url=FLAKE8_REPO_URL)
@@ -592,7 +594,7 @@ def test_process_pre_commit_config_no_python_linter_with_existing_pylint_and_oth
 
 def test_process_pre_commit_config_pylint_python_linter_with_existing_local():
     """Test the process_pre_commit_config function with the pylint_enabled option set to True."""
-    result = process_pre_commit_config(
+    result = PreCommitConfigProcessor(
         pre_commit_config=cast(
             CommentedMap,
             {
@@ -615,7 +617,7 @@ def test_process_pre_commit_config_pylint_python_linter_with_existing_local():
         pylint_enabled=True,
         test=True,
         debug=True,
-    )
+    ).process_pre_commit_config()
     assert result is not None
 
     repo = _find_repo(pre_commit_config=result, repo_url=FLAKE8_REPO_URL)
@@ -654,12 +656,12 @@ def test_process_pre_commit_config_pylint_python_linter_with_existing_local():
 
 def test_process_pre_commit_config_pydocstyle_python_linter():
     """Test the process_pre_commit_config function with the pylint_enabled option set to True."""
-    result = process_pre_commit_config(
+    result = PreCommitConfigProcessor(
         pre_commit_config=cast(CommentedMap, {}),
         pydocstyle_enabled=True,
         test=True,
         debug=True,
-    )
+    ).process_pre_commit_config()
     assert result is not None
 
     repo = _find_repo(pre_commit_config=result, repo_url=FLAKE8_REPO_URL)
@@ -674,7 +676,7 @@ def test_process_pre_commit_config_pydocstyle_python_linter():
 
 def test_process_pre_commit_config_all_python_linter():
     """Test the process_pre_commit_config function when all linters are enabled."""
-    result = process_pre_commit_config(
+    result = PreCommitConfigProcessor(
         pre_commit_config=cast(CommentedMap, {}),
         pylint_enabled=True,
         flake8_enabled=True,
@@ -682,7 +684,7 @@ def test_process_pre_commit_config_all_python_linter():
         bandit_enabled=True,
         test=True,
         debug=True,
-    )
+    ).process_pre_commit_config()
     assert result is not None
 
     repo = _find_repo(pre_commit_config=result, repo_url=FLAKE8_REPO_URL)
@@ -698,7 +700,7 @@ def test_process_pre_commit_config_all_python_linter():
 # Happy Path Test
 def test_process_pre_commit_config():
     """Test the process_pre_commit_config function with all options set."""
-    process_pre_commit_config(
+    PreCommitConfigProcessor(
         pre_commit_config=cast(CommentedMap, {}),
         include_jumanji_house=True,
         include_prettier=True,
@@ -709,4 +711,4 @@ def test_process_pre_commit_config():
         pydocstyle_enabled=True,
         bandit_enabled=True,
         test=True,
-    )
+    ).process_pre_commit_config()

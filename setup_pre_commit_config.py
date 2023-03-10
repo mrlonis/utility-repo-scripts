@@ -3,7 +3,7 @@ from argparse import ArgumentParser
 
 from src.constants.pre_commit_config import PRE_COMMIT_CONFIG_FILENAME, SAMPLE_PRE_COMMIT_CONFIG
 from src.constants.shared import REPO_NAME
-from src.process_pre_commit_config import process_pre_commit_config
+from src.process_pre_commit_config import PreCommitConfigProcessor
 from src.utils.core import str2bool
 from src.utils.ruamel.yaml import load_yaml_file
 
@@ -27,7 +27,7 @@ def main(
         debug=debug, exists=exists, filename=PRE_COMMIT_CONFIG_FILENAME, sample=SAMPLE_PRE_COMMIT_CONFIG
     )
 
-    process_pre_commit_config(
+    processor = PreCommitConfigProcessor(
         pre_commit_config=pre_commit_config,
         debug=debug,
         test=test,
@@ -41,6 +41,7 @@ def main(
         pre_commit_pylint_entry_prefix=pre_commit_pylint_entry_prefix,
         bandit_enabled=bandit_enabled,
     )
+    processor.process_pre_commit_config()
 
 
 if __name__ == "__main__":
