@@ -32,6 +32,31 @@ PYTHON_ANALYSIS_INDEXING_KEY = "python.analysis.indexing"
 PYTHON_ANALYSIS_INLAY_HINTS_FUNCTION_RETURN_TYPES_KEY = "python.analysis.inlayHints.functionReturnTypes"
 PYTHON_ANALYSIS_INLAY_HINTS_PYTEST_PARAMETERS_KEY = "python.analysis.inlayHints.pytestParameters"
 PYTHON_ANALYSIS_INLAY_HINTS_VARIABLE_TYPES_KEY = "python.analysis.inlayHints.variableTypes"
+
+PYTHON_ANALYSIS_PACKAGE_INDEX_DEPTHS_KEY = "python.analysis.packageIndexDepths"
+DEPTH_KEY = "depth"
+INCLUDE_ALL_SYMBOLS_KEY = "includeAllSymbols"
+NAME_KEY = "name"
+NAMES = []
+INDEX_NAMES = [
+    "alembic",
+    "boto3",
+    "django",
+    "environ",
+    "httpx",
+    "matplotlib",
+    "moto",
+    "fastapi",
+    "pydantic",
+    "requests",
+    "rest_framework",
+    "scipy",
+    "sklearn",
+    "sqlalchemy",
+    "sqlmodel",
+]
+DEFAULT_DEPTH = 2
+
 PYTHON_ANALYSIS_TYPE_CHECKING_MODE_KEY = "python.analysis.typeCheckingMode"
 PYTHON_ANALYSIS_USE_LIBRARY_CODE_FOR_TYPES_KEY = "python.analysis.useLibraryCodeForTypes"
 

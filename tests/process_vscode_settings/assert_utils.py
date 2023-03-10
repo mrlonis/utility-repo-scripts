@@ -1,4 +1,5 @@
 """This module contains utility functions for asserting vscode settings."""
+from copy import deepcopy
 from typing import Any, Dict, List, Optional, cast
 
 from src.constants.shared import REPO_NAME
@@ -6,13 +7,18 @@ from src.constants.vscode_settings import (
     AUTOPEP8_ARGS_KEY,
     BLACK_FORMATTER_ARGS_KEY,
     BLACK_FORMATTER_ARGS_VALUE,
+    DEFAULT_DEPTH,
+    DEPTH_KEY,
     EDITOR_CODE_ACTIONS_ON_SAVE_KEY,
     EDITOR_DEFAULT_FORMATTER_KEY,
     EDITOR_FORMAT_ON_SAVE_KEY,
     FLAKE8_ARGS_KEY,
     FLAKE8_ARGS_RCFILE_VALUE,
+    INCLUDE_ALL_SYMBOLS_KEY,
+    INDEX_NAMES,
     ISORT_ARGS_KEY,
     ISORT_ARGS_VALUE,
+    NAME_KEY,
     PYLINT_ARGS_KEY,
     PYLINT_ARGS_RCFILE_VALUE,
     PYTHON_ANALYSIS_AUTO_IMPORT_COMPLETIONS_KEY,
@@ -25,6 +31,7 @@ from src.constants.vscode_settings import (
     PYTHON_ANALYSIS_INLAY_HINTS_FUNCTION_RETURN_TYPES_KEY,
     PYTHON_ANALYSIS_INLAY_HINTS_PYTEST_PARAMETERS_KEY,
     PYTHON_ANALYSIS_INLAY_HINTS_VARIABLE_TYPES_KEY,
+    PYTHON_ANALYSIS_PACKAGE_INDEX_DEPTHS_KEY,
     PYTHON_ANALYSIS_TYPE_CHECKING_MODE_KEY,
     PYTHON_ANALYSIS_USE_LIBRARY_CODE_FOR_TYPES_KEY,
     PYTHON_DEFAULT_INTERPRETER_KEY,
@@ -64,6 +71,33 @@ def assert_python_default_interpreter_settings(data: Dict[str, Any]):
     assert data.get(PYTHON_DEFAULT_INTERPRETER_KEY) == f"~/.venvs/{REPO_NAME}"
 
 
+def assert_python_analysis_package_index_depths_settings(data: Dict[str, Any]):
+    """Assert that the python analysis package index depths settings are set correctly."""
+    package_index_depths = cast(
+        Optional[List[Dict[str, Any]]], data.get(PYTHON_ANALYSIS_PACKAGE_INDEX_DEPTHS_KEY)
+    )
+    assert package_index_depths is not None
+
+    index_names_copy = deepcopy(INDEX_NAMES)
+
+    for item in package_index_depths:
+        name = cast(Optional[str], item.get(NAME_KEY))
+        if name is not None and name in index_names_copy:
+            # Depth
+            depth = cast(Optional[int], item.get(DEPTH_KEY))
+            assert depth is not None
+            assert depth >= DEFAULT_DEPTH
+
+            # includeAllSymbols
+            include_all_symbols = cast(Optional[bool], item.get(INCLUDE_ALL_SYMBOLS_KEY))
+            assert include_all_symbols is not None
+            assert include_all_symbols is True
+
+            index_names_copy.remove(name)
+
+    assert len(index_names_copy) == 0
+
+
 def assert_python_analysis_settings(data: Dict[str, Any]):
     """Assert that the python analysis settings are set correctly."""
     auto_import_completions = cast(Optional[bool], data.get(PYTHON_ANALYSIS_AUTO_IMPORT_COMPLETIONS_KEY))
@@ -98,6 +132,9 @@ def assert_python_analysis_settings(data: Dict[str, Any]):
 
     variable_types = cast(Optional[bool], data.get(PYTHON_ANALYSIS_INLAY_HINTS_VARIABLE_TYPES_KEY))
     assert variable_types is not None
+
+    # python.analysis.packageIndexDepths
+    assert_python_analysis_package_index_depths_settings(data=data)
 
     type_checking_mode = cast(Optional[str], data.get(PYTHON_ANALYSIS_TYPE_CHECKING_MODE_KEY))
     assert type_checking_mode is not None

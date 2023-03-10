@@ -1,6 +1,7 @@
 """Do processing of the .vscode/settings.json file."""
 import json
 import os
+from copy import deepcopy
 from typing import Any, Dict, List, Optional, cast
 
 from src.constants.pyproject_toml import PYPROJECT_TOML_FILENAME
@@ -9,13 +10,18 @@ from src.constants.vscode_settings import (
     AUTOPEP8_ARGS_KEY,
     BLACK_FORMATTER_ARGS_KEY,
     BLACK_FORMATTER_ARGS_VALUE,
+    DEFAULT_DEPTH,
+    DEPTH_KEY,
     EDITOR_CODE_ACTIONS_ON_SAVE_KEY,
     EDITOR_DEFAULT_FORMATTER_KEY,
     EDITOR_FORMAT_ON_SAVE_KEY,
     FLAKE8_ARGS_KEY,
     FLAKE8_ARGS_RCFILE_VALUE,
+    INCLUDE_ALL_SYMBOLS_KEY,
+    INDEX_NAMES,
     ISORT_ARGS_KEY,
     ISORT_ARGS_VALUE,
+    NAME_KEY,
     PYLINT_ARGS_KEY,
     PYLINT_ARGS_RCFILE_VALUE,
     PYTHON_ANALYSIS_AUTO_IMPORT_COMPLETIONS_KEY,
@@ -28,6 +34,7 @@ from src.constants.vscode_settings import (
     PYTHON_ANALYSIS_INLAY_HINTS_FUNCTION_RETURN_TYPES_KEY,
     PYTHON_ANALYSIS_INLAY_HINTS_PYTEST_PARAMETERS_KEY,
     PYTHON_ANALYSIS_INLAY_HINTS_VARIABLE_TYPES_KEY,
+    PYTHON_ANALYSIS_PACKAGE_INDEX_DEPTHS_KEY,
     PYTHON_ANALYSIS_TYPE_CHECKING_MODE_KEY,
     PYTHON_ANALYSIS_USE_LIBRARY_CODE_FOR_TYPES_KEY,
     PYTHON_DEFAULT_INTERPRETER_KEY,
@@ -302,6 +309,42 @@ def _process_isort_options(data: Dict[str, Any], include_isort: bool):
         data.pop(ISORT_ARGS_KEY, None)
 
 
+def _process_python_analysis_package_index_depths(data: Dict[str, Any]):
+    existing_package_index_depths = cast(
+        Optional[List[Dict[str, Any]]], data.get(PYTHON_ANALYSIS_PACKAGE_INDEX_DEPTHS_KEY, None)
+    )
+
+    if existing_package_index_depths is None:
+        existing_package_index_depths = cast(List[Dict[str, Any]], [])
+
+    index_names_copy = deepcopy(INDEX_NAMES)
+
+    for item in existing_package_index_depths:
+        name = cast(Optional[str], item.get(NAME_KEY))
+        if name is not None and name in index_names_copy:
+            # Depth
+            existing_depth = cast(Optional[int], item.get(DEPTH_KEY))
+            if existing_depth is None or existing_depth < DEFAULT_DEPTH:
+                existing_depth = DEFAULT_DEPTH
+            item[DEPTH_KEY] = existing_depth
+
+            # includeAllSymbols
+            item[INCLUDE_ALL_SYMBOLS_KEY] = True
+
+            index_names_copy.remove(name)
+
+    for name in index_names_copy:
+        existing_package_index_depths.append(
+            {
+                NAME_KEY: name,
+                DEPTH_KEY: DEFAULT_DEPTH,
+                INCLUDE_ALL_SYMBOLS_KEY: True,
+            }
+        )
+
+    data[PYTHON_ANALYSIS_PACKAGE_INDEX_DEPTHS_KEY] = existing_package_index_depths
+
+
 def process_vscode_settings(
     vscode_settings: Dict[str, Any],
     debug: bool = False,
@@ -376,6 +419,9 @@ def process_vscode_settings(
 
     # include_isort
     _process_isort_options(data=vscode_settings, include_isort=include_isort)
+
+    # python.analysis.packageIndexDepths
+    _process_python_analysis_package_index_depths(data=vscode_settings)
 
     # Create .vscode/settings.json file
     if not test:  # pragma: no cover
