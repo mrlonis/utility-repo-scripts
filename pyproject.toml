@@ -17,7 +17,7 @@ ruamel-yaml = "^0.17.21"
 tomlkit = "^0.11.6"
 
 [tool.poetry.group.test.dependencies]
-bandit = { version = "^1.7.4", extras = [ "toml" ] }
+bandit = { version = "^1.7.5", extras = [ "toml" ] }
 flake8 = "^6.0.0"
 greenlet = "^2.0.2"
 mypy = "^1.1.1"
