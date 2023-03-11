@@ -7,7 +7,7 @@ from configupdater import ConfigUpdater
 
 def load_ini_file(debug: bool, exists: bool, filename: str, sample: str):
     """Load an ini file or create it from a sample."""
-    data = ConfigUpdater()
+    data = ConfigUpdater(allow_no_value=True, space_around_delimiters=False)
 
     if exists:
         if debug:

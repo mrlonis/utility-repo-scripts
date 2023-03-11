@@ -1,5 +1,7 @@
 """Do processing of the pylintrc file."""
-from configupdater import ConfigUpdater
+from typing import List
+
+from configupdater import AssignMultilineValueError, ConfigUpdater, Option, Section
 
 from src.constants.pylintrc import (
     PYLINTRC_FILENAME,
@@ -9,6 +11,8 @@ from src.constants.pylintrc import (
     PYLINTRC_MASTER_SECTION_KEY,
 )
 from src.constants.shared import DEFAULT_LINE_LENGTH, REPO_NAME
+
+INDENT = " " * 7
 
 
 def process_pylintrc(
@@ -25,33 +29,35 @@ def process_pylintrc(
     # Master Settings
     master_section = pylintrc.get_section(PYLINTRC_MASTER_SECTION_KEY, None)
     if master_section is None:
-        pylintrc.add_section(PYLINTRC_MASTER_SECTION_KEY)
-        master_section = pylintrc.get_section(PYLINTRC_MASTER_SECTION_KEY)
-        if master_section is None:
-            raise RuntimeError(f"Unable to add MASTER section to the {PYLINTRC_FILENAME} file")
+        master_section = Section(name=PYLINTRC_MASTER_SECTION_KEY)
+        pylintrc.add_section(master_section)
 
     ignore_settings = master_section.get(PYLINTRC_MASTER_IGNORE_KEY, None)
     if ignore_settings is None:
-        pylintrc.set(PYLINTRC_MASTER_SECTION_KEY, PYLINTRC_MASTER_IGNORE_KEY, "")
-        ignore_settings = master_section.get(PYLINTRC_MASTER_IGNORE_KEY, None)
-        if ignore_settings is None:
-            raise RuntimeError(
-                f"Unable to add ignore settings to the {PYLINTRC_MASTER_SECTION_KEY} "
-                + f"section of the {PYLINTRC_FILENAME} file"
-            )
+        ignore_settings = Option(key=PYLINTRC_MASTER_IGNORE_KEY, value="")
+        master_section.add_option(ignore_settings)
     if not ignore_settings.value:
         ignore_settings.value = ""
-
     if REPO_NAME not in ignore_settings.value:
-        ignore_settings.value = f"{ignore_settings.value}{',' if ignore_settings.value else ''}{REPO_NAME}"
+        try:
+            ignore_settings.value = (
+                f"{ignore_settings.value}{',' if ignore_settings.value != '' else ''}{REPO_NAME}"
+            )
+        except AssignMultilineValueError:
+            existing_values = ignore_settings.as_list()
+            new_values: List[str] = []
+            for value in existing_values:
+                if not value.endswith(","):
+                    value = f"{value},"
+                new_values.append(value)
+            new_values.append(REPO_NAME)
+            ignore_settings.set_values(values=new_values, separator="\n", indent=INDENT)
 
     # Format Settings
     format_section = pylintrc.get_section(PYLINTRC_FORMAT_SECTION_KEY, None)
     if format_section is None:
-        pylintrc.add_section(PYLINTRC_FORMAT_SECTION_KEY)
-        format_section = pylintrc.get_section(PYLINTRC_FORMAT_SECTION_KEY)
-        if format_section is None:
-            raise RuntimeError(f"Unable to add FORMAT section to the {PYLINTRC_FILENAME} file")
+        format_section = Section(name=PYLINTRC_FORMAT_SECTION_KEY)
+        pylintrc.add_section(format_section)
     format_section.set(PYLINTRC_FORMAT_MAX_LINE_LENGTH_KEY, str(line_length))
 
     # Create File
