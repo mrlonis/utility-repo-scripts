@@ -76,7 +76,7 @@ def _process_bandit(tools: Table, bandit_enabled: bool):
             existing_exclude_dirs = array()
 
         if REPO_NAME not in existing_exclude_dirs:
-            existing_exclude_dirs.insert(0, REPO_NAME)
+            existing_exclude_dirs.append(REPO_NAME)
 
         bandit_tool["exclude_dirs"] = existing_exclude_dirs
 
