@@ -3,7 +3,7 @@ from argparse import ArgumentParser
 
 from src.constants.pyproject_toml import PYPROJECT_TOML_FILENAME, SAMPLE_PYPROJECT_TOML
 from src.constants.shared import DEFAULT_LINE_LENGTH
-from src.process_pyproject_toml import process_pyproject_toml
+from src.process_pyproject_toml import PyProjectTomlProcessor
 from src.utils.core import str2bool
 from src.utils.tomlkit import load_toml_file
 
@@ -24,7 +24,7 @@ def main(
     pyproject_toml = load_toml_file(
         debug=debug, exists=exists, filename=PYPROJECT_TOML_FILENAME, sample=SAMPLE_PYPROJECT_TOML
     )
-    process_pyproject_toml(
+    PyProjectTomlProcessor(
         pyproject_toml=pyproject_toml,
         debug=debug,
         test=test,
@@ -35,7 +35,7 @@ def main(
         line_length=line_length,
         isort_profile=isort_profile,
         bandit_enabled=bandit_enabled,
-    )
+    ).process_pyproject_toml()
 
 
 if __name__ == "__main__":

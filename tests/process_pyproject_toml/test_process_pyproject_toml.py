@@ -17,7 +17,7 @@ from src.constants.pyproject_toml import (
     PYPROJECT_TOOL_KEY,
 )
 from src.constants.shared import DEFAULT_LINE_LENGTH, REPO_NAME
-from src.process_pyproject_toml import process_pyproject_toml
+from src.process_pyproject_toml import PyProjectTomlProcessor
 
 TEST_PYPROJECT_PYTEST_INI_OPTIONS_ADDOPTS_VALUE = f"-m fake_mark --ignore=./{REPO_NAME}"
 
@@ -25,7 +25,7 @@ TEST_PYPROJECT_PYTEST_INI_OPTIONS_ADDOPTS_VALUE = f"-m fake_mark --ignore=./{REP
 # No Options
 def test_process_pyproject_toml_no_options():
     """Test the process_pyproject_toml function with no options set."""
-    result = process_pyproject_toml(pyproject_toml=document(), debug=True, test=True)
+    result = PyProjectTomlProcessor(pyproject_toml=document(), debug=True, test=True).process_pyproject_toml()
     assert result is not None
     assert not result
 
@@ -34,9 +34,9 @@ def test_process_pyproject_toml_no_options():
 def test_process_pyproject_toml_no_python_formatter():
     """Test the process_pyproject_toml function with no python formatter."""
     python_formatter = ""
-    result = process_pyproject_toml(
+    result = PyProjectTomlProcessor(
         pyproject_toml=document(), python_formatter=python_formatter, debug=True, test=True
-    )
+    ).process_pyproject_toml()
     assert result is not None
     assert not result
 
@@ -44,9 +44,9 @@ def test_process_pyproject_toml_no_python_formatter():
 def test_process_pyproject_toml_autopep8_python_formatter():
     """Test the process_pyproject_toml function with autopep8 python formatter."""
     python_formatter = "autopep8"
-    result = process_pyproject_toml(
+    result = PyProjectTomlProcessor(
         pyproject_toml=document(), python_formatter=python_formatter, debug=True, test=True
-    )
+    ).process_pyproject_toml()
     assert result is not None
 
     tool = cast(Dict[str, Any], result.get(PYPROJECT_TOOL_KEY))
@@ -63,7 +63,7 @@ def test_process_pyproject_toml_autopep8_python_formatter():
 def test_process_pyproject_toml_autopep8_python_formatter_existing_values():
     """Test the process_pyproject_toml function with autopep8 python formatter."""
     python_formatter = "autopep8"
-    result = process_pyproject_toml(
+    result = PyProjectTomlProcessor(
         pyproject_toml=parse(
             f"""
 [{PYPROJECT_TOOL_KEY}.{PYPROJECT_AUTOPEP8_KEY}]
@@ -75,7 +75,7 @@ test = "test"
         python_formatter=python_formatter,
         debug=True,
         test=True,
-    )
+    ).process_pyproject_toml()
     assert result is not None
 
     tool = cast(Dict[str, Any], result.get(PYPROJECT_TOOL_KEY))
@@ -93,9 +93,9 @@ test = "test"
 def test_process_pyproject_toml_black_python_formatter():
     """Test the process_pyproject_toml function with black python formatter."""
     python_formatter = "black"
-    result = process_pyproject_toml(
+    result = PyProjectTomlProcessor(
         pyproject_toml=document(), python_formatter=python_formatter, debug=True, test=True
-    )
+    ).process_pyproject_toml()
     assert result is not None
 
     tool = cast(Dict[str, Any], result.get(PYPROJECT_TOOL_KEY))
@@ -111,7 +111,7 @@ def test_process_pyproject_toml_black_python_formatter():
 def test_process_pyproject_toml_black_python_formatter_existing_values():
     """Test the process_pyproject_toml function with black python formatter."""
     python_formatter = "black"
-    result = process_pyproject_toml(
+    result = PyProjectTomlProcessor(
         pyproject_toml=parse(
             f"""
 [{PYPROJECT_TOOL_KEY}.{PYPROJECT_BLACK_KEY}]
@@ -122,7 +122,7 @@ test = "test"
         python_formatter=python_formatter,
         debug=True,
         test=True,
-    )
+    ).process_pyproject_toml()
     assert result is not None
 
     tool = cast(Dict[str, Any], result.get(PYPROJECT_TOOL_KEY))
@@ -140,9 +140,9 @@ test = "test"
 def test_process_pyproject_toml_pydocstyle():
     """Test the process_pyproject_toml function with pydocstyle."""
     pydocstyle_enabled = True
-    result = process_pyproject_toml(
+    result = PyProjectTomlProcessor(
         pyproject_toml=document(), pydocstyle_enabled=pydocstyle_enabled, debug=True, test=True
-    )
+    ).process_pyproject_toml()
     assert result is not None
 
     tool = cast(Dict[str, Any], result.get(PYPROJECT_TOOL_KEY))
@@ -159,7 +159,7 @@ def test_process_pyproject_toml_pydocstyle():
 def test_process_pyproject_toml_pydocstyle_existing_values():
     """Test the process_pyproject_toml function with pydocstyle."""
     pydocstyle_enabled = True
-    result = process_pyproject_toml(
+    result = PyProjectTomlProcessor(
         pyproject_toml=parse(
             f"""
 [{PYPROJECT_TOOL_KEY}.{PYPROJECT_PYDOCSTYLE_KEY}]
@@ -171,7 +171,7 @@ test = "test"
         pydocstyle_enabled=pydocstyle_enabled,
         debug=True,
         test=True,
-    )
+    ).process_pyproject_toml()
     assert result is not None
 
     tool = cast(Dict[str, Any], result.get(PYPROJECT_TOOL_KEY))
@@ -190,9 +190,9 @@ test = "test"
 def test_process_pyproject_toml_bandit():
     """Test the process_pyproject_toml function with bandit."""
     bandit_enabled = True
-    result = process_pyproject_toml(
+    result = PyProjectTomlProcessor(
         pyproject_toml=document(), bandit_enabled=bandit_enabled, debug=True, test=True
-    )
+    ).process_pyproject_toml()
     assert result is not None
 
     tool = cast(Dict[str, Any], result.get(PYPROJECT_TOOL_KEY))
@@ -211,7 +211,7 @@ def test_process_pyproject_toml_bandit():
 def test_process_pyproject_toml_bandit_existing_values():
     """Test the process_pyproject_toml function with bandit."""
     bandit_enabled = True
-    result = process_pyproject_toml(
+    result = PyProjectTomlProcessor(
         pyproject_toml=parse(
             f"""
 [{PYPROJECT_TOOL_KEY}.{PYPROJECT_BANDIT_KEY}]
@@ -222,7 +222,7 @@ test = "test"
         bandit_enabled=bandit_enabled,
         debug=True,
         test=True,
-    )
+    ).process_pyproject_toml()
     assert result is not None
 
     tool = cast(Dict[str, Any], result.get(PYPROJECT_TOOL_KEY))
@@ -242,7 +242,7 @@ test = "test"
 def test_process_pyproject_toml_bandit_existing_values_has_repo_name():
     """Test the process_pyproject_toml function with bandit."""
     bandit_enabled = True
-    result = process_pyproject_toml(
+    result = PyProjectTomlProcessor(
         pyproject_toml=parse(
             f"""
 [{PYPROJECT_TOOL_KEY}.{PYPROJECT_BANDIT_KEY}]
@@ -253,7 +253,7 @@ test = "test"
         bandit_enabled=bandit_enabled,
         debug=True,
         test=True,
-    )
+    ).process_pyproject_toml()
     assert result is not None
 
     tool = cast(Dict[str, Any], result.get(PYPROJECT_TOOL_KEY))
@@ -274,9 +274,9 @@ test = "test"
 def test_process_pyproject_toml_no_isort():
     """Test the process_pyproject_toml function with no isort."""
     include_isort = False
-    result = process_pyproject_toml(
+    result = PyProjectTomlProcessor(
         pyproject_toml=document(), include_isort=include_isort, debug=True, test=True
-    )
+    ).process_pyproject_toml()
     assert result is not None
     assert not result
 
@@ -284,9 +284,9 @@ def test_process_pyproject_toml_no_isort():
 def test_process_pyproject_toml_isort():
     """Test the process_pyproject_toml function with isort."""
     include_isort = True
-    result = process_pyproject_toml(
+    result = PyProjectTomlProcessor(
         pyproject_toml=document(), include_isort=include_isort, debug=True, test=True
-    )
+    ).process_pyproject_toml()
     assert result is not None
 
     tool = cast(Dict[str, Any], result.get(PYPROJECT_TOOL_KEY))
@@ -303,13 +303,13 @@ def test_process_pyproject_toml_isort_with_profile():
     """Test the process_pyproject_toml function with isort."""
     include_isort = True
     isort_profile = "django"
-    result = process_pyproject_toml(
+    result = PyProjectTomlProcessor(
         pyproject_toml=document(),
         include_isort=include_isort,
         isort_profile=isort_profile,
         debug=True,
         test=True,
-    )
+    ).process_pyproject_toml()
     assert result is not None
 
     tool = cast(Dict[str, Any], result.get(PYPROJECT_TOOL_KEY))
@@ -328,14 +328,14 @@ def test_process_pyproject_toml_isort_with_profile_with_black_python_formatter()
     include_isort = True
     isort_profile = "django"
     python_formatter = "black"
-    result = process_pyproject_toml(
+    result = PyProjectTomlProcessor(
         pyproject_toml=document(),
         include_isort=include_isort,
         isort_profile=isort_profile,
         python_formatter=python_formatter,
         debug=True,
         test=True,
-    )
+    ).process_pyproject_toml()
     assert result is not None
 
     tool = cast(Dict[str, Any], result.get(PYPROJECT_TOOL_KEY))
@@ -352,7 +352,7 @@ def test_process_pyproject_toml_isort_with_profile_with_black_python_formatter()
 def test_process_pyproject_toml_isort_existing_values():
     """Test the process_pyproject_toml function with isort."""
     include_isort = True
-    result = process_pyproject_toml(
+    result = PyProjectTomlProcessor(
         pyproject_toml=parse(
             f"""
 [{PYPROJECT_TOOL_KEY}.{PYPROJECT_ISORT_KEY}]
@@ -363,7 +363,7 @@ test = "test"
         include_isort=include_isort,
         debug=True,
         test=True,
-    )
+    ).process_pyproject_toml()
     assert result is not None
 
     tool = cast(Dict[str, Any], result.get(PYPROJECT_TOOL_KEY))
@@ -380,7 +380,7 @@ test = "test"
 def test_process_pyproject_toml_isort_existing_values_no_isort_profile_but_existing_profile():
     """Test the process_pyproject_toml function with isort."""
     include_isort = True
-    result = process_pyproject_toml(
+    result = PyProjectTomlProcessor(
         pyproject_toml=parse(
             f"""
 [{PYPROJECT_TOOL_KEY}.{PYPROJECT_ISORT_KEY}]
@@ -392,7 +392,7 @@ test = "test"
         include_isort=include_isort,
         debug=True,
         test=True,
-    )
+    ).process_pyproject_toml()
     assert result is not None
 
     tool = cast(Dict[str, Any], result.get(PYPROJECT_TOOL_KEY))
@@ -410,9 +410,9 @@ test = "test"
 def test_process_pyproject_toml_pytest():
     """Test the process_pyproject_toml function with pytest."""
     pytest_enabled = True
-    result = process_pyproject_toml(
+    result = PyProjectTomlProcessor(
         pyproject_toml=document(), pytest_enabled=pytest_enabled, debug=True, test=True
-    )
+    ).process_pyproject_toml()
     assert result is not None
 
     tool = cast(Dict[str, Any], result.get(PYPROJECT_TOOL_KEY))
@@ -436,7 +436,7 @@ def test_process_pyproject_toml_pytest():
 def test_process_pyproject_toml_pytest_existing_values():
     """Test the process_pyproject_toml function with pytest."""
     pytest_enabled = True
-    result = process_pyproject_toml(
+    result = PyProjectTomlProcessor(
         pyproject_toml=parse(
             f"""
 [{PYPROJECT_TOOL_KEY}.{PYPROJECT_PYTEST_KEY}.{PYPROJECT_PYTEST_INI_OPTIONS_KEY}]
@@ -451,7 +451,7 @@ test = "test"
         pytest_enabled=pytest_enabled,
         debug=True,
         test=True,
-    )
+    ).process_pyproject_toml()
     assert result is not None
 
     tool = cast(Dict[str, Any], result.get(PYPROJECT_TOOL_KEY))
@@ -476,7 +476,7 @@ test = "test"
 def test_process_pyproject_toml_pytest_existing_value_addopts_has_ignore():
     """Test the process_pyproject_toml function with pytest."""
     pytest_enabled = True
-    result = process_pyproject_toml(
+    result = PyProjectTomlProcessor(
         pyproject_toml=parse(
             f"""
 [{PYPROJECT_TOOL_KEY}.{PYPROJECT_PYTEST_KEY}.{PYPROJECT_PYTEST_INI_OPTIONS_KEY}]
@@ -491,7 +491,7 @@ test = "test"
         pytest_enabled=pytest_enabled,
         debug=True,
         test=True,
-    )
+    ).process_pyproject_toml()
     assert result is not None
 
     tool = cast(Dict[str, Any], result.get(PYPROJECT_TOOL_KEY))
@@ -516,7 +516,7 @@ test = "test"
 # Happy Path Test
 def test_process_pyproject_toml():
     """Test the process_pyproject_toml function with all options set."""
-    result = process_pyproject_toml(
+    result = PyProjectTomlProcessor(
         pyproject_toml=document(),
         include_isort=True,
         python_formatter="black",
@@ -524,7 +524,7 @@ def test_process_pyproject_toml():
         pytest_enabled=True,
         line_length=DEFAULT_LINE_LENGTH,
         test=True,
-    )
+    ).process_pyproject_toml()
     assert result is not None
 
     tools = cast(Dict[str, Any], result.get(PYPROJECT_TOOL_KEY))
