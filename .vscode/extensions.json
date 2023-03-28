@@ -4,7 +4,6 @@
     "boto3typed.boto3-ide",
     "bungcip.better-toml",
     "ms-python.black-formatter",
-    "streetsidesoftware.code-spell-checker",
     "editorconfig.editorconfig",
     "ms-python.flake8",
     "visualstudioexptteam.vscodeintellicode",
@@ -16,6 +15,7 @@
     "ms-python.vscode-pylance",
     "ms-python.pylint",
     "ms-python.python",
-    "timonwong.shellcheck"
+    "timonwong.shellcheck",
+    "streetsidesoftware.code-spell-checker"
   ]
 }
