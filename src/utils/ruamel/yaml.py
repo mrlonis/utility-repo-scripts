@@ -31,7 +31,7 @@ def load_yaml_file(debug: bool, exists: bool, filename: str, sample: str):
 
 def find_repo_index(pre_commit_config: Dict[str, Any], repo_url: str) -> int:
     """Find the hook index of a given `repo_url` in the .pre-commit-config.yaml file."""
-    for index, repo in enumerate(pre_commit_config.get("repos", cast(List[Dict[str, Any]], []))):
+    for index, repo in enumerate(cast(List[Dict[str, Any]], pre_commit_config.get("repos", []))):
         if repo.get("repo") == repo_url:
             return index
     raise ValueError(f"Could not find repo: {repo_url}")
@@ -39,7 +39,7 @@ def find_repo_index(pre_commit_config: Dict[str, Any], repo_url: str) -> int:
 
 def find_hook_id_index(pre_commit_repo: Dict[str, Any], hook_id: str):
     """Find the hook index of a given `hook_id` in the .pre-commit-config.yaml file."""
-    for index, hook in enumerate(pre_commit_repo.get("hooks", cast(List[Dict[str, Any]], []))):
+    for index, hook in enumerate(cast(List[Dict[str, Any]], pre_commit_repo.get("hooks", []))):
         if hook.get("id") == hook_id:
             return index
     raise ValueError(f"Could not find hook with id {hook_id} in repo: {pre_commit_repo.get('repo')}")
