@@ -22,7 +22,6 @@ from src.constants.vscode_settings import (
     PYLINT_ARGS_KEY,
     PYLINT_ARGS_RCFILE_VALUE,
     PYTHON_ANALYSIS_AUTO_IMPORT_COMPLETIONS_KEY,
-    PYTHON_ANALYSIS_AUTO_IMPORT_USER_SYMBOLS_KEY,
     PYTHON_ANALYSIS_AUTO_SEARCH_PATHS_KEY,
     PYTHON_ANALYSIS_DIAGNOSTIC_MODE_KEY,
     PYTHON_ANALYSIS_EXCLUDE_KEY,
@@ -102,9 +101,6 @@ def assert_python_analysis_settings(data: Dict[str, Any]):
     """Assert that the python analysis settings are set correctly."""
     auto_import_completions = cast(Optional[bool], data.get(PYTHON_ANALYSIS_AUTO_IMPORT_COMPLETIONS_KEY))
     assert auto_import_completions is not None
-
-    auto_import_user_symbols = cast(Optional[bool], data.get(PYTHON_ANALYSIS_AUTO_IMPORT_USER_SYMBOLS_KEY))
-    assert auto_import_user_symbols is not None
 
     auto_search_paths = cast(Optional[bool], data.get(PYTHON_ANALYSIS_AUTO_SEARCH_PATHS_KEY))
     assert auto_search_paths is not None

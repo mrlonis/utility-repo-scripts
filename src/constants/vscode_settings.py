@@ -23,7 +23,6 @@ PYLINT_ARGS_KEY = "pylint.args"
 PYLINT_ARGS_RCFILE_VALUE = f"--rcfile={PYLINTRC_FILENAME}"
 
 PYTHON_ANALYSIS_AUTO_IMPORT_COMPLETIONS_KEY = "python.analysis.autoImportCompletions"
-PYTHON_ANALYSIS_AUTO_IMPORT_USER_SYMBOLS_KEY = "python.analysis.autoImportUserSymbols"
 PYTHON_ANALYSIS_AUTO_SEARCH_PATHS_KEY = "python.analysis.autoSearchPaths"
 PYTHON_ANALYSIS_DIAGNOSTIC_MODE_KEY = "python.analysis.diagnosticMode"
 PYTHON_ANALYSIS_EXCLUDE_KEY = "python.analysis.exclude"
@@ -37,7 +36,6 @@ PYTHON_ANALYSIS_PACKAGE_INDEX_DEPTHS_KEY = "python.analysis.packageIndexDepths"
 DEPTH_KEY = "depth"
 INCLUDE_ALL_SYMBOLS_KEY = "includeAllSymbols"
 NAME_KEY = "name"
-NAMES = []
 INDEX_NAMES = [
     "alembic",
     "boto3",
@@ -99,7 +97,6 @@ SAMPLE_VSCODE_SETTINGS = {
     ISORT_ARGS_KEY: [ISORT_ARGS_VALUE],
     PYLINT_ARGS_KEY: [PYLINT_ARGS_RCFILE_VALUE],
     PYTHON_ANALYSIS_AUTO_IMPORT_COMPLETIONS_KEY: True,
-    PYTHON_ANALYSIS_AUTO_IMPORT_USER_SYMBOLS_KEY: True,
     PYTHON_ANALYSIS_AUTO_SEARCH_PATHS_KEY: True,
     PYTHON_ANALYSIS_DIAGNOSTIC_MODE_KEY: "workspace",
     PYTHON_ANALYSIS_EXCLUDE_KEY: ["**/node_modules", "**/__pycache__", ".git", REPO_IGNORE_PATTERN],

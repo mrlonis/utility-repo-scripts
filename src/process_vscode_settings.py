@@ -25,7 +25,6 @@ from src.constants.vscode_settings import (
     PYLINT_ARGS_KEY,
     PYLINT_ARGS_RCFILE_VALUE,
     PYTHON_ANALYSIS_AUTO_IMPORT_COMPLETIONS_KEY,
-    PYTHON_ANALYSIS_AUTO_IMPORT_USER_SYMBOLS_KEY,
     PYTHON_ANALYSIS_AUTO_SEARCH_PATHS_KEY,
     PYTHON_ANALYSIS_DIAGNOSTIC_MODE_KEY,
     PYTHON_ANALYSIS_EXCLUDE_KEY,
@@ -87,10 +86,6 @@ def _process_python_analysis(data: Dict[str, Any]):
     auto_import_completions = cast(Optional[bool], data.get(PYTHON_ANALYSIS_AUTO_IMPORT_COMPLETIONS_KEY))
     if auto_import_completions is None:
         data[PYTHON_ANALYSIS_AUTO_IMPORT_COMPLETIONS_KEY] = True
-
-    auto_import_user_symbols = cast(Optional[bool], data.get(PYTHON_ANALYSIS_AUTO_IMPORT_USER_SYMBOLS_KEY))
-    if auto_import_user_symbols is None:
-        data[PYTHON_ANALYSIS_AUTO_IMPORT_USER_SYMBOLS_KEY] = True
 
     auto_search_paths = cast(Optional[bool], data.get(PYTHON_ANALYSIS_AUTO_SEARCH_PATHS_KEY))
     if auto_search_paths is None:
