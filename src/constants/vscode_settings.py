@@ -19,6 +19,7 @@ FLAKE8_ARGS_KEY = "flake8.args"
 FLAKE8_ARGS_RCFILE_VALUE = "--rcfile=.flake8"
 ISORT_ARGS_KEY = "isort.args"
 ISORT_ARGS_VALUE = f"--settings={PYPROJECT_TOML_FILENAME}"
+MYPY_ARGS_KEY = "mypy-type-checker.args"
 PYLINT_ARGS_KEY = "pylint.args"
 PYLINT_ARGS_RCFILE_VALUE = f"--rcfile={PYLINTRC_FILENAME}"
 

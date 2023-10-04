@@ -18,6 +18,7 @@ from src.constants.vscode_settings import (
     INDEX_NAMES,
     ISORT_ARGS_KEY,
     ISORT_ARGS_VALUE,
+    MYPY_ARGS_KEY,
     NAME_KEY,
     PYLINT_ARGS_KEY,
     PYLINT_ARGS_RCFILE_VALUE,
@@ -186,6 +187,11 @@ def assert_python_linting_settings(
         assert data.get(FLAKE8_ARGS_KEY) == [FLAKE8_ARGS_RCFILE_VALUE]
     else:
         assert data.get(FLAKE8_ARGS_KEY) is None
+
+    if mypy_enabled:
+        assert data.get(MYPY_ARGS_KEY) == ["--ignore-missing-imports", "--follow-imports=silent"]
+    else:
+        assert data.get(MYPY_ARGS_KEY) is None
 
 
 def assert_python_testing_settings(data: Dict[str, Any], pytest_enabled: bool, unittest_enabled: bool):

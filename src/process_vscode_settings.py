@@ -20,6 +20,7 @@ from src.constants.vscode_settings import (
     INDEX_NAMES,
     ISORT_ARGS_KEY,
     ISORT_ARGS_VALUE,
+    MYPY_ARGS_KEY,
     NAME_KEY,
     PYLINT_ARGS_KEY,
     PYLINT_ARGS_RCFILE_VALUE,
@@ -185,6 +186,10 @@ def _process_python_linter_options(
     # bandit
 
     # mypy
+    if mypy_enabled:
+        data[MYPY_ARGS_KEY] = ["--ignore-missing-imports", "--follow-imports=silent"]
+    else:
+        data.pop(MYPY_ARGS_KEY, None)
 
     # prospector
 

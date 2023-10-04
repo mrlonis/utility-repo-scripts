@@ -54,7 +54,7 @@ if command -v prettier >/dev/null; then
 		echo "prettier found"
 		echo "Formatting .vscode/settings.json"
 	fi
-	prettier --write .vscode/settings.json
+	prettier .vscode/settings.json --write --config .prettierrc --ignore-path .prettierignore
 else
 	if [ "$debug" = 1 ]; then
 		echo "prettier not found"
@@ -66,7 +66,7 @@ else
 			echo "Installing prettier globally to format .vscode/settings.json"
 		fi
 		npm install -g prettier
-		prettier --write .vscode/settings.json
+		prettier .vscode/settings.json --write --config .prettierrc --ignore-path .prettierignore
 	else
 		if [ "$debug" = 1 ]; then
 			echo "npm not found"
