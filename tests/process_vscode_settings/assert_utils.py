@@ -34,27 +34,7 @@ from src.constants.vscode_settings import (
     PYTHON_ANALYSIS_TYPE_CHECKING_MODE_KEY,
     PYTHON_ANALYSIS_USE_LIBRARY_CODE_FOR_TYPES_KEY,
     PYTHON_DEFAULT_INTERPRETER_KEY,
-    PYTHON_FORMATTING_PROVIDER_KEY,
     PYTHON_LANGUAGE_KEY,
-    PYTHON_LINTING_BANDIT_ARGS_KEY,
-    PYTHON_LINTING_BANDIT_ENABLED_KEY,
-    PYTHON_LINTING_ENABLED_KEY,
-    PYTHON_LINTING_FLAKE8_ARGS_KEY,
-    PYTHON_LINTING_FLAKE8_ENABLED_KEY,
-    PYTHON_LINTING_IGNORE_PATTERNS_KEY,
-    PYTHON_LINTING_MYPY_ARGS_KEY,
-    PYTHON_LINTING_MYPY_ENABLED_KEY,
-    PYTHON_LINTING_PROSPECTOR_ARGS_KEY,
-    PYTHON_LINTING_PROSPECTOR_ENABLED_KEY,
-    PYTHON_LINTING_PYCODESTYLE_ARGS_KEY,
-    PYTHON_LINTING_PYCODESTYLE_ENABLED_KEY,
-    PYTHON_LINTING_PYDOCSTYLE_ARGS_KEY,
-    PYTHON_LINTING_PYDOCSTYLE_ARGS_VALUE,
-    PYTHON_LINTING_PYDOCSTYLE_ENABLED_KEY,
-    PYTHON_LINTING_PYLAMA_ARGS_KEY,
-    PYTHON_LINTING_PYLAMA_ENABLED_KEY,
-    PYTHON_LINTING_PYLINT_ARGS_KEY,
-    PYTHON_LINTING_PYLINT_ENABLED_KEY,
     PYTHON_TESTING_PYTEST_ARGS_KEY,
     PYTHON_TESTING_PYTEST_ENABLED_KEY,
     PYTHON_TESTING_UNITTEST_ARGS_KEY,
@@ -159,17 +139,14 @@ def assert_python_formatter_settings(data: Dict[str, Any], python_formatter: str
 
     if python_formatter == "autopep8":
         assert python_language.get(EDITOR_DEFAULT_FORMATTER_KEY) == "ms-python.autopep8"
-        assert data.get(PYTHON_FORMATTING_PROVIDER_KEY) == "none"
         assert data.get(AUTOPEP8_ARGS_KEY) == []
         assert data.get(BLACK_FORMATTER_ARGS_KEY) is None
     elif python_formatter == "black":
         assert python_language.get(EDITOR_DEFAULT_FORMATTER_KEY) == "ms-python.black-formatter"
-        assert data.get(PYTHON_FORMATTING_PROVIDER_KEY) == "none"
         assert data.get(AUTOPEP8_ARGS_KEY) is None
         assert data.get(BLACK_FORMATTER_ARGS_KEY) == [BLACK_FORMATTER_ARGS_VALUE]
     else:
         assert python_language.get(EDITOR_DEFAULT_FORMATTER_KEY) == "ms-python.python"
-        assert data.get(PYTHON_FORMATTING_PROVIDER_KEY) == "none"
         assert data.get(BLACK_FORMATTER_ARGS_KEY) is None
         assert data.get(BLACK_FORMATTER_ARGS_KEY) is None
 
@@ -200,83 +177,15 @@ def assert_python_linting_settings(
 ):
     # pylint: disable=too-many-branches too-many-statements
     """Assert that the python linting settings are set correctly."""
-    if (  # pylint: disable=too-many-boolean-expressions
-        pylint_enabled
-        or flake8_enabled
-        or pydocstyle_enabled
-        or pycodestyle_enabled
-        or bandit_enabled
-        or mypy_enabled
-        or prospector_enabled
-        or pylama_enabled
-    ):
-        assert data.get(PYTHON_LINTING_ENABLED_KEY) is True
-    else:
-        assert data.get(PYTHON_LINTING_ENABLED_KEY) is False
-
     if pylint_enabled:
         assert data.get(PYLINT_ARGS_KEY) == [PYLINT_ARGS_RCFILE_VALUE]
-        assert data.get(PYTHON_LINTING_PYLINT_ARGS_KEY) == [PYLINT_ARGS_RCFILE_VALUE]
-        assert data.get(PYTHON_LINTING_PYLINT_ENABLED_KEY) is True
     else:
         assert data.get(PYLINT_ARGS_KEY) is None
-        assert data.get(PYTHON_LINTING_PYLINT_ARGS_KEY) is None
-        assert data.get(PYTHON_LINTING_PYLINT_ENABLED_KEY) is False
 
     if flake8_enabled:
         assert data.get(FLAKE8_ARGS_KEY) == [FLAKE8_ARGS_RCFILE_VALUE]
-        assert data.get(PYTHON_LINTING_FLAKE8_ARGS_KEY) == [FLAKE8_ARGS_RCFILE_VALUE]
-        assert data.get(PYTHON_LINTING_FLAKE8_ENABLED_KEY) is True
     else:
         assert data.get(FLAKE8_ARGS_KEY) is None
-        assert data.get(PYTHON_LINTING_FLAKE8_ARGS_KEY) is None
-        assert data.get(PYTHON_LINTING_FLAKE8_ENABLED_KEY) is False
-
-    if pydocstyle_enabled:
-        assert data.get(PYTHON_LINTING_PYDOCSTYLE_ENABLED_KEY) is True
-        assert data.get(PYTHON_LINTING_PYDOCSTYLE_ARGS_KEY) == [PYTHON_LINTING_PYDOCSTYLE_ARGS_VALUE]
-    else:
-        assert data.get(PYTHON_LINTING_PYDOCSTYLE_ENABLED_KEY) is False
-        assert data.get(PYTHON_LINTING_PYDOCSTYLE_ARGS_KEY) is None
-
-    if pycodestyle_enabled:
-        assert data.get(PYTHON_LINTING_PYCODESTYLE_ENABLED_KEY) is True
-        assert data.get(PYTHON_LINTING_PYCODESTYLE_ARGS_KEY) is not None
-    else:
-        assert data.get(PYTHON_LINTING_PYCODESTYLE_ENABLED_KEY) is False
-        assert data.get(PYTHON_LINTING_PYCODESTYLE_ARGS_KEY) is None
-
-    if bandit_enabled:
-        assert data.get(PYTHON_LINTING_BANDIT_ENABLED_KEY) is True
-        assert data.get(PYTHON_LINTING_BANDIT_ARGS_KEY) is not None
-    else:
-        assert data.get(PYTHON_LINTING_BANDIT_ENABLED_KEY) is False
-        assert data.get(PYTHON_LINTING_BANDIT_ARGS_KEY) is None
-
-    if mypy_enabled:
-        assert data.get(PYTHON_LINTING_MYPY_ENABLED_KEY) is True
-        assert data.get(PYTHON_LINTING_MYPY_ARGS_KEY) is not None
-    else:
-        assert data.get(PYTHON_LINTING_MYPY_ENABLED_KEY) is False
-        assert data.get(PYTHON_LINTING_MYPY_ARGS_KEY) is None
-
-    if prospector_enabled:
-        assert data.get(PYTHON_LINTING_PROSPECTOR_ENABLED_KEY) is True
-        assert data.get(PYTHON_LINTING_PROSPECTOR_ARGS_KEY) is not None
-    else:
-        assert data.get(PYTHON_LINTING_PROSPECTOR_ENABLED_KEY) is False
-        assert data.get(PYTHON_LINTING_PROSPECTOR_ARGS_KEY) is None
-
-    if pylama_enabled:
-        assert data.get(PYTHON_LINTING_PYLAMA_ENABLED_KEY) is True
-        assert data.get(PYTHON_LINTING_PYLAMA_ARGS_KEY) is not None
-    else:
-        assert data.get(PYTHON_LINTING_PYLAMA_ENABLED_KEY) is False
-        assert data.get(PYTHON_LINTING_PYLAMA_ARGS_KEY) is None
-
-    ignore_patterns = cast(Optional[List[str]], data.get(PYTHON_LINTING_IGNORE_PATTERNS_KEY))
-    assert ignore_patterns is not None
-    assert REPO_IGNORE_PATTERN in ignore_patterns
 
 
 def assert_python_testing_settings(data: Dict[str, Any], pytest_enabled: bool, unittest_enabled: bool):

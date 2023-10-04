@@ -4,7 +4,6 @@ import os
 from copy import deepcopy
 from typing import Any, Dict, List, Optional, cast
 
-from src.constants.pyproject_toml import PYPROJECT_TOML_FILENAME
 from src.constants.shared import REPO_NAME
 from src.constants.vscode_settings import (
     AUTOPEP8_ARGS_KEY,
@@ -37,27 +36,7 @@ from src.constants.vscode_settings import (
     PYTHON_ANALYSIS_TYPE_CHECKING_MODE_KEY,
     PYTHON_ANALYSIS_USE_LIBRARY_CODE_FOR_TYPES_KEY,
     PYTHON_DEFAULT_INTERPRETER_KEY,
-    PYTHON_FORMATTING_PROVIDER_KEY,
     PYTHON_LANGUAGE_KEY,
-    PYTHON_LINTING_BANDIT_ARGS_KEY,
-    PYTHON_LINTING_BANDIT_ENABLED_KEY,
-    PYTHON_LINTING_ENABLED_KEY,
-    PYTHON_LINTING_FLAKE8_ARGS_KEY,
-    PYTHON_LINTING_FLAKE8_ENABLED_KEY,
-    PYTHON_LINTING_IGNORE_PATTERNS_KEY,
-    PYTHON_LINTING_MYPY_ARGS_KEY,
-    PYTHON_LINTING_MYPY_ENABLED_KEY,
-    PYTHON_LINTING_PROSPECTOR_ARGS_KEY,
-    PYTHON_LINTING_PROSPECTOR_ENABLED_KEY,
-    PYTHON_LINTING_PYCODESTYLE_ARGS_KEY,
-    PYTHON_LINTING_PYCODESTYLE_ENABLED_KEY,
-    PYTHON_LINTING_PYDOCSTYLE_ARGS_KEY,
-    PYTHON_LINTING_PYDOCSTYLE_ARGS_VALUE,
-    PYTHON_LINTING_PYDOCSTYLE_ENABLED_KEY,
-    PYTHON_LINTING_PYLAMA_ARGS_KEY,
-    PYTHON_LINTING_PYLAMA_ENABLED_KEY,
-    PYTHON_LINTING_PYLINT_ARGS_KEY,
-    PYTHON_LINTING_PYLINT_ENABLED_KEY,
     PYTHON_TESTING_PYTEST_ARGS_KEY,
     PYTHON_TESTING_PYTEST_ENABLED_KEY,
     PYTHON_TESTING_UNITTEST_ARGS_KEY,
@@ -152,17 +131,14 @@ def _process_python_formatter_option(data: Dict[str, Any], python_formatter: str
 
     if python_formatter == "autopep8":
         python_language[EDITOR_DEFAULT_FORMATTER_KEY] = "ms-python.autopep8"
-        data[PYTHON_FORMATTING_PROVIDER_KEY] = "none"
         data[AUTOPEP8_ARGS_KEY] = []
         data.pop(BLACK_FORMATTER_ARGS_KEY, None)
     elif python_formatter == "black":
         python_language[EDITOR_DEFAULT_FORMATTER_KEY] = "ms-python.black-formatter"
-        data[PYTHON_FORMATTING_PROVIDER_KEY] = "none"
         data.pop(AUTOPEP8_ARGS_KEY, None)
         data[BLACK_FORMATTER_ARGS_KEY] = [BLACK_FORMATTER_ARGS_VALUE]
     else:
         python_language[EDITOR_DEFAULT_FORMATTER_KEY] = "ms-python.python"
-        data[PYTHON_FORMATTING_PROVIDER_KEY] = "none"
         data.pop(AUTOPEP8_ARGS_KEY, None)
         data.pop(BLACK_FORMATTER_ARGS_KEY, None)
 
@@ -190,95 +166,29 @@ def _process_python_linter_options(
     pylama_enabled: bool,
 ):
     # pylint: disable=too-many-branches too-many-statements
-    # General Linting Settings
-    if (  # pylint: disable=too-many-boolean-expressions
-        pylint_enabled
-        or flake8_enabled
-        or pydocstyle_enabled
-        or pycodestyle_enabled
-        or bandit_enabled
-        or mypy_enabled
-        or prospector_enabled
-        or pylama_enabled
-    ):
-        data[PYTHON_LINTING_ENABLED_KEY] = True
-    else:
-        data[PYTHON_LINTING_ENABLED_KEY] = False
-
-    ignore_patterns = cast(Optional[List[str]], data.get(PYTHON_LINTING_IGNORE_PATTERNS_KEY))
-    if ignore_patterns is None:
-        ignore_patterns = []
-        data[PYTHON_LINTING_IGNORE_PATTERNS_KEY] = ignore_patterns
-    if REPO_IGNORE_PATTERN not in ignore_patterns:
-        ignore_patterns.append(REPO_IGNORE_PATTERN)
-
     # pylint
     if pylint_enabled:
-        data[PYTHON_LINTING_PYLINT_ENABLED_KEY] = True
         data[PYLINT_ARGS_KEY] = [PYLINT_ARGS_RCFILE_VALUE]
-        data[PYTHON_LINTING_PYLINT_ARGS_KEY] = [PYLINT_ARGS_RCFILE_VALUE]
     else:
         data.pop(PYLINT_ARGS_KEY, None)
-        data.pop(PYTHON_LINTING_PYLINT_ARGS_KEY, None)
-        data[PYTHON_LINTING_PYLINT_ENABLED_KEY] = False
 
     # flake8
     if flake8_enabled:
-        data[PYTHON_LINTING_FLAKE8_ENABLED_KEY] = True
         data[FLAKE8_ARGS_KEY] = [FLAKE8_ARGS_RCFILE_VALUE]
-        data[PYTHON_LINTING_FLAKE8_ARGS_KEY] = [FLAKE8_ARGS_RCFILE_VALUE]
     else:
         data.pop(FLAKE8_ARGS_KEY, None)
-        data.pop(PYTHON_LINTING_FLAKE8_ARGS_KEY, None)
-        data[PYTHON_LINTING_FLAKE8_ENABLED_KEY] = False
 
     # pydocstyle
-    if pydocstyle_enabled:
-        data[PYTHON_LINTING_PYDOCSTYLE_ENABLED_KEY] = True
-        data[PYTHON_LINTING_PYDOCSTYLE_ARGS_KEY] = [PYTHON_LINTING_PYDOCSTYLE_ARGS_VALUE]
-    else:
-        data.pop(PYTHON_LINTING_PYDOCSTYLE_ARGS_KEY, None)
-        data[PYTHON_LINTING_PYDOCSTYLE_ENABLED_KEY] = False
 
     # pycodestyle
-    if pycodestyle_enabled:
-        data[PYTHON_LINTING_PYCODESTYLE_ARGS_KEY] = ["--config=./tox.ini"]
-        data[PYTHON_LINTING_PYCODESTYLE_ENABLED_KEY] = True
-    else:
-        data.pop(PYTHON_LINTING_PYCODESTYLE_ARGS_KEY, None)
-        data[PYTHON_LINTING_PYCODESTYLE_ENABLED_KEY] = False
 
     # bandit
-    if bandit_enabled:
-        data[PYTHON_LINTING_BANDIT_ARGS_KEY] = ["-c", PYPROJECT_TOML_FILENAME, "-r", "."]
-        data[PYTHON_LINTING_BANDIT_ENABLED_KEY] = True
-    else:
-        data.pop(PYTHON_LINTING_BANDIT_ARGS_KEY, None)
-        data[PYTHON_LINTING_BANDIT_ENABLED_KEY] = False
 
     # mypy
-    if mypy_enabled:
-        data[PYTHON_LINTING_MYPY_ARGS_KEY] = ["--ignore-missing-imports", "--follow-imports=silent"]
-        data[PYTHON_LINTING_MYPY_ENABLED_KEY] = True
-    else:
-        data.pop(PYTHON_LINTING_MYPY_ARGS_KEY, None)
-        data[PYTHON_LINTING_MYPY_ENABLED_KEY] = False
 
     # prospector
-    if prospector_enabled:
-        data[PYTHON_LINTING_PROSPECTOR_ARGS_KEY] = []
-        data[PYTHON_LINTING_PROSPECTOR_ENABLED_KEY] = True
-    else:
-        data.pop(PYTHON_LINTING_PROSPECTOR_ARGS_KEY, None)
-        data[PYTHON_LINTING_PROSPECTOR_ENABLED_KEY] = False
 
     # pylama
-    if pylama_enabled:
-        data[PYTHON_LINTING_PYLAMA_ARGS_KEY] = []
-        data[PYTHON_LINTING_PYLAMA_ENABLED_KEY] = True
-    else:
-        data.pop(PYTHON_LINTING_PYLAMA_ARGS_KEY, None)
-        data[PYTHON_LINTING_PYLAMA_ENABLED_KEY] = False
 
 
 def _process_python_testing_options(data: Dict[str, Any], pytest_enabled: bool, unittest_enabled: bool):
