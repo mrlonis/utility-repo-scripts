@@ -6,6 +6,7 @@ This repository holds common scripts for use in python repositories. The main sc
 
 - [utility-repo-scripts](#utility-repo-scripts)
   - [Table of Contents](#table-of-contents)
+  - [TODO](#todo)
   - [Usage](#usage)
     - [How Python is Determined](#how-python-is-determined)
       - [pyenv](#pyenv)
@@ -30,6 +31,11 @@ This repository holds common scripts for use in python repositories. The main sc
     - [Ruby](#ruby)
       - [Markdownlint](#markdownlint)
     - [(Optional) pyenv](#optional-pyenv)
+
+## TODO
+
+- Add `.prettierrc` file if it doesn't exist
+- Fix for new VS Code extensions and settings
 
 ## Usage
 

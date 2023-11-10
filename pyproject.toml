@@ -1,34 +1,34 @@
 [build-system]
-requires = [ "poetry-core" ]
+requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "utility-repo-scripts"
 version = "0.1.0"
 description = ""
-authors = [ "Matthew Lonis <mattlonis@gmail.com>" ]
+authors = ["Matthew Lonis <mattlonis@gmail.com>"]
 readme = "README.md"
-packages = [{include = "utility_repo_scripts"}]
+packages = [{ include = "utility_repo_scripts" }]
 
 [tool.poetry.dependencies]
-python = "^3.8.1"
+python = "^3.10"
 configupdater = "^3.1.1"
 ruamel-yaml = "^0.17.21"
 tomlkit = "^0.11.6"
 
 [tool.poetry.group.test.dependencies]
-bandit = { version = "^1.7.5", extras = [ "toml" ] }
+bandit = { version = "^1.7.5", extras = ["toml"] }
 flake8 = "^6.0.0"
 greenlet = "^2.0.2"
 mypy = "^1.2.0"
 pycodestyle = "^2.10.0"
 pydocstyle = "^6.3.0"
-pylama = { version = "^8.4.1", extras = [ "all" ] }
+pylama = { version = "^8.4.1", extras = ["all"] }
 pylint = "^2.17.2"
 pylint-junit = "^0.3.2"
 pytest = "^7.3.1"
 pytest-cov = "^4.0.0"
-pytest-xdist = { version = "^3.2.1", extras = [ "psutil" ] }
+pytest-xdist = { version = "^3.2.1", extras = ["psutil"] }
 tomli = "^2.0.1"
 
 [tool.poetry.group.dev.dependencies]
