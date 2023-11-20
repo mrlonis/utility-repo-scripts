@@ -36,13 +36,14 @@ This repository holds common scripts for use in python repositories. The main sc
 
 - Add `.prettierrc` file if it doesn't exist
 - Fix for new VS Code extensions and settings
+- Create `pyproject.toml` if it doesn't exist
 
 ## Usage
 
 This repo should be added to another repo as a submodule
 
 ```sh
-git submodule add -b master https://github.com/mrlonis/utility-repo-scripts.git
+git submodule add -b main https://github.com/mrlonis/utility-repo-scripts.git
 git commit -m "Adding utility-repo-scripts"
 ```
 
