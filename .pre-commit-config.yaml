@@ -25,7 +25,7 @@ repos:
         name: isort (python)
         args: [--settings-file=pyproject.toml] # Configure in pyproject.toml
   - repo: https://github.com/psf/black
-    rev: 23.12.1
+    rev: 24.1.1
     hooks:
       - id: black # Configure in pyproject.toml
   - repo: local
@@ -48,7 +48,7 @@ repos:
         args: [--config=pyproject.toml] # Configure in pyproject.toml
         additional_dependencies: [tomli]
   - repo: https://github.com/PyCQA/bandit
-    rev: 1.7.6
+    rev: 1.7.7
     hooks:
       - id: bandit
         args: [-c, pyproject.toml] # Configure in pyproject.toml
