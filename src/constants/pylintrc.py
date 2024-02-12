@@ -1,4 +1,5 @@
 """pylintrc file constants."""
+
 # region pylintrc Constants
 from src.constants.shared import DEFAULT_LINE_LENGTH, REPO_NAME
 
@@ -37,7 +38,7 @@ ignore-patterns=
 
 # Python code to execute, usually for sys.path manipulation such as
 # pygtk.require().
-init-hook="from pylint.config import find_pylintrc; import os, sys; sys.path.append(os.path.dirname(find_pylintrc()))"
+init-hook="from pylint.config import find_default_config_files; import os, sys; config_files = find_default_config_files(); sys.path.append(os.path.dirname(list(config_files)[0]));"
 
 # Use multiple processes to speed up Pylint. Specifying 0 will auto-detect the
 # number of processors available to use.
