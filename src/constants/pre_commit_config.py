@@ -1,4 +1,5 @@
 """.pre-commit-config.yaml file constants."""
+
 # region .pre-commit-config.yaml Constants
 from src.constants.pylintrc import PYLINTRC_FILENAME
 from src.constants.pyproject_toml import PYPROJECT_TOML_FILENAME
@@ -61,11 +62,6 @@ BLACK_HOOK_ID = "black"
 BLACK_HOOK = {"id": BLACK_HOOK_ID}
 BLACK_REPO = {"repo": BLACK_REPO_URL, "rev": "23.1.0", "hooks": [BLACK_HOOK]}
 
-YAPF_REPO_URL = "https://github.com/google/yapf"
-YAPF_HOOK_ID = "yapf"
-YAPF_HOOK = {"id": YAPF_HOOK_ID}
-YAPF_REPO = {"repo": YAPF_REPO_URL, "rev": "v0.32.0", "hooks": [YAPF_HOOK]}
-
 LOCAL_REPO_URL = "local"
 PYLINT_HOOK_ID = "pylint"
 PYLINT_HOOK = {
@@ -82,24 +78,6 @@ FLAKE8_REPO_URL = "https://github.com/pycqa/flake8"
 FLAKE8_HOOK_ID = "flake8"
 FLAKE8_HOOK = {"id": FLAKE8_HOOK_ID, "args": ["--config=.flake8"]}
 FLAKE8_REPO = {"repo": FLAKE8_REPO_URL, "rev": "6.0.0", "hooks": [FLAKE8_HOOK]}
-
-PYDOCSTYLE_REPO_URL = "https://github.com/pycqa/pydocstyle"
-PYDOCSTYLE_HOOK_ID = "pydocstyle"
-PYDOCSTYLE_HOOK = {
-    "id": PYDOCSTYLE_HOOK_ID,
-    "args": [f"--config={PYPROJECT_TOML_FILENAME}"],
-    "additional_dependencies": ["tomli"],
-}
-PYDOCSTYLE_REPO = {"repo": PYDOCSTYLE_REPO_URL, "rev": "6.3.0", "hooks": [PYDOCSTYLE_HOOK]}
-
-BANDIT_REPO_URL = "https://github.com/PyCQA/bandit"
-BANDIT_HOOK_ID = "bandit"
-BANDIT_HOOK = {
-    "id": BANDIT_HOOK_ID,
-    "args": ["-c", f"{PYPROJECT_TOML_FILENAME}"],
-    "additional_dependencies": ["bandit[toml]"],
-}
-BANDIT_REPO = {"repo": BANDIT_REPO_URL, "rev": "1.7.4", "hooks": [BANDIT_HOOK]}
 
 SAMPLE_PRE_COMMIT_CONFIG = f"""
 repos:
@@ -136,10 +114,6 @@ repos:
     rev: 23.1.0
     hooks:
       - id: {BLACK_HOOK_ID} # Configure in {PYPROJECT_TOML_FILENAME}
-  - repo: {YAPF_REPO_URL}
-    rev: 'v0.32.0' # Use the sha / tag you want to point at
-    hooks:
-      - id: {YAPF_HOOK_ID}
   - repo: {LOCAL_REPO_URL}
     hooks:
       - id: {PYLINT_HOOK_ID}
@@ -153,17 +127,5 @@ repos:
     hooks:
       - id: {FLAKE8_HOOK_ID}
         args: [--config=.flake8]
-  - repo: {PYDOCSTYLE_REPO_URL}
-    rev: 6.3.0
-    hooks:
-      - id: {PYDOCSTYLE_HOOK_ID}
-        args: [--config={PYPROJECT_TOML_FILENAME}] # Configure in {PYPROJECT_TOML_FILENAME}
-        additional_dependencies: ['tomli']
-  - repo: {BANDIT_REPO_URL}
-    rev: 1.7.4
-    hooks:
-      - id: {BANDIT_HOOK_ID}
-        args: ["-c", "{PYPROJECT_TOML_FILENAME}"] # Configure in pyproject.toml
-        additional_dependencies: ["bandit[toml]"]
 """
 # endregion

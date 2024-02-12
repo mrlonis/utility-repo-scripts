@@ -1,4 +1,5 @@
 """.vscode/settings.json file constants."""
+
 # region .vscode/settings.json Constants
 from src.constants.pylintrc import PYLINTRC_FILENAME
 from src.constants.pyproject_toml import PYPROJECT_TOML_FILENAME
@@ -68,7 +69,7 @@ SEARCH_EXCLUDE_KEY = "search.exclude"
 
 SAMPLE_VSCODE_SETTINGS = {
     PYTHON_LANGUAGE_KEY: {
-        EDITOR_CODE_ACTIONS_ON_SAVE_KEY: {SOURCE_ORGANIZE_IMPORTS_KEY: True},
+        EDITOR_CODE_ACTIONS_ON_SAVE_KEY: {SOURCE_ORGANIZE_IMPORTS_KEY: "explicit"},
         EDITOR_DEFAULT_FORMATTER_KEY: "<python_formatter>",
         EDITOR_FORMAT_ON_SAVE_KEY: True,
     },

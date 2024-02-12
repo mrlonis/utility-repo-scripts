@@ -21,12 +21,7 @@ isort_profile=""
 python_formatter=""
 pylint_enabled=0
 flake8_enabled=0
-pydocstyle_enabled=0
-pycodestyle_enabled=0
-bandit_enabled=0
 mypy_enabled=0
-prospector_enabled=0
-pylama_enabled=0
 pytest_enabled=0
 unittest_enabled=0
 overwrite_vscode_launch=0
@@ -83,23 +78,8 @@ while getopts d:v:r:-: OPT; do
 	flake8_enabled)
 		flake8_enabled=1
 		;;
-	pydocstyle_enabled)
-		pydocstyle_enabled=1
-		;;
-	pycodestyle_enabled)
-		pycodestyle_enabled=1
-		;;
-	bandit_enabled)
-		bandit_enabled=1
-		;;
 	mypy_enabled)
 		mypy_enabled=1
-		;;
-	prospector_enabled)
-		prospector_enabled=1
-		;;
-	pylama_enabled)
-		pylama_enabled=1
 		;;
 	pytest_enabled)
 		pytest_enabled=1
@@ -153,12 +133,7 @@ if [ "$print_options" = 1 ] && [ "$debug" = 1 ]; then
 	echo "    --python_formatter: $python_formatter"
 	echo "    --pylint_enabled: $pylint_enabled"
 	echo "    --flake8_enabled: $flake8_enabled"
-	echo "    --pydocstyle_enabled: $pydocstyle_enabled"
-	echo "    --pycodestyle_enabled: $pycodestyle_enabled"
-	echo "    --bandit_enabled: $bandit_enabled"
 	echo "    --mypy_enabled: $mypy_enabled"
-	echo "    --prospector_enabled: $prospector_enabled"
-	echo "    --pylama_enabled: $pylama_enabled"
 	echo "    --pytest_enabled: $pytest_enabled"
 	echo "    --unittest_enabled: $unittest_enabled"
 	echo "    --overwrite_vscode_launch: $overwrite_vscode_launch"
@@ -225,9 +200,8 @@ fi
 
 if [ "$python_formatter" != "" ] &&
 	[ "$python_formatter" != "autopep8" ] &&
-	[ "$python_formatter" != "black" ] &&
-	[ "$python_formatter" != "yapf" ]; then
-	error "Invalid python_formatter option: ($python_formatter). Valid values are ['', autopep8, black, yapf]"
+	[ "$python_formatter" != "black" ]; then
+	error "Invalid python_formatter option: ($python_formatter). Valid values are ['', autopep8, black]"
 fi
 
 if [ "$pylint_enabled" != 0 ] && [ "$pylint_enabled" != 1 ]; then
@@ -238,28 +212,8 @@ if [ "$flake8_enabled" != 0 ] && [ "$flake8_enabled" != 1 ]; then
 	error "Invalid flake8_enabled option: ($flake8_enabled). Valid values are [0, 1]"
 fi
 
-if [ "$pydocstyle_enabled" != 0 ] && [ "$pydocstyle_enabled" != 1 ]; then
-	error "Invalid pydocstyle_enabled option: ($pydocstyle_enabled). Valid values are [0, 1]"
-fi
-
-if [ "$pycodestyle_enabled" != 0 ] && [ "$pycodestyle_enabled" != 1 ]; then
-	error "Invalid pycodestyle_enabled option: ($pycodestyle_enabled). Valid values are [0, 1]"
-fi
-
-if [ "$bandit_enabled" != 0 ] && [ "$bandit_enabled" != 1 ]; then
-	error "Invalid bandit_enabled option: ($bandit_enabled). Valid values are [0, 1]"
-fi
-
 if [ "$mypy_enabled" != 0 ] && [ "$mypy_enabled" != 1 ]; then
 	error "Invalid mypy_enabled option: ($mypy_enabled). Valid values are [0, 1]"
-fi
-
-if [ "$prospector_enabled" != 0 ] && [ "$prospector_enabled" != 1 ]; then
-	error "Invalid prospector_enabled option: ($prospector_enabled). Valid values are [0, 1]"
-fi
-
-if [ "$pylama_enabled" != 0 ] && [ "$pylama_enabled" != 1 ]; then
-	error "Invalid pylama_enabled option: ($pylama_enabled). Valid values are [0, 1]"
 fi
 
 if [ "$pytest_enabled" != 0 ] && [ "$pytest_enabled" != 1 ]; then

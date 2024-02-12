@@ -17,13 +17,9 @@ ruamel-yaml = "^0.17.21"
 tomlkit = "^0.11.6"
 
 [tool.poetry.group.test.dependencies]
-bandit = { version = "^1.7.5", extras = ["toml"] }
 flake8 = "^6.0.0"
 greenlet = "^2.0.2"
 mypy = "^1.2.0"
-pycodestyle = "^2.10.0"
-pydocstyle = "^6.3.0"
-pylama = { version = "^8.4.1", extras = ["all"] }
 pylint = "^2.17.2"
 pylint-junit = "^0.3.2"
 pytest = "^7.3.1"
@@ -37,22 +33,13 @@ black = "^23.1.0"
 isort = "^5.12.0"
 pip-tools = "^6.13.0"
 pre-commit = "^3.2.2"
-tox = "^4.4.12"
-yapf = "^0.32.0"
-
-[tool.bandit]
-exclude_dirs = ["tests", "utility-repo-scripts"]
 
 [tool.black]
-line-length = 110
+line-length = 120
 
 [tool.isort]
-line_length = 110
+line_length = 120
 profile = "black"
-
-[tool.pydocstyle]
-inherit = false
-match = ".*.py"
 
 [tool.pytest.ini_options]
 addopts = "--ignore=./utility-repo-scripts/**"

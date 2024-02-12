@@ -41,15 +41,3 @@ repos:
     hooks:
       - id: flake8
         args: [--config=.flake8]
-  - repo: https://github.com/pycqa/pydocstyle
-    rev: 6.3.0
-    hooks:
-      - id: pydocstyle
-        args: [--config=pyproject.toml] # Configure in pyproject.toml
-        additional_dependencies: [tomli]
-  - repo: https://github.com/PyCQA/bandit
-    rev: 1.7.7
-    hooks:
-      - id: bandit
-        args: [-c, pyproject.toml] # Configure in pyproject.toml
-        additional_dependencies: ['bandit[toml]']

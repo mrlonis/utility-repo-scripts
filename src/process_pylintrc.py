@@ -1,4 +1,5 @@
 """Do processing of the pylintrc file."""
+
 from typing import List
 
 from configupdater import AssignMultilineValueError, ConfigUpdater, Option, Section
@@ -40,9 +41,7 @@ def process_pylintrc(
         ignore_settings.value = ""
     if REPO_NAME not in ignore_settings.value:
         try:
-            ignore_settings.value = (
-                f"{ignore_settings.value}{',' if ignore_settings.value != '' else ''}{REPO_NAME}"
-            )
+            ignore_settings.value = f"{ignore_settings.value}{',' if ignore_settings.value != '' else ''}{REPO_NAME}"
         except AssignMultilineValueError:
             existing_values = ignore_settings.as_list()
             new_values: List[str] = []

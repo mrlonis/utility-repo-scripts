@@ -1,15 +1,13 @@
 """Test the src/process_pyproject_toml.py file."""
-from typing import Any, Dict, List, Optional, cast
+
+from typing import Any, Dict, cast
 
 from tomlkit import document, parse
 
 from src.constants.pyproject_toml import (
     PYPROJECT_AUTOPEP8_KEY,
-    PYPROJECT_BANDIT_KEY,
     PYPROJECT_BLACK_KEY,
     PYPROJECT_ISORT_KEY,
-    PYPROJECT_PYCODESTYLE_MATCH_VALUE,
-    PYPROJECT_PYDOCSTYLE_KEY,
     PYPROJECT_PYTEST_INI_OPTIONS_KEY,
     PYPROJECT_PYTEST_INI_OPTIONS_LOG_CLI_DATE_FORMAT_VALUE,
     PYPROJECT_PYTEST_INI_OPTIONS_LOG_CLI_VALUE,
@@ -134,140 +132,6 @@ test = "test"
     assert len(black_tool.keys()) == 2
     assert black_tool.get("line-length") == DEFAULT_LINE_LENGTH
     assert black_tool.get("test") == "test"
-
-
-# Test pydocstyle Options
-def test_process_pyproject_toml_pydocstyle():
-    """Test the process_pyproject_toml function with pydocstyle."""
-    pydocstyle_enabled = True
-    result = PyProjectTomlProcessor(
-        pyproject_toml=document(), pydocstyle_enabled=pydocstyle_enabled, debug=True, test=True
-    ).process_pyproject_toml()
-    assert result is not None
-
-    tool = cast(Dict[str, Any], result.get(PYPROJECT_TOOL_KEY))
-    assert tool is not None
-
-    pydocstyle_tool = cast(Dict[str, Any], tool.get(PYPROJECT_PYDOCSTYLE_KEY))
-    assert pydocstyle_tool is not None
-
-    assert len(pydocstyle_tool.keys()) == 2
-    assert pydocstyle_tool.get("inherit") is False
-    assert pydocstyle_tool.get("match") == PYPROJECT_PYCODESTYLE_MATCH_VALUE
-
-
-def test_process_pyproject_toml_pydocstyle_existing_values():
-    """Test the process_pyproject_toml function with pydocstyle."""
-    pydocstyle_enabled = True
-    result = PyProjectTomlProcessor(
-        pyproject_toml=parse(
-            f"""
-[{PYPROJECT_TOOL_KEY}.{PYPROJECT_PYDOCSTYLE_KEY}]
-inherit = true
-match = "{PYPROJECT_PYCODESTYLE_MATCH_VALUE}"
-test = "test"
-        """
-        ),
-        pydocstyle_enabled=pydocstyle_enabled,
-        debug=True,
-        test=True,
-    ).process_pyproject_toml()
-    assert result is not None
-
-    tool = cast(Dict[str, Any], result.get(PYPROJECT_TOOL_KEY))
-    assert tool is not None
-
-    pydocstyle_tool = cast(Dict[str, Any], tool.get(PYPROJECT_PYDOCSTYLE_KEY))
-    assert pydocstyle_tool is not None
-
-    assert len(pydocstyle_tool.keys()) == 3
-    assert pydocstyle_tool.get("inherit") is False
-    assert pydocstyle_tool.get("match") == PYPROJECT_PYCODESTYLE_MATCH_VALUE
-    assert pydocstyle_tool.get("test") == "test"
-
-
-# Test bandit Options
-def test_process_pyproject_toml_bandit():
-    """Test the process_pyproject_toml function with bandit."""
-    bandit_enabled = True
-    result = PyProjectTomlProcessor(
-        pyproject_toml=document(), bandit_enabled=bandit_enabled, debug=True, test=True
-    ).process_pyproject_toml()
-    assert result is not None
-
-    tool = cast(Dict[str, Any], result.get(PYPROJECT_TOOL_KEY))
-    assert tool is not None
-
-    bandit_tool = cast(Dict[str, Any], tool.get(PYPROJECT_BANDIT_KEY))
-    assert bandit_tool is not None
-
-    assert len(bandit_tool.keys()) == 1
-    exclude_dirs = cast(Optional[List[str]], bandit_tool.get("exclude_dirs"))
-    assert exclude_dirs is not None
-    assert len(exclude_dirs) == 1
-    assert REPO_NAME in exclude_dirs
-
-
-def test_process_pyproject_toml_bandit_existing_values():
-    """Test the process_pyproject_toml function with bandit."""
-    bandit_enabled = True
-    result = PyProjectTomlProcessor(
-        pyproject_toml=parse(
-            f"""
-[{PYPROJECT_TOOL_KEY}.{PYPROJECT_BANDIT_KEY}]
-exclude_dirs = ["tests"]
-test = "test"
-"""
-        ),
-        bandit_enabled=bandit_enabled,
-        debug=True,
-        test=True,
-    ).process_pyproject_toml()
-    assert result is not None
-
-    tool = cast(Dict[str, Any], result.get(PYPROJECT_TOOL_KEY))
-    assert tool is not None
-
-    bandit_tool = cast(Dict[str, Any], tool.get(PYPROJECT_BANDIT_KEY))
-    assert bandit_tool is not None
-
-    assert len(bandit_tool.keys()) == 2
-    exclude_dirs = cast(Optional[List[str]], bandit_tool.get("exclude_dirs"))
-    assert exclude_dirs is not None
-    assert len(exclude_dirs) == 2
-    assert exclude_dirs == ["tests", REPO_NAME]
-    assert bandit_tool.get("test") == "test"
-
-
-def test_process_pyproject_toml_bandit_existing_values_has_repo_name():
-    """Test the process_pyproject_toml function with bandit."""
-    bandit_enabled = True
-    result = PyProjectTomlProcessor(
-        pyproject_toml=parse(
-            f"""
-[{PYPROJECT_TOOL_KEY}.{PYPROJECT_BANDIT_KEY}]
-exclude_dirs = ["tests", "{REPO_NAME}"]
-test = "test"
-"""
-        ),
-        bandit_enabled=bandit_enabled,
-        debug=True,
-        test=True,
-    ).process_pyproject_toml()
-    assert result is not None
-
-    tool = cast(Dict[str, Any], result.get(PYPROJECT_TOOL_KEY))
-    assert tool is not None
-
-    bandit_tool = cast(Dict[str, Any], tool.get(PYPROJECT_BANDIT_KEY))
-    assert bandit_tool is not None
-
-    assert len(bandit_tool.keys()) == 2
-    exclude_dirs = cast(Optional[List[str]], bandit_tool.get("exclude_dirs"))
-    assert exclude_dirs is not None
-    assert len(exclude_dirs) == 2
-    assert exclude_dirs == ["tests", REPO_NAME]
-    assert bandit_tool.get("test") == "test"
 
 
 # Test isort Options
@@ -520,7 +384,6 @@ def test_process_pyproject_toml():
         pyproject_toml=document(),
         include_isort=True,
         python_formatter="black",
-        pydocstyle_enabled=True,
         pytest_enabled=True,
         line_length=DEFAULT_LINE_LENGTH,
         test=True,
@@ -540,11 +403,6 @@ def test_process_pyproject_toml():
     assert isort_tool is not None
     assert isort_tool.get("line_length") == DEFAULT_LINE_LENGTH
     assert isort_tool.get("profile") == "black"
-
-    pydocstyle_tool = cast(Dict[str, Any], tools.get(PYPROJECT_PYDOCSTYLE_KEY))
-    assert pydocstyle_tool is not None
-    assert pydocstyle_tool.get("inherit") is False
-    assert pydocstyle_tool.get("match") == PYPROJECT_PYCODESTYLE_MATCH_VALUE
 
     pytest_tool = cast(Dict[str, Any], tools.get(PYPROJECT_PYTEST_KEY))
     assert pytest_tool is not None

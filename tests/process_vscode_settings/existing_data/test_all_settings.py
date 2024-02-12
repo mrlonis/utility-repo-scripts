@@ -1,4 +1,5 @@
 """Tests for process_vscode_settings.py with existing data."""
+
 from copy import deepcopy
 
 from src.constants.vscode_settings import SAMPLE_VSCODE_SETTINGS
@@ -20,12 +21,7 @@ def test_process_vscode_settings():
     python_formatter = "black"
     pylint_enabled = True
     flake8_enabled = True
-    pydocstyle_enabled = True
-    pycodestyle_enabled = True
-    bandit_enabled = True
     mypy_enabled = True
-    prospector_enabled = True
-    pylama_enabled = True
     pytest_enabled = True
     unittest_enabled = True
 
@@ -36,12 +32,7 @@ def test_process_vscode_settings():
         python_formatter=python_formatter,
         pylint_enabled=pylint_enabled,
         flake8_enabled=flake8_enabled,
-        pydocstyle_enabled=pydocstyle_enabled,
-        pycodestyle_enabled=pycodestyle_enabled,
-        bandit_enabled=bandit_enabled,
         mypy_enabled=mypy_enabled,
-        prospector_enabled=prospector_enabled,
-        pylama_enabled=pylama_enabled,
         pytest_enabled=pytest_enabled,
         unittest_enabled=unittest_enabled,
     )
@@ -52,16 +43,6 @@ def test_process_vscode_settings():
     assert_python_formatter_settings(data=result, python_formatter=python_formatter)
     assert_isort_settings(data=result, isort_enabled=isort_enabled)
     assert_python_linting_settings(
-        data=result,
-        pylint_enabled=pylint_enabled,
-        flake8_enabled=flake8_enabled,
-        pydocstyle_enabled=pydocstyle_enabled,
-        pycodestyle_enabled=pycodestyle_enabled,
-        bandit_enabled=bandit_enabled,
-        mypy_enabled=mypy_enabled,
-        prospector_enabled=prospector_enabled,
-        pylama_enabled=pylama_enabled,
+        data=result, pylint_enabled=pylint_enabled, flake8_enabled=flake8_enabled, mypy_enabled=mypy_enabled
     )
-    assert_python_testing_settings(
-        data=result, pytest_enabled=pytest_enabled, unittest_enabled=unittest_enabled
-    )
+    assert_python_testing_settings(data=result, pytest_enabled=pytest_enabled, unittest_enabled=unittest_enabled)

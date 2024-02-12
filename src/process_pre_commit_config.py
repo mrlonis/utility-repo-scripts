@@ -1,4 +1,5 @@
 """Do processing of the .pre-commit-config.yaml file."""
+
 from typing import Any, Dict, List, cast
 
 from ruamel.yaml import YAML
@@ -9,10 +10,6 @@ from src.constants.pre_commit_config import (
     AUTOPEP8_HOOK_ID,
     AUTOPEP8_REPO,
     AUTOPEP8_REPO_URL,
-    BANDIT_HOOK,
-    BANDIT_HOOK_ID,
-    BANDIT_REPO,
-    BANDIT_REPO_URL,
     BLACK_HOOK,
     BLACK_HOOK_ID,
     BLACK_REPO,
@@ -45,10 +42,6 @@ from src.constants.pre_commit_config import (
     PRETTIER_HOOK_ID,
     PRETTIER_REPO,
     PRETTIER_REPO_URL,
-    PYDOCSTYLE_HOOK,
-    PYDOCSTYLE_HOOK_ID,
-    PYDOCSTYLE_REPO,
-    PYDOCSTYLE_REPO_URL,
     PYLINT_HOOK,
     PYLINT_HOOK_ID,
     SHELL_FORMAT_HOOK,
@@ -57,10 +50,6 @@ from src.constants.pre_commit_config import (
     SHELLCHECK_HOOK_ID,
     TRAILING_WHITESPACE_HOOK,
     TRAILING_WHITESPACE_HOOK_ID,
-    YAPF_HOOK,
-    YAPF_HOOK_ID,
-    YAPF_REPO,
-    YAPF_REPO_URL,
 )
 from src.constants.shared import REPO_NAME
 from src.utils.core import validate_python_formatter_option
@@ -82,8 +71,6 @@ class PreCommitConfigProcessor:
         python_formatter: str = "",
         pylint_enabled: bool = False,
         flake8_enabled: bool = False,
-        pydocstyle_enabled: bool = False,
-        bandit_enabled: bool = False,
         pre_commit_pylint_entry_prefix: str = f"{REPO_NAME}/",
     ):  # pylint: disable=too-many-arguments
         """Initialize the PreCommitConfigProcessor class."""
@@ -96,8 +83,6 @@ class PreCommitConfigProcessor:
         self.python_formatter = python_formatter
         self.pylint_enabled = pylint_enabled
         self.flake8_enabled = flake8_enabled
-        self.pydocstyle_enabled = pydocstyle_enabled
-        self.bandit_enabled = bandit_enabled
         self.pre_commit_pylint_entry_prefix = pre_commit_pylint_entry_prefix
 
         if self.debug:
@@ -110,9 +95,7 @@ class PreCommitConfigProcessor:
             print(f"    --python_formatter: {self.python_formatter}")
             print(f"    --pylint_enabled: {self.pylint_enabled}")
             print(f"    --flake8_enabled: {self.flake8_enabled}")
-            print(f"    --pydocstyle_enabled: {self.pydocstyle_enabled}")
             print(f"    --pylint_entry_prefix: {self.pre_commit_pylint_entry_prefix}")
-            print(f"    --bandit_enabled: {self.bandit_enabled}")
             print("")
 
     def process_pre_commit_config(self):
@@ -212,7 +195,7 @@ class PreCommitConfigProcessor:
 
             remove_hooks(
                 pre_commit_config=self.pre_commit_config,
-                repo_urls=[BLACK_REPO_URL, YAPF_REPO_URL],
+                repo_urls=[BLACK_REPO_URL],
             )
         elif self.python_formatter == "black":
             update_hook(
@@ -224,34 +207,12 @@ class PreCommitConfigProcessor:
 
             remove_hooks(
                 pre_commit_config=self.pre_commit_config,
-                repo_urls=[
-                    AUTOPEP8_REPO_URL,
-                    YAPF_REPO_URL,
-                ],
-            )
-        elif self.python_formatter == "yapf":
-            update_hook(
-                pre_commit_config=self.pre_commit_config,
-                repo_url=YAPF_REPO_URL,
-                repo_default=YAPF_REPO,
-                hooks=[(YAPF_HOOK_ID, YAPF_HOOK)],
-            )
-
-            remove_hooks(
-                pre_commit_config=self.pre_commit_config,
-                repo_urls=[
-                    AUTOPEP8_REPO_URL,
-                    BLACK_REPO_URL,
-                ],
+                repo_urls=[AUTOPEP8_REPO_URL],
             )
         else:
             remove_hooks(
                 pre_commit_config=self.pre_commit_config,
-                repo_urls=[
-                    AUTOPEP8_REPO_URL,
-                    BLACK_REPO_URL,
-                    YAPF_REPO_URL,
-                ],
+                repo_urls=[AUTOPEP8_REPO_URL, BLACK_REPO_URL],
             )
 
     def _update_pylint_config(self):
@@ -288,24 +249,4 @@ class PreCommitConfigProcessor:
                 repo_url=FLAKE8_REPO_URL,
                 repo_default=FLAKE8_REPO,
                 hooks=[(FLAKE8_HOOK_ID, FLAKE8_HOOK)],
-            )
-
-        if not self.pydocstyle_enabled:
-            remove_hooks(pre_commit_config=self.pre_commit_config, repo_urls=[PYDOCSTYLE_REPO_URL])
-        else:
-            update_hook(
-                pre_commit_config=self.pre_commit_config,
-                repo_url=PYDOCSTYLE_REPO_URL,
-                repo_default=PYDOCSTYLE_REPO,
-                hooks=[(PYDOCSTYLE_HOOK_ID, PYDOCSTYLE_HOOK)],
-            )
-
-        if not self.bandit_enabled:
-            remove_hooks(pre_commit_config=self.pre_commit_config, repo_urls=[BANDIT_REPO_URL])
-        else:
-            update_hook(
-                pre_commit_config=self.pre_commit_config,
-                repo_url=BANDIT_REPO_URL,
-                repo_default=BANDIT_REPO,
-                hooks=[(BANDIT_HOOK_ID, BANDIT_HOOK)],
             )

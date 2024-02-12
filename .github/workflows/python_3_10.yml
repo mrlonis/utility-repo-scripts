@@ -12,7 +12,6 @@ env:
     setup_pre_commit_config.py
     setup_pylintrc.py
     setup_pyproject_toml.py
-    setup_tox_ini.py
     setup_vscode.py
 
 jobs:
@@ -40,11 +39,8 @@ jobs:
       - name: Pylint
         run: poetry run pylint ${{ env.LINT_PATHS }}
 
-      - name: Pydocstyle
-        run: poetry run pydocstyle ${{ env.LINT_PATHS }}
-
-      - name: Bandit
-        run: poetry run bandit -c pyproject.toml -r .
+      - name: Mypy
+        run: poetry run mypy ${{ env.LINT_PATHS }}
 
       - name: Pytest
-        run: poetry run pytest -n auto
+        run: poetry run pytest --cov -n auto

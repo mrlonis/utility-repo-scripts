@@ -1,4 +1,5 @@
 """Do processing of the .vscode/settings.json file."""
+
 from argparse import ArgumentParser
 
 from src.constants.vscode_settings import SAMPLE_VSCODE_SETTINGS, VSCODE_SETTINGS_JSON_FILENAME
@@ -12,12 +13,7 @@ def main(
     python_formatter="",
     pylint_enabled: bool = False,
     flake8_enabled: bool = False,
-    pydocstyle_enabled: bool = False,
-    pycodestyle_enabled: bool = False,
-    bandit_enabled: bool = False,
     mypy_enabled: bool = False,
-    prospector_enabled: bool = False,
-    pylama_enabled: bool = False,
     pytest_enabled: bool = False,
     unittest_enabled: bool = False,
     test: bool = False,
@@ -38,12 +34,7 @@ def main(
         python_formatter=python_formatter,
         pylint_enabled=pylint_enabled,
         flake8_enabled=flake8_enabled,
-        pydocstyle_enabled=pydocstyle_enabled,
-        pycodestyle_enabled=pycodestyle_enabled,
-        bandit_enabled=bandit_enabled,
         mypy_enabled=mypy_enabled,
-        prospector_enabled=prospector_enabled,
-        pylama_enabled=pylama_enabled,
         pytest_enabled=pytest_enabled,
         unittest_enabled=unittest_enabled,
         use_pyenv=use_pyenv,
@@ -57,12 +48,7 @@ if __name__ == "__main__":
     parser.add_argument("--python_formatter", default="black", type=str)
     parser.add_argument("--pylint_enabled", action="store_true")
     parser.add_argument("--flake8_enabled", action="store_true")
-    parser.add_argument("--pydocstyle_enabled", action="store_true")
-    parser.add_argument("--pycodestyle_enabled", action="store_true")
-    parser.add_argument("--bandit_enabled", action="store_true")
     parser.add_argument("--mypy_enabled", action="store_true")
-    parser.add_argument("--prospector_enabled", action="store_true")
-    parser.add_argument("--pylama_enabled", action="store_true")
     parser.add_argument("--pytest_enabled", action="store_true")
     parser.add_argument("--unittest_enabled", action="store_true")
     parser.add_argument("--test", action="store_true")
@@ -76,12 +62,7 @@ if __name__ == "__main__":
         python_formatter=args.python_formatter,
         pylint_enabled=args.pylint_enabled,
         flake8_enabled=args.flake8_enabled,
-        pydocstyle_enabled=args.pydocstyle_enabled,
-        pycodestyle_enabled=args.pycodestyle_enabled,
-        bandit_enabled=args.bandit_enabled,
         mypy_enabled=args.mypy_enabled,
-        prospector_enabled=args.prospector_enabled,
-        pylama_enabled=args.pylama_enabled,
         pytest_enabled=args.pytest_enabled,
         unittest_enabled=args.unittest_enabled,
         test=args.test,

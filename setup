@@ -13,10 +13,8 @@ source setup_python_app.sh \
 	--python_formatter="black" \
 	--pylint_enabled \
 	--flake8_enabled \
-	--pydocstyle_enabled \
-	--pycodestyle_enabled \
-	--bandit_enabled \
+	--mypy_enabled \
 	--pytest_enabled \
 	--overwrite_vscode_launch \
-	--line_length=110 \
+	--line_length=120 \
 	--pre_commit_pylint_entry_prefix=""

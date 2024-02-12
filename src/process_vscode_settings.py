@@ -1,4 +1,5 @@
 """Do processing of the .vscode/settings.json file."""
+
 import json
 import os
 from copy import deepcopy
@@ -90,9 +91,7 @@ def _process_python_analysis(data: Dict[str, Any]):
     if indexing is None:
         data[PYTHON_ANALYSIS_INDEXING_KEY] = True
 
-    function_return_types = cast(
-        Optional[bool], data.get(PYTHON_ANALYSIS_INLAY_HINTS_FUNCTION_RETURN_TYPES_KEY)
-    )
+    function_return_types = cast(Optional[bool], data.get(PYTHON_ANALYSIS_INLAY_HINTS_FUNCTION_RETURN_TYPES_KEY))
     if function_return_types is None:
         data[PYTHON_ANALYSIS_INLAY_HINTS_FUNCTION_RETURN_TYPES_KEY] = True
 
@@ -108,9 +107,7 @@ def _process_python_analysis(data: Dict[str, Any]):
     if type_checking_mode is None:
         data[PYTHON_ANALYSIS_TYPE_CHECKING_MODE_KEY] = "basic"
 
-    use_library_code_for_types = cast(
-        Optional[bool], data.get(PYTHON_ANALYSIS_USE_LIBRARY_CODE_FOR_TYPES_KEY)
-    )
+    use_library_code_for_types = cast(Optional[bool], data.get(PYTHON_ANALYSIS_USE_LIBRARY_CODE_FOR_TYPES_KEY))
     if use_library_code_for_types is None:
         data[PYTHON_ANALYSIS_USE_LIBRARY_CODE_FOR_TYPES_KEY] = True
 
@@ -145,9 +142,7 @@ def _process_python_formatter_option(data: Dict[str, Any], python_formatter: str
 
     python_language[EDITOR_FORMAT_ON_SAVE_KEY] = True
 
-    code_actions_on_save = cast(
-        Optional[Dict[str, Any]], python_language.get(EDITOR_CODE_ACTIONS_ON_SAVE_KEY)
-    )
+    code_actions_on_save = cast(Optional[Dict[str, Any]], python_language.get(EDITOR_CODE_ACTIONS_ON_SAVE_KEY))
     if code_actions_on_save is None:
         code_actions_on_save = {}
         python_language[EDITOR_CODE_ACTIONS_ON_SAVE_KEY] = code_actions_on_save
@@ -156,15 +151,7 @@ def _process_python_formatter_option(data: Dict[str, Any], python_formatter: str
 
 
 def _process_python_linter_options(
-    data: Dict[str, Any],
-    pylint_enabled: bool,
-    flake8_enabled: bool,
-    pydocstyle_enabled: bool,
-    pycodestyle_enabled: bool,
-    bandit_enabled: bool,
-    mypy_enabled: bool,
-    prospector_enabled: bool,
-    pylama_enabled: bool,
+    data: Dict[str, Any], pylint_enabled: bool, flake8_enabled: bool, mypy_enabled: bool
 ):
     # pylint: disable=too-many-branches too-many-statements
     # pylint
@@ -179,21 +166,11 @@ def _process_python_linter_options(
     else:
         data.pop(FLAKE8_ARGS_KEY, None)
 
-    # pydocstyle
-
-    # pycodestyle
-
-    # bandit
-
     # mypy
     if mypy_enabled:
         data[MYPY_ARGS_KEY] = ["--ignore-missing-imports", "--follow-imports=silent"]
     else:
         data.pop(MYPY_ARGS_KEY, None)
-
-    # prospector
-
-    # pylama
 
 
 def _process_python_testing_options(data: Dict[str, Any], pytest_enabled: bool, unittest_enabled: bool):
@@ -263,12 +240,7 @@ def process_vscode_settings(
     python_formatter: str = "",
     pylint_enabled: bool = False,
     flake8_enabled: bool = False,
-    pydocstyle_enabled: bool = False,
-    pycodestyle_enabled: bool = False,
-    bandit_enabled: bool = False,
     mypy_enabled: bool = False,
-    prospector_enabled: bool = False,
-    pylama_enabled: bool = False,
     pytest_enabled: bool = False,
     unittest_enabled: bool = False,
     use_pyenv: bool = False,
@@ -283,12 +255,7 @@ def process_vscode_settings(
         print(f"    --python_formatter: {python_formatter}")
         print(f"    --pylint_enabled: {pylint_enabled}")
         print(f"    --flake8_enabled: {flake8_enabled}")
-        print(f"    --pydocstyle_enabled: {pydocstyle_enabled}")
-        print(f"    --pycodestyle_enabled: {pycodestyle_enabled}")
-        print(f"    --bandit_enabled: {bandit_enabled}")
         print(f"    --mypy_enabled: {mypy_enabled}")
-        print(f"    --prospector_enabled: {prospector_enabled}")
-        print(f"    --pylama_enabled: {pylama_enabled}")
         print(f"    --pytest_enabled: {pytest_enabled}")
         print(f"    --unittest_enabled: {unittest_enabled}")
         print(f"    --use_pyenv: {use_pyenv}")
@@ -314,12 +281,7 @@ def process_vscode_settings(
         data=vscode_settings,
         pylint_enabled=pylint_enabled,
         flake8_enabled=flake8_enabled,
-        pydocstyle_enabled=pydocstyle_enabled,
-        pycodestyle_enabled=pycodestyle_enabled,
-        bandit_enabled=bandit_enabled,
         mypy_enabled=mypy_enabled,
-        prospector_enabled=prospector_enabled,
-        pylama_enabled=pylama_enabled,
     )
 
     # python_testing_framework

@@ -138,9 +138,6 @@ echo ""
 # .flake8 Setup
 "$script_dir"/setup_flake8.sh "$@"
 
-# tox.ini Setup
-"$script_dir"/setup_tox_ini.sh "$@"
-
 # Install Dependencies
 "$script_dir"/setup_install_dependencies.sh "$@"
 

@@ -1,4 +1,5 @@
 """Core Python utility functions for the project."""
+
 import json
 from argparse import ArgumentTypeError
 from copy import deepcopy
@@ -9,10 +10,9 @@ from typing import Any, Dict, Union, cast
 
 def validate_python_formatter_option(python_formatter: str):
     """Validate the python_formatter option."""
-    if python_formatter not in ["", "autopep8", "black", "yapf"]:
+    if python_formatter not in ["", "autopep8", "black"]:
         raise ValueError(
-            f"Invalid python_formatter: {python_formatter}. "
-            + "Valid Options are: ['', 'autopep8', 'black', 'yapf']"
+            f"Invalid python_formatter: {python_formatter}. " + "Valid Options are: ['', 'autopep8', 'black']"
         )
 
 

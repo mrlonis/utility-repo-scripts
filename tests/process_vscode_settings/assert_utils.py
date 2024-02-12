@@ -1,4 +1,5 @@
 """This module contains utility functions for asserting vscode settings."""
+
 from copy import deepcopy
 from typing import Any, Dict, List, Optional, cast
 
@@ -53,9 +54,7 @@ def assert_python_default_interpreter_settings(data: Dict[str, Any]):
 
 def assert_python_analysis_package_index_depths_settings(data: Dict[str, Any]):
     """Assert that the python analysis package index depths settings are set correctly."""
-    package_index_depths = cast(
-        Optional[List[Dict[str, Any]]], data.get(PYTHON_ANALYSIS_PACKAGE_INDEX_DEPTHS_KEY)
-    )
+    package_index_depths = cast(Optional[List[Dict[str, Any]]], data.get(PYTHON_ANALYSIS_PACKAGE_INDEX_DEPTHS_KEY))
     assert package_index_depths is not None
 
     index_names_copy = deepcopy(INDEX_NAMES)
@@ -99,9 +98,7 @@ def assert_python_analysis_settings(data: Dict[str, Any]):
     indexing = cast(Optional[bool], data.get(PYTHON_ANALYSIS_INDEXING_KEY))
     assert indexing is not None
 
-    function_return_types = cast(
-        Optional[bool], data.get(PYTHON_ANALYSIS_INLAY_HINTS_FUNCTION_RETURN_TYPES_KEY)
-    )
+    function_return_types = cast(Optional[bool], data.get(PYTHON_ANALYSIS_INLAY_HINTS_FUNCTION_RETURN_TYPES_KEY))
     assert function_return_types is not None
 
     pytest_parameters = cast(Optional[bool], data.get(PYTHON_ANALYSIS_INLAY_HINTS_PYTEST_PARAMETERS_KEY))
@@ -117,9 +114,7 @@ def assert_python_analysis_settings(data: Dict[str, Any]):
     assert type_checking_mode is not None
     assert type_checking_mode in ["off", "basic", "strict"]
 
-    use_library_code_for_types = cast(
-        Optional[bool], data.get(PYTHON_ANALYSIS_USE_LIBRARY_CODE_FOR_TYPES_KEY)
-    )
+    use_library_code_for_types = cast(Optional[bool], data.get(PYTHON_ANALYSIS_USE_LIBRARY_CODE_FOR_TYPES_KEY))
     assert use_library_code_for_types is not None
 
 
@@ -155,9 +150,7 @@ def assert_python_formatter_settings(data: Dict[str, Any], python_formatter: str
     assert format_on_save is not None
     assert format_on_save is True
 
-    code_actions_on_save = cast(
-        Optional[Dict[str, Any]], python_language.get(EDITOR_CODE_ACTIONS_ON_SAVE_KEY)
-    )
+    code_actions_on_save = cast(Optional[Dict[str, Any]], python_language.get(EDITOR_CODE_ACTIONS_ON_SAVE_KEY))
     assert code_actions_on_save is not None
 
     source_organize_imports = cast(Optional[bool], code_actions_on_save.get(SOURCE_ORGANIZE_IMPORTS_KEY))
@@ -166,15 +159,7 @@ def assert_python_formatter_settings(data: Dict[str, Any], python_formatter: str
 
 
 def assert_python_linting_settings(
-    data: Dict[str, Any],
-    pylint_enabled: bool,
-    flake8_enabled: bool,
-    pydocstyle_enabled: bool,
-    pycodestyle_enabled: bool,
-    bandit_enabled: bool,
-    mypy_enabled: bool,
-    prospector_enabled: bool,
-    pylama_enabled: bool,
+    data: Dict[str, Any], pylint_enabled: bool, flake8_enabled: bool, mypy_enabled: bool
 ):
     # pylint: disable=too-many-branches too-many-statements
     """Assert that the python linting settings are set correctly."""

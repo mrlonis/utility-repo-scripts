@@ -1,4 +1,5 @@
 """Do processing of the .flake8 file."""
+
 from configupdater import ConfigUpdater, Option
 
 from src.constants.shared import DEFAULT_LINE_LENGTH, REPO_NAME

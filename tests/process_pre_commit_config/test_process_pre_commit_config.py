@@ -1,4 +1,5 @@
 """Test the src/process_pre_commit_config.py file."""
+
 from typing import Any, Dict, List, cast
 
 from ruamel.yaml.comments import CommentedMap
@@ -19,12 +20,10 @@ from src.constants.pre_commit_config import (
     PRE_COMMIT_REPO_URL,
     PRE_COMMIT_REV,
     PRETTIER_REPO_URL,
-    PYDOCSTYLE_REPO_URL,
     PYLINT_HOOK_ID,
     SHELL_FORMAT_HOOK_ID,
     SHELLCHECK_HOOK_ID,
     TRAILING_WHITESPACE_HOOK_ID,
-    YAPF_REPO_URL,
 )
 from src.constants.pylintrc import PYLINTRC_FILENAME
 from src.constants.shared import REPO_NAME
@@ -315,9 +314,6 @@ def test_process_pre_commit_config_no_python_formatter():
     repo = _find_repo(pre_commit_config=result, repo_url=BLACK_REPO_URL)
     assert repo is None
 
-    repo = _find_repo(pre_commit_config=result, repo_url=YAPF_REPO_URL)
-    assert repo is None
-
 
 def test_process_pre_commit_config_autopep8_python_formatter():
     """Test the process_pre_commit_config function with the python_formatter option set to autopep8."""
@@ -331,9 +327,6 @@ def test_process_pre_commit_config_autopep8_python_formatter():
     repo = _find_repo(pre_commit_config=result, repo_url=BLACK_REPO_URL)
     assert repo is None
 
-    repo = _find_repo(pre_commit_config=result, repo_url=YAPF_REPO_URL)
-    assert repo is None
-
 
 def test_process_pre_commit_config_black_python_formatter():
     """Test the process_pre_commit_config function with the python_formatter option set to black."""
@@ -345,25 +338,6 @@ def test_process_pre_commit_config_black_python_formatter():
     assert result is not None
 
     repo = _find_repo(pre_commit_config=result, repo_url=AUTOPEP8_REPO_URL)
-    assert repo is None
-
-    repo = _find_repo(pre_commit_config=result, repo_url=YAPF_REPO_URL)
-    assert repo is None
-
-
-def test_process_pre_commit_config_yapf_python_formatter():
-    """Test the process_pre_commit_config function with the python_formatter option set to yapf."""
-    python_formatter = "yapf"
-
-    result = PreCommitConfigProcessor(
-        pre_commit_config=cast(CommentedMap, {}), python_formatter=python_formatter, test=True, debug=True
-    ).process_pre_commit_config()
-    assert result is not None
-
-    repo = _find_repo(pre_commit_config=result, repo_url=AUTOPEP8_REPO_URL)
-    assert repo is None
-
-    repo = _find_repo(pre_commit_config=result, repo_url=BLACK_REPO_URL)
     assert repo is None
 
 
@@ -401,9 +375,6 @@ def test_process_pre_commit_config_flake8_python_linter():
     repo = _find_repo(pre_commit_config=result, repo_url=LOCAL_REPO_URL)
     assert repo is None
 
-    repo = _find_repo(pre_commit_config=result, repo_url=PYDOCSTYLE_REPO_URL)
-    assert repo is None
-
 
 def test_process_pre_commit_config_pylint_python_linter():
     """Test the process_pre_commit_config function with the pylint_enabled option set to True."""
@@ -435,9 +406,6 @@ def test_process_pre_commit_config_pylint_python_linter():
     assert hook["language"] == "script"
     assert hook["types"] == ["python"]
     assert hook["args"] == ["pylint", "-v", RC_FILE_ARG]
-
-    repo = _find_repo(pre_commit_config=result, repo_url=PYDOCSTYLE_REPO_URL)
-    assert repo is None
 
 
 def test_process_pre_commit_config_pylint_python_linter_with_existing_pylint():
@@ -491,9 +459,6 @@ def test_process_pre_commit_config_pylint_python_linter_with_existing_pylint():
     assert hook["types"] == ["python"]
     assert hook["args"] == ["pylint", IGNORE_TEST_ARG, "-v", RC_FILE_ARG]
     assert hook["exclude"] == EXCLUDE_STATIC
-
-    repo = _find_repo(pre_commit_config=result, repo_url=PYDOCSTYLE_REPO_URL)
-    assert repo is None
 
 
 def test_process_pre_commit_config_no_python_linter_with_existing_pylint():
@@ -588,9 +553,6 @@ def test_process_pre_commit_config_no_python_linter_with_existing_pylint_and_oth
     assert hook["language"] == "script"
     assert hook["types"] == ["python"]
 
-    repo = _find_repo(pre_commit_config=result, repo_url=PYDOCSTYLE_REPO_URL)
-    assert repo is None
-
 
 def test_process_pre_commit_config_pylint_python_linter_with_existing_local():
     """Test the process_pre_commit_config function with the pylint_enabled option set to True."""
@@ -650,15 +612,11 @@ def test_process_pre_commit_config_pylint_python_linter_with_existing_local():
     assert hook2["types"] == ["python"]
     assert hook2["args"] == ["pylint", "-v", RC_FILE_ARG]
 
-    repo = _find_repo(pre_commit_config=result, repo_url=PYDOCSTYLE_REPO_URL)
-    assert repo is None
-
 
 def test_process_pre_commit_config_pydocstyle_python_linter():
     """Test the process_pre_commit_config function with the pylint_enabled option set to True."""
     result = PreCommitConfigProcessor(
         pre_commit_config=cast(CommentedMap, {}),
-        pydocstyle_enabled=True,
         test=True,
         debug=True,
     ).process_pre_commit_config()
@@ -669,9 +627,6 @@ def test_process_pre_commit_config_pydocstyle_python_linter():
 
     repo = _find_repo(pre_commit_config=result, repo_url=LOCAL_REPO_URL)
     assert repo is None
-
-    repo = _find_repo(pre_commit_config=result, repo_url=PYDOCSTYLE_REPO_URL)
-    assert repo is not None
 
 
 def test_process_pre_commit_config_all_python_linter():
@@ -680,8 +635,6 @@ def test_process_pre_commit_config_all_python_linter():
         pre_commit_config=cast(CommentedMap, {}),
         pylint_enabled=True,
         flake8_enabled=True,
-        pydocstyle_enabled=True,
-        bandit_enabled=True,
         test=True,
         debug=True,
     ).process_pre_commit_config()
@@ -691,9 +644,6 @@ def test_process_pre_commit_config_all_python_linter():
     assert repo is not None
 
     repo = _find_repo(pre_commit_config=result, repo_url=LOCAL_REPO_URL)
-    assert repo is not None
-
-    repo = _find_repo(pre_commit_config=result, repo_url=PYDOCSTYLE_REPO_URL)
     assert repo is not None
 
 
@@ -708,7 +658,5 @@ def test_process_pre_commit_config():
         python_formatter="black",
         pylint_enabled=True,
         flake8_enabled=True,
-        pydocstyle_enabled=True,
-        bandit_enabled=True,
         test=True,
     ).process_pre_commit_config()

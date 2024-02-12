@@ -1,4 +1,5 @@
 """Do processing of the .pre-commit-config.yaml file."""
+
 from argparse import ArgumentParser
 
 from src.constants.pre_commit_config import PRE_COMMIT_CONFIG_FILENAME, SAMPLE_PRE_COMMIT_CONFIG
@@ -16,11 +17,9 @@ def main(
     python_formatter="",
     pylint_enabled: bool = False,
     flake8_enabled: bool = False,
-    pydocstyle_enabled: bool = False,
     pre_commit_pylint_entry_prefix=f"{REPO_NAME}/",
     test: bool = False,
     exists: bool = False,
-    bandit_enabled: bool = False,
 ):  # pylint: disable=too-many-arguments
     """Do processing of the .pre-commit-config.yaml file."""
     pre_commit_config = load_yaml_file(
@@ -37,9 +36,7 @@ def main(
         python_formatter=python_formatter,
         pylint_enabled=pylint_enabled,
         flake8_enabled=flake8_enabled,
-        pydocstyle_enabled=pydocstyle_enabled,
         pre_commit_pylint_entry_prefix=pre_commit_pylint_entry_prefix,
-        bandit_enabled=bandit_enabled,
     )
     processor.process_pre_commit_config()
 
@@ -70,8 +67,6 @@ if __name__ == "__main__":
         python_formatter=args.python_formatter,
         pylint_enabled=args.pylint_enabled,
         flake8_enabled=args.flake8_enabled,
-        pydocstyle_enabled=args.pydocstyle_enabled,
         pre_commit_pylint_entry_prefix=args.pre_commit_pylint_entry_prefix,
         exists=args.exists,
-        bandit_enabled=args.bandit_enabled,
     )

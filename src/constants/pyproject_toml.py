@@ -1,28 +1,22 @@
 """pyproject.toml file constants."""
+
 # region pyproject.toml Constants
 from src.constants.shared import DEFAULT_LINE_LENGTH, REPO_NAME
 
 PYPROJECT_TOML_FILENAME = "pyproject.toml"
 PYPROJECT_TOOL_KEY = "tool"
 PYPROJECT_AUTOPEP8_KEY = "autopep8"
-PYPROJECT_BANDIT_KEY = "bandit"
 PYPROJECT_BLACK_KEY = "black"
 PYPROJECT_ISORT_KEY = "isort"
-PYPROJECT_PYDOCSTYLE_KEY = "pydocstyle"
 PYPROJECT_PYCODESTYLE_MATCH_VALUE = ".*.py"
 PYPROJECT_PYTEST_KEY = "pytest"
 PYPROJECT_PYTEST_INI_OPTIONS_KEY = "ini_options"
-PYPROJECT_PYTEST_INI_OPTIONS_LOG_CLI_VALUE = (
-    "%(asctime)s [%(levelname)8s] %(message)s (%(filename)s:%(lineno)s)"
-)
+PYPROJECT_PYTEST_INI_OPTIONS_LOG_CLI_VALUE = "%(asctime)s [%(levelname)8s] %(message)s (%(filename)s:%(lineno)s)"
 PYPROJECT_PYTEST_INI_OPTIONS_LOG_CLI_DATE_FORMAT_VALUE = "%Y-%m-%d %H:%M:%S"
 
 SAMPLE_PYPROJECT_TOML = f"""[{PYPROJECT_TOOL_KEY}.{PYPROJECT_AUTOPEP8_KEY}]
 max_line_length = {DEFAULT_LINE_LENGTH}
 experimental = true
-
-[{PYPROJECT_TOOL_KEY}.{PYPROJECT_BANDIT_KEY}]
-exclude_dirs = ["tests", "{REPO_NAME}"]
 
 [{PYPROJECT_TOOL_KEY}.{PYPROJECT_BLACK_KEY}]
 line-length = {DEFAULT_LINE_LENGTH}
@@ -30,10 +24,6 @@ line-length = {DEFAULT_LINE_LENGTH}
 [{PYPROJECT_TOOL_KEY}.{PYPROJECT_ISORT_KEY}]
 line_length = {DEFAULT_LINE_LENGTH}
 profile = "black"
-
-[{PYPROJECT_TOOL_KEY}.{PYPROJECT_PYDOCSTYLE_KEY}]
-inherit = false
-match = "{PYPROJECT_PYCODESTYLE_MATCH_VALUE}"
 
 [{PYPROJECT_TOOL_KEY}.{PYPROJECT_PYTEST_KEY}.{PYPROJECT_PYTEST_INI_OPTIONS_KEY}]
 addopts = "--ignore=./{REPO_NAME}"

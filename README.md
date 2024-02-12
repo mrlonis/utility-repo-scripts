@@ -89,25 +89,24 @@ The `setup` script accepts a few flags to customize the setup process:
 
 **Note**: `0` is False and `1` is True
 
-| Flag                               | Description                                                                     | Default                 | Valid Values                        |
-| :--------------------------------- | :------------------------------------------------------------------------------ | :---------------------- | :---------------------------------- |
-| `-d` or `--debug`                  | Enables or disables debug echo statements                                       | `False`                 |                                     |
-| `--package_manager`                | Specifies which package manager to use                                          | `pip`                   | [`pip`, `pip-tools`, `poetry`]      |
-| `-r` or `--rebuild_venv`           | Specifies whether or not to delete and re-create the virtual environment or not | `False`                 |                                     |
-| `--python_version`                 | Specifies the python version to use                                             | `3.8`                   | [`3.8`, `3.9`, `3.10`, `3.11`]      |
-| `--is_package`                     | Specifies whether or not the project is a package                               | `False`                 |                                     |
-| `--include_jumanji_house`          | Specifies whether or not to include the `jumanjihouse` `pre-commit` hooks       | `False`                 |                                     |
-| `--include_prettier`               | Specifies whether or not to include the `prettier` `pre-commit` hooks           | `False`                 |                                     |
-| `--include_isort`                  | Specifies whether or not to include the `isort` `pre-commit` hooks              | `False`                 |                                     |
-| `--python_formatter`               | Specifies which python formatter to use                                         | `''`                    | [`''`, `autopep8`, `black`, `yapf`] |
-| `--pylint_enabled`                 | Specifies whether or not to enable `pylint`                                     | `False`                 |                                     |
-| `--flake8_enabled`                 | Specifies whether or not to enable `flake8`                                     | `False`                 |                                     |
-| `--pydocstyle_enabled`             | Specifies whether or not to enable `pydocstyle`                                 | `False`                 |                                     |
-| `--pytest_enabled`                 | Specifies whether or not to enable `pytest`                                     | `False`                 |                                     |
-| `--unittest_enabled`               | Specifies whether or not to enable `unittest`                                   | `False`                 |                                     |
-| `--overwrite_vscode_launch`        | Enables or disables the overriding of the `.vscode/launch.json` file            | `False`                 |                                     |
-| `--line_length`                    | Specifies the line length to use for various settings                           | `125`                   | `Any non-zero positive integer`     |
-| `--pre_commit_pylint_entry_prefix` | Specifies the prefix to use for the `pylint` pre-commit hook entry              | `utility-repo-scripts/` |                                     |
+| Flag                               | Description                                                                     | Default                 | Valid Values                    |
+| :--------------------------------- | :------------------------------------------------------------------------------ | :---------------------- | :------------------------------ |
+| `-d` or `--debug`                  | Enables or disables debug echo statements                                       | `False`                 |                                 |
+| `--package_manager`                | Specifies which package manager to use                                          | `pip`                   | [`pip`, `pip-tools`, `poetry`]  |
+| `-r` or `--rebuild_venv`           | Specifies whether or not to delete and re-create the virtual environment or not | `False`                 |                                 |
+| `--python_version`                 | Specifies the python version to use                                             | `3.8`                   | [`3.8`, `3.9`, `3.10`, `3.11`]  |
+| `--is_package`                     | Specifies whether or not the project is a package                               | `False`                 |                                 |
+| `--include_jumanji_house`          | Specifies whether or not to include the `jumanjihouse` `pre-commit` hooks       | `False`                 |                                 |
+| `--include_prettier`               | Specifies whether or not to include the `prettier` `pre-commit` hooks           | `False`                 |                                 |
+| `--include_isort`                  | Specifies whether or not to include the `isort` `pre-commit` hooks              | `False`                 |                                 |
+| `--python_formatter`               | Specifies which python formatter to use                                         | `''`                    | [`''`, `autopep8`, `black`]     |
+| `--pylint_enabled`                 | Specifies whether or not to enable `pylint`                                     | `False`                 |                                 |
+| `--flake8_enabled`                 | Specifies whether or not to enable `flake8`                                     | `False`                 |                                 |
+| `--pytest_enabled`                 | Specifies whether or not to enable `pytest`                                     | `False`                 |                                 |
+| `--unittest_enabled`               | Specifies whether or not to enable `unittest`                                   | `False`                 |                                 |
+| `--overwrite_vscode_launch`        | Enables or disables the overriding of the `.vscode/launch.json` file            | `False`                 |                                 |
+| `--line_length`                    | Specifies the line length to use for various settings                           | `125`                   | `Any non-zero positive integer` |
+| `--pre_commit_pylint_entry_prefix` | Specifies the prefix to use for the `pylint` pre-commit hook entry              | `utility-repo-scripts/` |                                 |
 
 [Back to Top](#utility-repo-scripts)
 

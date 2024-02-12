@@ -1,17 +1,15 @@
 """Do processing of the pyproject.toml file."""
+
 from pathlib import Path
 from typing import Optional, cast
 
-from tomlkit import TOMLDocument, array, document, dump, table
-from tomlkit.items import Array, Table
+from tomlkit import TOMLDocument, document, dump, table
+from tomlkit.items import Table
 
 from src.constants.pyproject_toml import (
     PYPROJECT_AUTOPEP8_KEY,
-    PYPROJECT_BANDIT_KEY,
     PYPROJECT_BLACK_KEY,
     PYPROJECT_ISORT_KEY,
-    PYPROJECT_PYCODESTYLE_MATCH_VALUE,
-    PYPROJECT_PYDOCSTYLE_KEY,
     PYPROJECT_PYTEST_INI_OPTIONS_KEY,
     PYPROJECT_PYTEST_INI_OPTIONS_LOG_CLI_DATE_FORMAT_VALUE,
     PYPROJECT_PYTEST_INI_OPTIONS_LOG_CLI_VALUE,
@@ -33,8 +31,6 @@ class PyProjectTomlProcessor:
         include_isort: bool = False,
         python_formatter="",
         isort_profile: str = "",
-        pydocstyle_enabled: bool = False,
-        bandit_enabled: bool = False,
         pytest_enabled: bool = False,
         line_length: int = DEFAULT_LINE_LENGTH,
         debug: bool = False,
@@ -46,8 +42,6 @@ class PyProjectTomlProcessor:
         self.include_isort = include_isort
         self.python_formatter = python_formatter
         self.isort_profile = isort_profile
-        self.pydocstyle_enabled = pydocstyle_enabled
-        self.bandit_enabled = bandit_enabled
         self.pytest_enabled = pytest_enabled
         self.line_length = line_length
         self.debug = debug
@@ -58,8 +52,6 @@ class PyProjectTomlProcessor:
             print(f"    --include-isort: {self.include_isort}")
             print(f"    --python-formatter: {self.python_formatter}")
             print(f"    --isort-profile: {self.isort_profile}")
-            print(f"    --pydocstyle-enabled: {self.pydocstyle_enabled}")
-            print(f"    --bandit-enabled: {self.bandit_enabled}")
             print(f"    --pytest-enabled: {self.pytest_enabled}")
             print(f"    --line-length: {self.line_length}")
             print(f"    --debug: {self.debug}")
@@ -79,12 +71,6 @@ class PyProjectTomlProcessor:
 
         # python_formatter
         self._process_python_formatter(tools=tools)
-
-        # pydocstyle_enabled
-        self._process_pydocstyle(tools=tools)
-
-        # bandit_enabled
-        self._process_bandit(tools=tools)
 
         # include_isort
         self._process_isort(tools=tools)
@@ -119,39 +105,6 @@ class PyProjectTomlProcessor:
         else:
             tools.pop(PYPROJECT_AUTOPEP8_KEY, None)
             tools.pop(PYPROJECT_BLACK_KEY, None)
-
-    def _process_pydocstyle(self, tools: Table):
-        if not self.pydocstyle_enabled:
-            tools.pop(PYPROJECT_PYDOCSTYLE_KEY, None)
-        else:
-            pydocstyle_tool = cast(Optional[Table], tools.get(PYPROJECT_PYDOCSTYLE_KEY))
-
-            if pydocstyle_tool is None:
-                pydocstyle_tool = table()
-                tools[PYPROJECT_PYDOCSTYLE_KEY] = pydocstyle_tool
-
-            pydocstyle_tool["inherit"] = False
-            pydocstyle_tool["match"] = PYPROJECT_PYCODESTYLE_MATCH_VALUE
-
-    def _process_bandit(self, tools: Table):
-        if not self.bandit_enabled:
-            tools.pop(PYPROJECT_BANDIT_KEY, None)
-        else:
-            bandit_tool = cast(Optional[Table], tools.get(PYPROJECT_BANDIT_KEY))
-
-            if bandit_tool is None:
-                bandit_tool = table()
-                tools[PYPROJECT_BANDIT_KEY] = bandit_tool
-
-            # Special processing for exclude_dirs
-            existing_exclude_dirs = cast(Optional[Array], bandit_tool.get("exclude_dirs"))
-            if existing_exclude_dirs is None:
-                existing_exclude_dirs = array()
-
-            if REPO_NAME not in existing_exclude_dirs:
-                existing_exclude_dirs.append(REPO_NAME)
-
-            bandit_tool["exclude_dirs"] = existing_exclude_dirs
 
     def _process_isort(self, tools: Table):
         if not self.include_isort:
