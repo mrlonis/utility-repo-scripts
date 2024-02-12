@@ -1,20 +1,3 @@
 {
-  "singleQuote": true,
-  "printWidth": 125,
-  "tabWidth": 2,
-  "trailingComma": "none",
-  "overrides": [
-    {
-      "files": "*.html",
-      "options": {
-        "parser": "html"
-      }
-    },
-    {
-      "files": "*.component.html",
-      "options": {
-        "parser": "angular"
-      }
-    }
-  ]
+  "printWidth": 125
 }
