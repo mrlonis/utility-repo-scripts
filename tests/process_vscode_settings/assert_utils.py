@@ -155,7 +155,7 @@ def assert_python_formatter_settings(data: Dict[str, Any], python_formatter: str
 
     source_organize_imports = cast(Optional[bool], code_actions_on_save.get(SOURCE_ORGANIZE_IMPORTS_KEY))
     assert source_organize_imports is not None
-    assert source_organize_imports is True
+    assert source_organize_imports == "explicit"
 
 
 def assert_python_linting_settings(

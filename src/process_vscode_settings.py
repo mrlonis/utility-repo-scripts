@@ -147,7 +147,7 @@ def _process_python_formatter_option(data: Dict[str, Any], python_formatter: str
         code_actions_on_save = {}
         python_language[EDITOR_CODE_ACTIONS_ON_SAVE_KEY] = code_actions_on_save
 
-    code_actions_on_save[SOURCE_ORGANIZE_IMPORTS_KEY] = True
+    code_actions_on_save[SOURCE_ORGANIZE_IMPORTS_KEY] = "explicit"
 
 
 def _process_python_linter_options(
