@@ -51,10 +51,8 @@ if __name__ == "__main__":
     parser.add_argument("--python_formatter", default="black", type=str)
     parser.add_argument("--pylint_enabled", action="store_true")
     parser.add_argument("--flake8_enabled", action="store_true")
-    parser.add_argument("--pydocstyle_enabled", action="store_true")
     parser.add_argument("--pre_commit_pylint_entry_prefix", default=f"{REPO_NAME}/", type=str)
     parser.add_argument("--exists", type=str2bool, default=False)
-    parser.add_argument("--bandit_enabled", action="store_true")
 
     args, unknown = parser.parse_known_args()
 

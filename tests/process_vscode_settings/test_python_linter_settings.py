@@ -52,22 +52,6 @@ def test_process_vscode_settings_flake8_python_linter():
     )
 
 
-def test_process_vscode_settings_pydocstyle_python_linter():
-    """Test the process_vscode_settings function when pydocstyle is enabled."""
-    pylint_enabled = False
-    flake8_enabled = False
-    mypy_enabled = False
-
-    result = process_vscode_settings(
-        vscode_settings={}, pylint_enabled=pylint_enabled, flake8_enabled=flake8_enabled, test=True, debug=True
-    )
-    assert result is not None
-
-    assert_python_linting_settings(
-        data=result, pylint_enabled=pylint_enabled, flake8_enabled=flake8_enabled, mypy_enabled=mypy_enabled
-    )
-
-
 def test_process_vscode_settings_all_python_linters():
     """Test the process_vscode_settings function when all linters are enabled."""
     pylint_enabled = True

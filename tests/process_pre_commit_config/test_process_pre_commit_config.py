@@ -613,22 +613,6 @@ def test_process_pre_commit_config_pylint_python_linter_with_existing_local():
     assert hook2["args"] == ["pylint", "-v", RC_FILE_ARG]
 
 
-def test_process_pre_commit_config_pydocstyle_python_linter():
-    """Test the process_pre_commit_config function with the pylint_enabled option set to True."""
-    result = PreCommitConfigProcessor(
-        pre_commit_config=cast(CommentedMap, {}),
-        test=True,
-        debug=True,
-    ).process_pre_commit_config()
-    assert result is not None
-
-    repo = _find_repo(pre_commit_config=result, repo_url=FLAKE8_REPO_URL)
-    assert repo is None
-
-    repo = _find_repo(pre_commit_config=result, repo_url=LOCAL_REPO_URL)
-    assert repo is None
-
-
 def test_process_pre_commit_config_all_python_linter():
     """Test the process_pre_commit_config function when all linters are enabled."""
     result = PreCommitConfigProcessor(
