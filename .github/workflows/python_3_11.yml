@@ -31,7 +31,6 @@ jobs:
 
       - name: Install Dependencies
         run: poetry install --no-interaction --no-root --without dev
-        if: steps.cache_dependencies.outputs.cache-hit != 'true'
 
       - name: Flake8
         run: poetry run flake8 ${{ env.LINT_PATHS }}
