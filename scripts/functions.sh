@@ -15,11 +15,13 @@ find_site_package() {
 			echo "Installing $pypi_name temporarily for pre-commit setup"
 		fi
 		pip install "$pypi_name"
-		export existed=0
+		exists=0
 	else
 		if [ "$debug" = 1 ]; then
 			echo "$pypi_name found"
 		fi
-		export existed=1
+		exists=1
 	fi
+	echo $exists
+	return $exists
 }

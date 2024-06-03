@@ -1,4 +1,5 @@
 """ruamel.yaml utility functions."""
+
 from copy import deepcopy
 from os import getenv
 from pathlib import Path
@@ -92,9 +93,7 @@ def remove_hooks(
 
     for repo_url in repo_urls:
         if repo_url == "local":
-            _remove_local_hook(
-                pre_commit_config=pre_commit_config, repos=repos, repo_url=repo_url, local_ids=local_ids
-            )
+            _remove_local_hook(pre_commit_config=pre_commit_config, repos=repos, repo_url=repo_url, local_ids=local_ids)
         else:
             try:
                 hook_index = find_repo_index(pre_commit_config, repo_url)
@@ -123,6 +122,23 @@ def deep_update(source: dict, updates: dict):
         else:
             source[key] = value
     return source
+
+
+def update_repo_rev(pre_commit_config: CommentedMap, repo_url: str, repo_default: Dict[str, Any], rev: str):
+    """Update a repo rev in the .pre-commit-config.yaml file."""
+    try:
+        existing_repo_index = find_repo_index(pre_commit_config, repo_url)
+    except ValueError:
+        existing_repo_index = None
+
+    repos = cast(List[Dict[str, Any]], pre_commit_config.get("repos", []))
+    if existing_repo_index is None:
+        repos.append(deepcopy(repo_default))
+        pre_commit_config["repos"] = repos
+    else:
+        existing_repo = repos[existing_repo_index]
+        existing_repo["rev"] = rev
+    pre_commit_config["repos"] = repos
 
 
 def update_hook(

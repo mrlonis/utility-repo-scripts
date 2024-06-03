@@ -1,4 +1,5 @@
 """Do processing of the .flake8 file."""
+
 from argparse import ArgumentParser
 
 from src.constants.flake8 import FLAKE8_FILENAME, SAMPLE_FLAKE8

@@ -39,13 +39,10 @@ rebuild_venv=0
 source "$script_dir"/scripts/process_cli_options.sh "$@" --script_name="setup_python_app.sh" --print_options=1
 
 # Variables
-venv_folder_location="${WORKON_HOME:-"$HOME/.venvs"}"
 current_dir=$PWD
 project_name=$(basename "$current_dir")
 python_exe="python$python_version"
 python_exe="${python_exe:-python3}" # If the specified python version is not installed, default to python3
-venv_location="$venv_folder_location/$project_name"
-venv_activate_location="$venv_location/bin/activate"
 
 #region Virtual Environment Setup
 echo "$dash_separator Virtual Environment Setup $dash_separator"
@@ -91,37 +88,15 @@ if [ "$pyenv_installed" = 1 ]; then
 		echo "    - The python executable from pyenv is mapped to a different virtual environment than the one we created."
 		echo "        - This can happen if you haven't set a global pyenv version. Try running 'pyenv global <version>' to set a global version and then re-launch your SHELL."
 		echo "    - The virtual environment already exists and is mapped to a different python version. In this case run ./setup 1 to force a rebuild of the virtual environment. If this doesn't work consider reading the README.md for the utility-repo-scripts repository."
+		echo "    - You might not have pyenv-virtualenv installed. Run 'brew install pyenv-virtualenv' to install it."
 		echo "Please try the setup script again."
 		exit 1
 	fi
 else
-	echo "Using python from brew or system to setup project..."
-
-	if [ "$package_manager" = "pip" ] || [ "$rebuild_venv" = 1 ]; then
-		if [ "$debug" = 1 ]; then
-			echo "Rebuilding virtual environment"
-		fi
-		deactivate 2>/dev/null || true # deactivate the current virtual environment if it exists
-		rm -rf "$venv_location"
-	fi
-
-	set -e # make sure we exit if this fails, otherwise we may corrupt the main environment
-	if [ -d "$venv_location" ]; then
-		if [ "$debug" = 1 ]; then
-			echo "Found $venv_location folder"
-		fi
-	else
-		if [ "$debug" = 1 ]; then
-			echo "Did not find $venv_location folder. Creating virtual environment"
-		fi
-		$python_exe -m venv "$venv_location"
-	fi
-	if [ "$debug" = 1 ]; then
-		echo "Activating virtual environment"
-	fi
-	# shellcheck disable=SC1090
-	source "$venv_activate_location"
-	set +e
+	echo "pyenv not installed! Please installl pyenv to use this setup script."
+	echo "brew install pyenv pyenv-virtualenv"
+	echo "Exiting..."
+	exit 1
 fi
 echo ""
 #endregion
@@ -152,20 +127,12 @@ fi
 # Setup VS Code
 "$script_dir"/setup_vscode.sh "$@" --use_pyenv="$use_pyenv"
 
+# Setup Prettier
+"$script_dir"/setup_prettier.sh "$@"
+
 # Custom after setup script
 "$script_dir"/setup_custom_after_setup_script.sh "$@"
 
 # Print out the final message
 echo "$dash_separator Project setup complete $dash_separator"
-if [ "$use_pyenv" = 1 ]; then
-	echo "Either re-launch $SHELL or run 'pyenv shell $project_name' to activate your virtual environment"
-	echo ""
-	echo "You can also have the setup script activate the virtual environment for you on exit."
-	echo "To do this run 'source setup' instead of './setup'."
-else
-	echo "Run 'source $venv_activate_location' to activate your virtual environment"
-	echo "If using virtualenvwrapper, run 'workon $project_name' to activate your virtual environment"
-	if [ "$debug" = 1 ]; then
-		echo "To learn about virtualenvwrapper, go to https://virtualenvwrapper.readthedocs.io/en/latest/"
-	fi
-fi
+echo "Either re-launch $SHELL or run 'pyenv shell $project_name' to activate your virtual environment."

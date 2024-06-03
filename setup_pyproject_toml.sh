@@ -15,9 +15,7 @@ if [ "$debug" = 1 ]; then
 fi
 
 # Install toml if it doesn't exist
-find_site_package tomlkit tomlkit
-existed=${existed:-0} # Load existed from find_site_package function if it exists
-tomlkit_installed="$existed"
+tomlkit_installed=$(find_site_package tomlkit tomlkit)
 if [ "$debug" = 1 ]; then
 	echo "tomlkit_installed: $tomlkit_installed"
 fi

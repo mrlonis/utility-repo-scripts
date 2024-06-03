@@ -18,9 +18,7 @@ if [ "$pylint_enabled" = 1 ]; then
 	source "$script_dir"/scripts/functions.sh "$@" # Loads find_site_package function
 
 	# Install configupdater if it doesn't exist
-	find_site_package configupdater configupdater
-	existed=${existed:-0} # Load existed from find_site_package function if it exists
-	configupdater_installed="$existed"
+	configupdater_installed=$(find_site_package configupdater configupdater)
 	if [ "$debug" = 1 ]; then
 		echo "configupdater_installed: $configupdater_installed"
 	fi

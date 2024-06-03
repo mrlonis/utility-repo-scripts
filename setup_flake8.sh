@@ -15,11 +15,8 @@ if [ "$flake8_enabled" = 1 ]; then
 		echo "$dash_separator Setup .flake8 $dash_separator"
 	fi
 
-	source "$script_dir"/scripts/functions.sh "$@" # Loads find_site_package function
-
 	# Install configupdater if it doesn't exist
-	find_site_package configupdater configupdater
-	configupdater_installed="$existed"
+	configupdater_installed=$(find_site_package configupdater configupdater)
 	if [ "$debug" = 1 ]; then
 		echo "configupdater_installed: $configupdater_installed"
 	fi

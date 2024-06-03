@@ -7,6 +7,9 @@ debug=0
 source "$script_dir"/scripts/process_cli_options.sh "$@"
 source "$script_dir"/scripts/functions.sh "$@" # Loads find_site_package function
 
+# Check if .prettierrc exists
+[ ! -f ".prettierrc" ] && prettierrc_exists=0 || prettierrc_exists=1
+
 # Check if .pre-commit-config.yaml exists
 [ ! -f ".pre-commit-config.yaml" ] && pre_commit_config_exists=0 || pre_commit_config_exists=1
 
@@ -20,7 +23,7 @@ if [ "$debug" = 1 ]; then
 fi
 
 # Create .pre-commit-config.yaml using setup_pre_commit_config.py
-python "$script_dir"/setup_pre_commit_config.py "$@" --exists="$pre_commit_config_exists"
+python "$script_dir"/setup_prettier.py "$@" --prettierrc_exists="$prettierrc_exists" --pre_commit_config_exists="$pre_commit_config_exists"
 
 # Uninstall ruamel.yaml if it didn't exist prior to running this script
 if [ "$ruamel_yaml_installed" = 0 ]; then
@@ -29,13 +32,17 @@ if [ "$ruamel_yaml_installed" = 0 ]; then
 	pip uninstall -y ruamel.yaml.clib
 fi
 
-# Attempt to format newly created .pre-commit-config.yaml using prettier
+# Attempt to format newly created .pre-commit-config.yaml and .prettierrc using prettier
 if command -v prettier >/dev/null; then
 	if [ "$debug" = 1 ]; then
 		echo "prettier found"
 		echo "Formatting .pre-commit-config.yaml"
 	fi
 	prettier --write .pre-commit-config.yaml
+	if [ "$debug" = 1 ]; then
+		echo "Formatting .prettierrc"
+	fi
+	prettier --write .prettierrc
 else
 	if [ "$debug" = 1 ]; then
 		echo "prettier not found"
@@ -44,15 +51,19 @@ else
 	if command -v npm >/dev/null; then
 		if [ "$debug" = 1 ]; then
 			echo "npm found"
-			echo "Installing prettier globally to format .pre-commit-config.json"
+			echo "Installing prettier globally to format .pre-commit-config.yaml and .prettierrc"
 		fi
 		npm install -g prettier
 		prettier --write .pre-commit-config.yaml
+		prettier --write .prettierrc
 	else
 		if [ "$debug" = 1 ]; then
 			echo "npm not found"
-			echo "Skipping formatting of .pre-commit-config.yaml"
+			echo "Skipping formatting of .pre-commit-config.yaml and .prettierrc"
 		fi
 	fi
 fi
-echo ""
+
+if [ "$debug" = 1 ]; then
+	echo ""
+fi

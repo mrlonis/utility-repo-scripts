@@ -41,7 +41,7 @@ JUMANJI_HOUSE_REPO = {
 PRETTIER_REPO_URL = "https://github.com/pre-commit/mirrors-prettier"
 PRETTIER_HOOK_ID = "prettier"
 PRETTIER_HOOK = {"id": PRETTIER_HOOK_ID, "args": ["--write", "--config=.prettierrc"]}
-PRETTIER_REPO = {"repo": PRETTIER_REPO_URL, "rev": "v3.0.0-alpha.4", "hooks": [PRETTIER_HOOK]}
+PRETTIER_REPO = {"repo": PRETTIER_REPO_URL, "rev": "v3.1.0", "hooks": [PRETTIER_HOOK]}
 
 ISORT_REPO_URL = "https://github.com/pycqa/isort"
 ISORT_HOOK_ID = "isort"

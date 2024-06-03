@@ -1,0 +1,5 @@
+from src.constants.shared import DEFAULT_LINE_LENGTH
+
+PRINT_WIDTH_KEY = "printWidth"
+SAMPLE_PRETTIERRC = {PRINT_WIDTH_KEY: DEFAULT_LINE_LENGTH}
+PRETTIER_FILENAME = ".prettierrc"
