@@ -8,7 +8,15 @@ version = "0.1.0"
 description = ""
 authors = ["Matthew Lonis <mattlonis@gmail.com>"]
 readme = "README.md"
-packages = [{ include = "utility_repo_scripts" }]
+packages = [{ include = "src" }]
+
+[tool.poetry.scripts]
+setup_flake8 = "src.setup_flake8:script_entry"
+setup_pre_commit_config = "src.setup_pre_commit_config:script_entry"
+setup_prettier = "src.setup_prettier:script_entry"
+setup_pylintrc = "src.setup_pylintrc:script_entry"
+setup_pyproject_toml = "src.setup_pyproject_toml:script_entry"
+setup_vscode = "src.setup_vscode:script_entry"
 
 [tool.poetry.dependencies]
 python = "^3.10"

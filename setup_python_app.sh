@@ -17,16 +17,17 @@ if [ "$debug" = 1 ]; then
 fi
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
+echo "$script_dir"
 
 # script_dir workaround for when a project using this submodule tries to source the 'setup' script file
-if [ ! -f "$script_dir"/scripts/process_cli_options.sh ]; then
+if [ ! -f "$script_dir"/scripts/utils/process_cli_options.sh ]; then
 	echo "Failed to find process_cli_options.sh in $script_dir/scripts"
 	backup_script_path=$(dirname -- "$0")
 	echo "Attempting to find process_cli_options.sh in $script_dir/$backup_script_path/scripts"
 	script_dir="$script_dir/$backup_script_path"
 fi
 
-if [ ! -f "$script_dir"/scripts/process_cli_options.sh ]; then
+if [ ! -f "$script_dir"/scripts/utils/process_cli_options.sh ]; then
 	echo "Failed to find process_cli_options.sh in $script_dir/scripts"
 	echo "Something went teribbly wrong"
 	exit 1
@@ -36,7 +37,7 @@ fi
 python_version="3.10"
 package_manager="pip"
 rebuild_venv=0
-source "$script_dir"/scripts/process_cli_options.sh "$@" --script_name="setup_python_app.sh" --print_options=1
+source "$script_dir"/scripts/utils/process_cli_options.sh "$@" --script_name="setup_python_app.sh" --print_options=1
 
 # Variables
 current_dir=$PWD
@@ -102,19 +103,19 @@ echo ""
 #endregion
 
 # pre-commit Setup
-"$script_dir"/setup_pre_commit_config.sh "$@"
+"$script_dir"/scripts/setup_pre_commit_config.sh "$@"
 
 # pyproject.toml Setup
-"$script_dir"/setup_pyproject_toml.sh "$@"
+"$script_dir"/scripts/setup_pyproject_toml.sh "$@"
 
 # pylintrc Setup
-"$script_dir"/setup_pylintrc.sh "$@"
+"$script_dir"/scripts/setup_pylintrc.sh "$@"
 
 # .flake8 Setup
-"$script_dir"/setup_flake8.sh "$@"
+"$script_dir"/scripts/setup_flake8.sh "$@"
 
 # Install Dependencies
-"$script_dir"/setup_install_dependencies.sh "$@"
+"$script_dir"/scripts/setup_install_dependencies.sh "$@"
 
 # Install pre-commit hooks
 if [ -f ".pre-commit-config.yaml" ]; then
@@ -125,13 +126,13 @@ if [ -f ".pre-commit-config.yaml" ]; then
 fi
 
 # Setup VS Code
-"$script_dir"/setup_vscode.sh "$@" --use_pyenv="$use_pyenv"
+"$script_dir"/scripts/setup_vscode.sh "$@" --use_pyenv="$use_pyenv"
 
 # Setup Prettier
-"$script_dir"/setup_prettier.sh "$@"
+"$script_dir"/scripts/setup_prettier.sh "$@"
 
 # Custom after setup script
-"$script_dir"/setup_custom_after_setup_script.sh "$@"
+"$script_dir"/scripts/setup_custom_after_setup_script.sh "$@"
 
 # Print out the final message
 echo "$dash_separator Project setup complete $dash_separator"
