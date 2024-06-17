@@ -56,7 +56,7 @@ This will add the `utility-repo-scripts` repository as a submodule in the `utili
 ```sh
 #!/bin/bash
 git submodule update --init --remote --force
-source utility-repo-scripts/setup_python_app.sh --package_manager="pip" --python_version="3.8"
+source utility-repo-scripts/setup_python_app.sh --package_manager="pip"
 ```
 
 ### CLI Flags
@@ -65,25 +65,24 @@ The `setup` script accepts a few flags to customize the setup process:
 
 **Note**: `0` is False and `1` is True
 
-| Flag                        | Description                                                                      | Default  | Valid Values                                                                                                   |
-| :-------------------------- | :------------------------------------------------------------------------------- | :------- | :------------------------------------------------------------------------------------------------------------- |
-| `-d` or `--debug`           | Enables or disables debug echo statements                                        | `False`  |                                                                                                                |
-| `-r` or `--rebuild_venv`    | Whether or not to delete and re-create the virtual environment or not            | `False`  |                                                                                                                |
-| `--python_version`          | The python version to use                                                        | `3.10`   | Any valid [pyenv install](https://github.com/pyenv/pyenv/blob/master/COMMANDS.md#pyenv-install) version string |
-| `--package_manager`         | Specifies which package manager to use                                           | `poetry` | [`pip`, `pip-tools`, `poetry`]                                                                                 |
-| `--is_package`              | Specifies whether or not the project is a package                                | `False`  |                                                                                                                |
-| `--include_jumanji_house`   | Specifies whether or not to include the `jumanjihouse` `pre-commit` hooks        | `True`   |                                                                                                                |
-| `--include_prettier`        | Specifies whether or not to include the `prettier` `pre-commit` hooks            | `True`   |                                                                                                                |
-| `--include_isort`           | Specifies whether or not to include the `isort` `pre-commit` hooks               | `True`   |                                                                                                                |
-| `--isort_profile`           | [isort Profiles](https://pycqa.github.io/isort/docs/configuration/profiles.html) | `black`  | Any valid [isort profile](https://pycqa.github.io/isort/docs/configuration/profiles.html)                      |
-| `--python_formatter`        | Specifies which python formatter to use                                          | `black`  | [`""`, `autopep8`, `black`]                                                                                    |
-| `--pylint_enabled`          | Specifies whether or not to enable `pylint`                                      | `True`   |                                                                                                                |
-| `--flake8_enabled`          | Specifies whether or not to enable `flake8`                                      | `True`   |                                                                                                                |
-| `--mypy_enabled`            | Specifies whether or not to enable `mypy`                                        | `True`   |                                                                                                                |
-| `--pytest_enabled`          | Specifies whether or not to enable `pytest`                                      | `True`   |                                                                                                                |
-| `--unittest_enabled`        | Specifies whether or not to enable `unittest`                                    | `False`  |                                                                                                                |
-| `--overwrite_vscode_launch` | Enables or disables the overriding of the `.vscode/launch.json` file             | `False`  |                                                                                                                |
-| `--line_length`             | Specifies the line length to use for various settings                            | `120`    | `Any non-zero positive integer`                                                                                |
+| Flag                        | Description                                                                      | Default  | Valid Values                                                                              |
+| :-------------------------- | :------------------------------------------------------------------------------- | :------- | :---------------------------------------------------------------------------------------- |
+| `-d` or `--debug`           | Enables or disables debug echo statements                                        | `False`  |                                                                                           |
+| `-r` or `--rebuild_venv`    | Whether or not to delete and re-create the virtual environment or not            | `False`  |                                                                                           |
+| `--package_manager`         | Specifies which package manager to use                                           | `poetry` | [`pip`, `pip-tools`, `poetry`]                                                            |
+| `--is_package`              | Specifies whether or not the project is a package                                | `False`  |                                                                                           |
+| `--include_jumanji_house`   | Specifies whether or not to include the `jumanjihouse` `pre-commit` hooks        | `True`   |                                                                                           |
+| `--include_prettier`        | Specifies whether or not to include the `prettier` `pre-commit` hooks            | `True`   |                                                                                           |
+| `--include_isort`           | Specifies whether or not to include the `isort` `pre-commit` hooks               | `True`   |                                                                                           |
+| `--isort_profile`           | [isort Profiles](https://pycqa.github.io/isort/docs/configuration/profiles.html) | `black`  | Any valid [isort profile](https://pycqa.github.io/isort/docs/configuration/profiles.html) |
+| `--python_formatter`        | Specifies which python formatter to use                                          | `black`  | [`""`, `autopep8`, `black`]                                                               |
+| `--pylint_enabled`          | Specifies whether or not to enable `pylint`                                      | `True`   |                                                                                           |
+| `--flake8_enabled`          | Specifies whether or not to enable `flake8`                                      | `True`   |                                                                                           |
+| `--mypy_enabled`            | Specifies whether or not to enable `mypy`                                        | `True`   |                                                                                           |
+| `--pytest_enabled`          | Specifies whether or not to enable `pytest`                                      | `True`   |                                                                                           |
+| `--unittest_enabled`        | Specifies whether or not to enable `unittest`                                    | `False`  |                                                                                           |
+| `--overwrite_vscode_launch` | Enables or disables the overriding of the `.vscode/launch.json` file             | `False`  |                                                                                           |
+| `--line_length`             | Specifies the line length to use for various settings                            | `120`    | `Any non-zero positive integer`                                                           |
 
 [Back to Top](#utility-repo-scripts)
 
@@ -99,7 +98,6 @@ git submodule update --init --remote --force
 source utility-repo-scripts/setup_python_app.sh \
     --package_manager="pip" \
     --rebuild_venv="$rebuild_venv" \
-    --python_version="3.8" \
     --python_formatter="" \
     --pylint_enabled \
     --pytest_enabled \
@@ -154,7 +152,6 @@ rebuild_venv="${rebuild_venv:-0}"
 source utility-repo-scripts/setup_python_app.sh \
     --package_manager="pip-tools" \
     --rebuild_venv="$rebuild_venv" \
-    --python_version="3.8" \
     --python_formatter="" \
     --pylint_enabled \
     --pytest_enabled \
@@ -239,7 +236,6 @@ rebuild_venv="${rebuild_venv:-0}"
 source utility-repo-scripts/setup_python_app.sh \
     --package_manager="pip-tools" \
     --rebuild_venv="$rebuild_venv" \
-    --python_version="3.8" \
     --python_formatter="" \
     --pylint_enabled \
     --pytest_enabled \
@@ -267,7 +263,6 @@ rebuild_venv="${rebuild_venv:-0}"
 source utility-repo-scripts/setup_python_app.sh \
     --package_manager="poetry" \
     --rebuild_venv="$rebuild_venv" \
-    --python_version="3.8" \
     --python_formatter="" \
     --pylint_enabled \
     --pytest_enabled \
@@ -313,7 +308,6 @@ rebuild_venv="${rebuild_venv:-0}"
 source utility-repo-scripts/setup_python_app.sh \
     --package_manager="poetry" \
     --rebuild_venv="$rebuild_venv" \
-    --python_version="3.8" \
     --python_formatter="" \
     --pylint_enabled \
     --pytest_enabled \

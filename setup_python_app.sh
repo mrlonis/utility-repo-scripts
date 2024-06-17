@@ -1,9 +1,9 @@
 #!/bin/bash
+python_version="3.12"
+
 #region Variables, Script Dir Validation & Load Functions
 current_dir=$PWD
 project_name=$(basename "$current_dir")
-python_exe="python$python_version"
-python_exe="${python_exe:-python3}" # If the specified python version is not installed, default to python3
 pylintrc_filename=".pylintrc"
 dash_separator="--------------------" # 20 dashes
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
@@ -27,7 +27,6 @@ source "$script_dir"/scripts/functions.sh "$@"
 #region Process CLI Options
 debug=0
 rebuild_venv=0
-python_version="3.10"
 package_manager="poetry"
 is_package=0
 isort_profile="black"
@@ -49,9 +48,6 @@ while getopts d:v:r:-: OPT; do
 		;;
 	r | rebuild_venv)
 		rebuild_venv=${OPTARG}
-		;;
-	python_version)
-		python_version=${OPTARG}
 		;;
 	package_manager)
 		package_manager=${OPTARG}
@@ -89,7 +85,6 @@ if [ "$debug" = 1 ]; then
 	echo "$dash_separator setup_python_app.sh CLI Arguments $dash_separator"
 	echo "    -d (--debug): $debug"
 	echo "    -r (--rebuild_venv): $rebuild_venv"
-	echo "    --python_version: $python_version"
 	echo "    --package_manager: $package_manager"
 	echo "    --is_package: $is_package"
 	echo "    --isort_profile: $isort_profile"
@@ -118,13 +113,6 @@ else
 	if [ "$is_package" != 0 ] && [ "$is_package" != 1 ]; then
 		error "Invalid is_package option: ($is_package). Valid values are [0, 1]"
 	fi
-fi
-
-if [ "$python_version" != "3.8" ] &&
-	[ "$python_version" != "3.9" ] &&
-	[ "$python_version" != "3.10" ] &&
-	[ "$python_version" != "3.11" ]; then
-	error "Invalid python_version option: ($python_version). Valid values are ['3.8', '3.9', '3.10', '3.11']"
 fi
 
 if [ "$isort_profile" != "" ] &&
