@@ -5,7 +5,7 @@ script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
 # Process CLI Arguments
 debug=0
 source "$script_dir"/scripts/process_cli_options.sh "$@"
-source "$script_dir"/scripts/functions.sh "$@" # Loads find_site_package function
+source "$script_dir"/scripts/functions.sh "$@" # Loads find_site_package & prettier_format functions
 
 # Check if .prettierrc exists
 [ ! -f ".prettierrc" ] && prettierrc_exists=0 || prettierrc_exists=1
@@ -14,7 +14,9 @@ source "$script_dir"/scripts/functions.sh "$@" # Loads find_site_package functio
 [ ! -f ".pre-commit-config.yaml" ] && pre_commit_config_exists=0 || pre_commit_config_exists=1
 
 # Setup Logging
-echo "$dash_separator .pre-commit-config.yaml Setup $dash_separator"
+if [ "$debug" = 1 ]; then
+	echo "$dash_separator .pre-commit-config.yaml Setup $dash_separator"
+fi
 
 # Install ruamel.yaml if it doesn't exist
 ruamel_yaml_installed=$(find_site_package ruamel.yaml ruamel.yaml)
@@ -27,42 +29,16 @@ python "$script_dir"/setup_prettier.py "$@" --prettierrc_exists="$prettierrc_exi
 
 # Uninstall ruamel.yaml if it didn't exist prior to running this script
 if [ "$ruamel_yaml_installed" = 0 ]; then
-	echo "Uninstalling ruamel.yaml since it did not exist in the virtual environment prior to running this script"
+	if [ "$debug" = 1 ]; then
+		echo "Uninstalling ruamel.yaml since it did not exist in the virtual environment prior to running this script"
+	fi
 	pip uninstall -y ruamel.yaml
 	pip uninstall -y ruamel.yaml.clib
 fi
 
 # Attempt to format newly created .pre-commit-config.yaml and .prettierrc using prettier
-if command -v prettier >/dev/null; then
-	if [ "$debug" = 1 ]; then
-		echo "prettier found"
-		echo "Formatting .pre-commit-config.yaml"
-	fi
-	prettier --write .pre-commit-config.yaml
-	if [ "$debug" = 1 ]; then
-		echo "Formatting .prettierrc"
-	fi
-	prettier --write .prettierrc
-else
-	if [ "$debug" = 1 ]; then
-		echo "prettier not found"
-	fi
-
-	if command -v npm >/dev/null; then
-		if [ "$debug" = 1 ]; then
-			echo "npm found"
-			echo "Installing prettier globally to format .pre-commit-config.yaml and .prettierrc"
-		fi
-		npm install -g prettier
-		prettier --write .pre-commit-config.yaml
-		prettier --write .prettierrc
-	else
-		if [ "$debug" = 1 ]; then
-			echo "npm not found"
-			echo "Skipping formatting of .pre-commit-config.yaml and .prettierrc"
-		fi
-	fi
-fi
+prettier_format .pre-commit-config.yaml
+prettier_format .prettierrc
 
 if [ "$debug" = 1 ]; then
 	echo ""

@@ -9,7 +9,9 @@ is_package=0
 source "$script_dir"/scripts/process_cli_options.sh "$@"
 
 #region Install Dependencies
-echo "$dash_separator Installing Dependencies $dash_separator"
+if [ "$debug" = 1 ]; then
+	echo "$dash_separator Installing Dependencies $dash_separator"
+fi
 
 # Install Common Dependencies
 python -m pip install --upgrade pip
@@ -88,12 +90,12 @@ elif [ "$package_manager" = "poetry" ]; then
 
 	if [ "$is_package" = 1 ]; then
 		if [ "$debug" = 1 ]; then
-			echo "Project is a package. Calling poetry install"
+			echo "Project is a package. Calling poetry install --sync"
 		fi
 		poetry install --sync
 	else
 		if [ "$debug" = 1 ]; then
-			echo "Project is not a package. Calling poetry install --no-root"
+			echo "Project is not a package. Calling poetry install --no-root --sync"
 		fi
 		poetry install --no-root --sync
 	fi

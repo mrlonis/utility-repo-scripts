@@ -7,6 +7,7 @@ script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
 pylint_enabled=0
 debug=0
 source "$script_dir"/scripts/process_cli_options.sh "$@"
+source "$script_dir"/scripts/functions.sh "$@"
 
 # pylintrc Setup
 if [ "$pylint_enabled" = 1 ]; then
@@ -19,9 +20,6 @@ if [ "$pylint_enabled" = 1 ]; then
 
 	# Install configupdater if it doesn't exist
 	configupdater_installed=$(find_site_package configupdater configupdater)
-	if [ "$debug" = 1 ]; then
-		echo "configupdater_installed: $configupdater_installed"
-	fi
 
 	# Create pylintrc using setup_pylintrc.py
 	[ ! -f "$pylintrc_filename" ] && pylintrc_exists=0 || pylintrc_exists=1
@@ -33,10 +31,7 @@ if [ "$pylint_enabled" = 1 ]; then
 	mv "$tmp" "$pylintrc_filename"
 
 	# Uninstall configupdater if it didn't exist prior to running this script
-	if [ "$configupdater_installed" = 0 ]; then
-		echo "Uninstalling configupdater since it did not exist in the virtual environment prior to running this script"
-		pip uninstall -y configupdater
-	fi
+	uninstall_site_package configupdater "$configupdater_installed"
 	if [ "$debug" = 1 ]; then
 		echo ""
 	fi

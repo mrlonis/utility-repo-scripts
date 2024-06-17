@@ -17,9 +17,6 @@ if [ "$flake8_enabled" = 1 ]; then
 
 	# Install configupdater if it doesn't exist
 	configupdater_installed=$(find_site_package configupdater configupdater)
-	if [ "$debug" = 1 ]; then
-		echo "configupdater_installed: $configupdater_installed"
-	fi
 
 	# Create .flake8 using setup_flake8.py
 	[ ! -f ".flake8" ] && flake8_exists=0 || flake8_exists=1
@@ -31,10 +28,7 @@ if [ "$flake8_enabled" = 1 ]; then
 	mv "$tmp" ".flake8"
 
 	# Uninstall configupdater if it didn't exist prior to running this script
-	if [ "$configupdater_installed" = 0 ]; then
-		echo "Uninstalling configupdater since it did not exist in the virtual environment prior to running this script"
-		pip uninstall -y configupdater
-	fi
+	uninstall_site_package configupdater "$configupdater_installed"
 	if [ "$debug" = 1 ]; then
 		echo ""
 	fi

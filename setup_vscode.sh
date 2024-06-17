@@ -11,9 +11,12 @@ overwrite_vscode_launch=0
 pylint_enabled=0
 flake8_enabled=0
 source "$script_dir"/scripts/process_cli_options.sh "$@"
+source "$script_dir"/scripts/functions.sh "$@"
 
 # VS Code Settings
-echo "$dash_separator VS Code settings.json $dash_separator"
+if [ "$debug" = 1 ]; then
+	echo "$dash_separator VS Code settings.json $dash_separator"
+fi
 [ ! -f ".vscode/settings.json" ] && vscode_settings_exist=0 || vscode_settings_exist=1
 
 mkdir -p .vscode
@@ -21,63 +24,14 @@ mkdir -p .vscode
 # Create settings.json using setup_vscode.py
 python "$script_dir"/setup_vscode.py "$@" --exists="$vscode_settings_exist"
 
-# Attempt to sort newly created .vscode/settings.json using prettier
-if command -v sort-json >/dev/null; then
-	if [ "$debug" = 1 ]; then
-		echo "sort-json found"
-		echo "Sorting .vscode/settings.json"
-	fi
-	sort-json .vscode/settings.json
-else
-	if [ "$debug" = 1 ]; then
-		echo "sort-json not found"
-	fi
-
-	if command -v npm >/dev/null; then
-		if [ "$debug" = 1 ]; then
-			echo "npm found"
-			echo "Installing sort-json globally to format .vscode/settings.json"
-		fi
-		npm install -g sort-json
-		sort-json .vscode/settings.json
-	else
-		if [ "$debug" = 1 ]; then
-			echo "npm not found"
-			echo "Skipping sorting of .vscode/settings.json"
-		fi
-	fi
-fi
-
-# Attempt to format newly created .vscode/settings.json using prettier
-if command -v prettier >/dev/null; then
-	if [ "$debug" = 1 ]; then
-		echo "prettier found"
-		echo "Formatting .vscode/settings.json"
-	fi
-	prettier .vscode/settings.json --write --config .prettierrc --ignore-path .prettierignore
-else
-	if [ "$debug" = 1 ]; then
-		echo "prettier not found"
-	fi
-
-	if command -v npm >/dev/null; then
-		if [ "$debug" = 1 ]; then
-			echo "npm found"
-			echo "Installing prettier globally to format .vscode/settings.json"
-		fi
-		npm install -g prettier
-		prettier .vscode/settings.json --write --config .prettierrc --ignore-path .prettierignore
-	else
-		if [ "$debug" = 1 ]; then
-			echo "npm not found"
-			echo "Skipping formatting of .vscode/settings.json"
-		fi
-	fi
-fi
-echo ""
+# Attempt to sort & format newly created .vscode/settings.json
+json_sort .vscode/settings.json
+prettier_format .vscode/settings.json
 
 #region VS Code Launch
-echo "$dash_separator VS Code launch.json $dash_separator"
+if [ "$debug" = 1 ]; then
+	echo "$dash_separator VS Code launch.json $dash_separator"
+fi
 if [ ! -e .vscode/launch.json ] && [ -e .vscode/launch.sample.json ]; then
 	# copy launch json template file
 	if [ "$overwrite_vscode_launch" = 1 ]; then

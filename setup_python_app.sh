@@ -2,7 +2,7 @@
 debug=0
 dash_separator="--------------------" # 20 dashes
 
-if [ "$debug" = 1 ]; then
+if [ "$debug" = 0 ]; then
 	echo "Printing BASH_SOURCE array ${BASH_SOURCE[*]}"
 	bash_source_dir_name=$(dirname "${BASH_SOURCE[0]}")
 	echo "bash_source_dir_name = $bash_source_dir_name"
@@ -14,6 +14,7 @@ if [ "$debug" = 1 ]; then
 	echo "basename: $(basename -- "$0")"
 	echo "dirname: $(dirname -- "$0")"
 	echo "dirname/readlink: $(dirname -- "$(readlink -f -- "$0")")"
+	echo ""
 fi
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
@@ -45,7 +46,9 @@ python_exe="python$python_version"
 python_exe="${python_exe:-python3}" # If the specified python version is not installed, default to python3
 
 #region Virtual Environment Setup
-echo "$dash_separator Virtual Environment Setup $dash_separator"
+if [ "$debug" = 1 ]; then
+	echo "$dash_separator Virtual Environment Setup $dash_separator"
+fi
 
 pyenv_installed=0
 if command -v pyenv >/dev/null; then
@@ -54,7 +57,6 @@ fi
 
 use_pyenv=0
 if [ "$pyenv_installed" = 1 ]; then
-	echo "pyenv Installed! Using pyenv to setup project..."
 	use_pyenv=1
 	pyenv install -s "$python_version"
 
@@ -66,7 +68,7 @@ if [ "$pyenv_installed" = 1 ]; then
 	if [ "$package_manager" = "pip" ] || [ "$rebuild_venv" = 1 ]; then
 		# We have to always delete the environment if using pip as package manager since it doesn't
 		# provide a way to synchronize the dependencies within the virtual environment like pip-tools or poetry
-		# We provide an option plag rebuild_venv to force delete the environment if using poetry or pip-tools
+		# We provide an option flag rebuild_venv to force delete the environment if using poetry or pip-tools
 		if [ "$debug" = 1 ]; then
 			echo "Rebuilding virtual environment"
 		fi
@@ -94,7 +96,10 @@ if [ "$pyenv_installed" = 1 ]; then
 	fi
 else
 	echo "pyenv not installed! Please installl pyenv to use this setup script."
+	echo "To Install run the following command using brew:"
+	echo ""
 	echo "brew install pyenv pyenv-virtualenv"
+	echo ""
 	echo "Exiting..."
 	exit 1
 fi
@@ -118,7 +123,9 @@ echo ""
 
 # Install pre-commit hooks
 if [ -f ".pre-commit-config.yaml" ]; then
-	echo "$dash_separator pre-commit install & pre-commit autoupdate $dash_separator"
+	if [ "$debug" = 1 ]; then
+		echo "$dash_separator pre-commit install & pre-commit autoupdate $dash_separator"
+	fi
 	pre-commit install
 	pre-commit autoupdate
 	echo ""
