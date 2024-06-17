@@ -5,6 +5,7 @@ from src.constants.shared import DEFAULT_LINE_LENGTH, REPO_NAME
 
 PYPROJECT_TOML_FILENAME = "pyproject.toml"
 PYPROJECT_TOOL_KEY = "tool"
+PYPROJECT_POETRY_KEY = "poetry"
 PYPROJECT_AUTOPEP8_KEY = "autopep8"
 PYPROJECT_BLACK_KEY = "black"
 PYPROJECT_ISORT_KEY = "isort"

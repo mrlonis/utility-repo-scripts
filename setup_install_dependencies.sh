@@ -5,7 +5,6 @@ script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
 # Process CLI Arguments
 debug=0
 package_manager="pip"
-is_package=0
 source "$script_dir"/scripts/process_cli_options.sh "$@"
 
 #region Install Dependencies
@@ -88,17 +87,10 @@ elif [ "$package_manager" = "poetry" ]; then
 		echo "Found pyproject.toml. Installing requirements via Poetry"
 	fi
 
-	if [ "$is_package" = 1 ]; then
-		if [ "$debug" = 1 ]; then
-			echo "Project is a package. Calling poetry install --sync"
-		fi
-		poetry install --sync
-	else
-		if [ "$debug" = 1 ]; then
-			echo "Project is not a package. Calling poetry install --no-root --sync"
-		fi
-		poetry install --no-root --sync
-	fi
+	poetry install --sync
+	echo "Calling poetry show -o to list outdated packages"
+	poetry show -o
+	echo "Consider running poetry update and using poetry show -o to update your packages."
 	req_installed=1
 fi
 ### No need for an else statement since we validate inputs above

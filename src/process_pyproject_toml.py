@@ -10,6 +10,7 @@ from src.constants.pyproject_toml import (
     PYPROJECT_AUTOPEP8_KEY,
     PYPROJECT_BLACK_KEY,
     PYPROJECT_ISORT_KEY,
+    PYPROJECT_POETRY_KEY,
     PYPROJECT_PYTEST_INI_OPTIONS_KEY,
     PYPROJECT_PYTEST_INI_OPTIONS_LOG_CLI_DATE_FORMAT_VALUE,
     PYPROJECT_PYTEST_INI_OPTIONS_LOG_CLI_VALUE,
@@ -33,6 +34,8 @@ class PyProjectTomlProcessor:
         isort_profile: str = "",
         pytest_enabled: bool = False,
         line_length: int = DEFAULT_LINE_LENGTH,
+        package_manager: str = "pip",
+        is_package: bool = False,
         debug: bool = False,
         test: bool = False,
     ):
@@ -44,6 +47,8 @@ class PyProjectTomlProcessor:
         self.isort_profile = isort_profile
         self.pytest_enabled = pytest_enabled
         self.line_length = line_length
+        self.package_manager = package_manager
+        self.is_package = is_package
         self.debug = debug
         self.test = test
 
@@ -54,6 +59,8 @@ class PyProjectTomlProcessor:
             print(f"    --isort-profile: {self.isort_profile}")
             print(f"    --pytest-enabled: {self.pytest_enabled}")
             print(f"    --line-length: {self.line_length}")
+            print(f"    --package-manager: {self.package_manager}")
+            print(f"    --is-package: {self.is_package}")
             print(f"    --debug: {self.debug}")
             print(f"    --test: {self.test}")
             print("")
@@ -77,6 +84,9 @@ class PyProjectTomlProcessor:
 
         # pytest_enabled
         self._process_pytest(tools=tools)
+
+        # Poetry package-mode
+        self._poetry_package_mode(tools=tools)
 
         # Create pyproject.toml file
         self._handle_create(tools=tools)
@@ -156,6 +166,14 @@ class PyProjectTomlProcessor:
             ini_options["log_cli_date_format"] = PYPROJECT_PYTEST_INI_OPTIONS_LOG_CLI_DATE_FORMAT_VALUE
 
             pytest_tool["ini_options"] = ini_options
+
+    def _poetry_package_mode(self, tools: Table):
+        if self.package_manager == "poetry" and not self.is_package:
+            poetry_tool: Table | None = cast(Optional[Table], tools.get(PYPROJECT_POETRY_KEY))
+            if poetry_tool is None:
+                poetry_tool = table()
+                tools[PYPROJECT_POETRY_KEY] = poetry_tool
+            poetry_tool["package-mode"] = False
 
     def _handle_removing_file(self, tools: Table):
         if not tools:
