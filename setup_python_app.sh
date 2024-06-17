@@ -1,22 +1,5 @@
 #!/bin/bash
-debug=0
 dash_separator="--------------------" # 20 dashes
-
-if [ "$debug" = 0 ]; then
-	echo "Printing BASH_SOURCE array ${BASH_SOURCE[*]}"
-	bash_source_dir_name=$(dirname "${BASH_SOURCE[0]}")
-	echo "bash_source_dir_name = $bash_source_dir_name"
-	bash_source_length=${#BASH_SOURCE[@]}
-	echo "bash_source_length = $bash_source_length"
-
-	echo "pwd: $(pwd)"
-	echo "\$0: $0"
-	echo "basename: $(basename -- "$0")"
-	echo "dirname: $(dirname -- "$0")"
-	echo "dirname/readlink: $(dirname -- "$(readlink -f -- "$0")")"
-	echo ""
-fi
-
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
 
 # script_dir workaround for when a project using this submodule tries to source the 'setup' script file
@@ -34,6 +17,7 @@ if [ ! -f "$script_dir"/scripts/process_cli_options.sh ]; then
 fi
 
 # Process CLI Arguments
+debug=0
 python_version="3.10"
 package_manager="pip"
 rebuild_venv=0
@@ -106,6 +90,9 @@ fi
 echo ""
 #endregion
 
+# Setup Prettier .prettierrc
+"$script_dir"/setup_prettierrc.sh "$@"
+
 # pre-commit Setup
 "$script_dir"/setup_pre_commit_config.sh "$@"
 
@@ -131,11 +118,11 @@ if [ -f ".pre-commit-config.yaml" ]; then
 	echo ""
 fi
 
+# Fix Prettier pre-commit hook
+"$script_dir"/setup_fix_prettier_pre_commit.sh "$@"
+
 # Setup VS Code
 "$script_dir"/setup_vscode.sh "$@" --use_pyenv="$use_pyenv"
-
-# Setup Prettier
-"$script_dir"/setup_prettier.sh "$@"
 
 # Custom after setup script
 "$script_dir"/setup_custom_after_setup_script.sh "$@"

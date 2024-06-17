@@ -6,7 +6,7 @@ script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
 flake8_enabled=0
 debug=0
 source "$script_dir"/scripts/process_cli_options.sh "$@"
-source "$script_dir"/scripts/functions.sh "$@" # Loads find_site_package function
+source "$script_dir"/scripts/functions.sh "$@"
 
 # .flake8 Setup
 if [ "$flake8_enabled" = 1 ]; then

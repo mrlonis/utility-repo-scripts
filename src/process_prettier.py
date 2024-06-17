@@ -12,21 +12,19 @@ from src.constants.shared import DEFAULT_LINE_LENGTH
 from src.utils.ruamel.yaml import update_repo_rev
 
 
-def process_prettier(
-    pre_commit_config: CommentedMap,
+def process_prettierrc(
     prettierrc_data: dict[str, Any],
     debug: bool = False,
     test: bool = False,
     line_length: int = DEFAULT_LINE_LENGTH,
 ):
-    """Do processing for prettier file."""
+    """Do processing for prettierrc file."""
     if debug:
-        print("process_prettier.py CLI Arguments:")
+        print("process_prettier.py: process_prettierrc(): CLI Arguments:")
         print(f"    --debug: {debug}")
         print(f"    --test: {test}")
         print(f"    --line_length: {line_length}")
         print(f"    --prettierrc_data: {prettierrc_data}")
-        print(f"    --pre_commit_config: {pre_commit_config}")
         print("")
 
     if prettierrc_data[PRINT_WIDTH_KEY] != line_length:
@@ -40,6 +38,24 @@ def process_prettier(
     else:
         if debug:
             print("TESTING: Not Writing .prettierrc file")
+
+    return prettierrc_data
+
+
+def process_pre_commit_config(
+    pre_commit_config: CommentedMap,
+    debug: bool = False,
+    test: bool = False,
+    line_length: int = DEFAULT_LINE_LENGTH,
+):
+    """Do processing for prettier file."""
+    if debug:
+        print("process_prettier.py: process_pre_commit_config(): CLI Arguments:")
+        print(f"    --debug: {debug}")
+        print(f"    --test: {test}")
+        print(f"    --line_length: {line_length}")
+        print(f"    --pre_commit_config: {pre_commit_config}")
+        print("")
 
     # Fixing prettier pre-commit hook since it updates to an alpha version
     if debug:
@@ -64,4 +80,4 @@ def process_prettier(
             print("TESTING: Not Creating .pre-commit-config.yaml")
             print(pre_commit_config)
 
-    return prettierrc_data, pre_commit_config
+    return pre_commit_config

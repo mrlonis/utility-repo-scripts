@@ -100,3 +100,18 @@ json_sort() {
 	fi
 	return 1
 }
+
+print_bash_source_information() {
+	echo "Printing BASH_SOURCE array ${BASH_SOURCE[*]}"
+	bash_source_dir_name=$(dirname "${BASH_SOURCE[0]}")
+	echo "bash_source_dir_name = $bash_source_dir_name"
+	bash_source_length=${#BASH_SOURCE[@]}
+	echo "bash_source_length = $bash_source_length"
+
+	echo "pwd: $(pwd)"
+	echo "\$0: $0"
+	echo "basename: $(basename -- "$0")"
+	echo "dirname: $(dirname -- "$0")"
+	echo "dirname/readlink: $(dirname -- "$(readlink -f -- "$0")")"
+	echo ""
+}
