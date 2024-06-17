@@ -4,15 +4,17 @@ on: [push, pull_request]
 
 env:
   PYTHON_VERSION: "3.12"
-  POETRY_VERSION: "1.8.2"
+  POETRY_VERSION: "1.8.3"
   LINT_PATHS: >
     src
     tests
+    setup_fix_prettier_pre_commit.py
     setup_flake8.py
     setup_pre_commit_config.py
+    setup_prettierrc.py
     setup_pylintrc.py
     setup_pyproject_toml.py
-    setup_vscode.py
+    setup_vscode_settings.py
 
 jobs:
   build:
