@@ -117,7 +117,7 @@ function print_bash_source_information() {
 }
 
 function remove_trailing_whitespace() {
-	filename="1"
+	filename="$1"
 	tmp=$(mktemp)
 	sed -e 's/[[:space:]]*$//' <"$filename" >"$tmp"
 	mv "$tmp" "$filename"

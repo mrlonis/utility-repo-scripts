@@ -364,7 +364,7 @@ if [ "$flake8_enabled" = 1 ]; then
 	[ ! -f ".flake8" ] && flake8_exists=0 || flake8_exists=1
 	python "$script_dir"/setup_flake8.py "$@" --exists="$flake8_exists"
 	uninstall_site_package configupdater "$configupdater_installed"
-	remove_trailing_whitespace ".flake8"
+	remove_trailing_whitespace .flake8
 
 	if [ "$debug" = 1 ]; then
 		echo ""
