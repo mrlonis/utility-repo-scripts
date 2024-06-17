@@ -1,7 +1,7 @@
 #!/bin/bash
 debug=${debug:-0} # Load debug cli option if it already exists
 
-find_site_package() {
+function find_site_package() {
 	package_name="$1"
 	pypi_name="$2"
 	package_location=$(python -c "import $package_name; print($package_name.__file__)")
@@ -28,7 +28,7 @@ find_site_package() {
 	return $exists
 }
 
-uninstall_site_package() {
+function uninstall_site_package() {
 	package_name="$1"
 	package_installed="$2"
 	if [ "$package_installed" = 0 ]; then
@@ -37,7 +37,7 @@ uninstall_site_package() {
 	fi
 }
 
-prettier_format() {
+function prettier_format() {
 	file_name="$1"
 	if command -v prettier >/dev/null; then
 		if [ "$debug" = 1 ]; then
@@ -69,7 +69,7 @@ prettier_format() {
 	return 1
 }
 
-json_sort() {
+function json_sort() {
 	file_path="$1"
 	if command -v sort-json >/dev/null; then
 		if [ "$debug" = 1 ]; then
@@ -101,7 +101,7 @@ json_sort() {
 	return 1
 }
 
-print_bash_source_information() {
+function print_bash_source_information() {
 	echo "Printing BASH_SOURCE array ${BASH_SOURCE[*]}"
 	bash_source_dir_name=$(dirname "${BASH_SOURCE[0]}")
 	echo "bash_source_dir_name = $bash_source_dir_name"
@@ -114,4 +114,34 @@ print_bash_source_information() {
 	echo "dirname: $(dirname -- "$0")"
 	echo "dirname/readlink: $(dirname -- "$(readlink -f -- "$0")")"
 	echo ""
+}
+
+function remove_trailing_whitespace() {
+	filename="1"
+	tmp=$(mktemp)
+	sed -e 's/[[:space:]]*$//' <"$filename" >"$tmp"
+	mv "$tmp" "$filename"
+}
+
+function in_list() {
+	LIST=$1
+	DELIMITER=$2
+	VALUE=$3
+	[[ "$LIST" =~ ($DELIMITER|^)$VALUE($DELIMITER|$) ]]
+}
+
+function install_vscode_Extension_if_not_installed() {
+	extension_name="$1"
+	installed_extensions="$2"
+
+	in_list "$installed_extensions" " " "$extension_name" && extension_installed=0 || extension_installed=1
+	if [ "$extension_installed" = 0 ]; then
+		code --install-extension "$extension_name" --force >/dev/null
+	fi
+}
+
+function error() {
+	# complain to STDERR and exit with error
+	echo "$*" >&2
+	exit 2
 }

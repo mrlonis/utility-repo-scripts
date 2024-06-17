@@ -1,4 +1,5 @@
 """Tests for process_vscode_settings.py with existing data."""
+
 from copy import deepcopy
 
 from src.constants.vscode_settings import SAMPLE_VSCODE_SETTINGS

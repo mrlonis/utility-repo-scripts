@@ -1,4 +1,5 @@
 """Do processing of the pylintrc file."""
+
 from argparse import ArgumentParser
 
 from src.constants.pylintrc import PYLINTRC_FILENAME, SAMPLE_PYLINTRC

@@ -18,7 +18,6 @@ def main(
     unittest_enabled: bool = False,
     test: bool = False,
     exists: bool = False,
-    use_pyenv: bool = False,
 ):
     # pylint: disable=too-many-arguments, too-many-locals
     """Do processing of the .vscode/settings.json file."""
@@ -37,7 +36,6 @@ def main(
         mypy_enabled=mypy_enabled,
         pytest_enabled=pytest_enabled,
         unittest_enabled=unittest_enabled,
-        use_pyenv=use_pyenv,
     )
 
 
@@ -53,7 +51,6 @@ if __name__ == "__main__":
     parser.add_argument("--unittest_enabled", action="store_true")
     parser.add_argument("--test", action="store_true")
     parser.add_argument("--exists", type=str2bool, default=False)
-    parser.add_argument("--use_pyenv", type=str2bool, default=False)
     args, unknown = parser.parse_known_args()
 
     main(
@@ -67,5 +64,4 @@ if __name__ == "__main__":
         unittest_enabled=args.unittest_enabled,
         test=args.test,
         exists=args.exists,
-        use_pyenv=args.use_pyenv,
     )

@@ -50,16 +50,10 @@ from src.constants.vscode_settings import (
 from src.utils.core import validate_python_formatter_option
 
 
-def _process_python_default_interpreter(data: Dict[str, Any], use_pyenv: bool):
+def _process_python_default_interpreter(data: Dict[str, Any]):
     project_name = os.path.basename(os.getenv("PWD", ""))
-
-    if use_pyenv:
-        venv_location = f"~/.pyenv/versions/{project_name}"
-        data[PYTHON_DEFAULT_INTERPRETER_KEY] = venv_location
-    else:
-        venv_folder_location = os.getenv("WORKON_HOME", "~/.venvs")
-        venv_location = f"{venv_folder_location.replace(os.getenv('HOME', ''), '~')}/{project_name}"
-        data[PYTHON_DEFAULT_INTERPRETER_KEY] = venv_location
+    venv_location = f"~/.pyenv/versions/{project_name}"
+    data[PYTHON_DEFAULT_INTERPRETER_KEY] = venv_location
 
 
 def _process_python_analysis(data: Dict[str, Any]):
@@ -243,7 +237,6 @@ def process_vscode_settings(
     mypy_enabled: bool = False,
     pytest_enabled: bool = False,
     unittest_enabled: bool = False,
-    use_pyenv: bool = False,
 ):
     """Do processing of the .vscode/settings.json file."""
     # pylint: disable=too-many-arguments too-many-locals
@@ -258,14 +251,13 @@ def process_vscode_settings(
         print(f"    --mypy_enabled: {mypy_enabled}")
         print(f"    --pytest_enabled: {pytest_enabled}")
         print(f"    --unittest_enabled: {unittest_enabled}")
-        print(f"    --use_pyenv: {use_pyenv}")
         print("")
 
     # Validate String Inputs
     validate_python_formatter_option(python_formatter=python_formatter)
 
     # python.defaultInterpreterPath
-    _process_python_default_interpreter(data=vscode_settings, use_pyenv=use_pyenv)
+    _process_python_default_interpreter(data=vscode_settings)
 
     # python.analysis
     _process_python_analysis(data=vscode_settings)

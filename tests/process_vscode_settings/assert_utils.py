@@ -49,7 +49,7 @@ from src.constants.vscode_settings import (
 
 def assert_python_default_interpreter_settings(data: Dict[str, Any]):
     """Assert that the python default interpreter settings are set correctly."""
-    assert data.get(PYTHON_DEFAULT_INTERPRETER_KEY) == f"~/.venvs/{REPO_NAME}"
+    assert data.get(PYTHON_DEFAULT_INTERPRETER_KEY) == f"~/.pyenv/versions/{REPO_NAME}"
 
 
 def assert_python_analysis_package_index_depths_settings(data: Dict[str, Any]):
