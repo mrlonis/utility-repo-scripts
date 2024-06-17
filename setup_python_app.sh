@@ -26,24 +26,15 @@ source "$script_dir"/scripts/functions.sh "$@"
 
 #region Process CLI Options
 debug=0
-package_manager="pip"
 rebuild_venv=0
 python_version="3.10"
+package_manager="poetry"
 is_package=0
-include_jumanji_house=0
-include_prettier=0
-include_isort=0
-isort_profile=""
-python_formatter=""
-pylint_enabled=0
-flake8_enabled=0
-mypy_enabled=0
-pytest_enabled=0
-unittest_enabled=0
+isort_profile="black"
+python_formatter="black"
 overwrite_vscode_launch=0
-line_length=125
+line_length=120
 pre_commit_pylint_entry_prefix="utility-repo-scripts/"
-remove_parsed_args=0
 
 while getopts d:v:r:-: OPT; do
 	# support long options: https://stackoverflow.com/a/28466267/519360
@@ -56,47 +47,23 @@ while getopts d:v:r:-: OPT; do
 	d | debug)
 		debug=1
 		;;
-	v | package_manager)
-		package_manager=${OPTARG}
-		;;
 	r | rebuild_venv)
 		rebuild_venv=${OPTARG}
 		;;
 	python_version)
 		python_version=${OPTARG}
 		;;
+	package_manager)
+		package_manager=${OPTARG}
+		;;
 	is_package)
 		is_package=1
-		;;
-	include_jumanji_house)
-		include_jumanji_house=1
-		;;
-	include_prettier)
-		include_prettier=1
-		;;
-	include_isort)
-		include_isort=1
 		;;
 	isort_profile)
 		isort_profile=${OPTARG}
 		;;
 	python_formatter)
 		python_formatter=${OPTARG}
-		;;
-	pylint_enabled)
-		pylint_enabled=1
-		;;
-	flake8_enabled)
-		flake8_enabled=1
-		;;
-	mypy_enabled)
-		mypy_enabled=1
-		;;
-	pytest_enabled)
-		pytest_enabled=1
-		;;
-	unittest_enabled)
-		unittest_enabled=1
 		;;
 	overwrite_vscode_launch)
 		overwrite_vscode_launch=1
@@ -107,14 +74,11 @@ while getopts d:v:r:-: OPT; do
 	pre_commit_pylint_entry_prefix)
 		pre_commit_pylint_entry_prefix=${OPTARG}
 		;;
-	remove_parsed_args)
-		remove_parsed_args=1
-		;;
 	??*)
 		echo "Invalid long option provided (--$OPT). Consider removing this from the setup file"
 		;;
 	?)
-		echo "The only valid short flags supported are ['-d', '-v', '-r']"
+		echo "The only valid short flags supported are ['-d', '-r']"
 		;;
 	esac
 done
@@ -124,24 +88,15 @@ done
 if [ "$debug" = 1 ]; then
 	echo "$dash_separator setup_python_app.sh CLI Arguments $dash_separator"
 	echo "    -d (--debug): $debug"
-	echo "    -v (--package_manager): $package_manager"
 	echo "    -r (--rebuild_venv): $rebuild_venv"
 	echo "    --python_version: $python_version"
+	echo "    --package_manager: $package_manager"
 	echo "    --is_package: $is_package"
-	echo "    --include_jumanji_house: $include_jumanji_house"
-	echo "    --include_prettier: $include_prettier"
-	echo "    --include_isort: $include_isort"
 	echo "    --isort_profile: $isort_profile"
 	echo "    --python_formatter: $python_formatter"
-	echo "    --pylint_enabled: $pylint_enabled"
-	echo "    --flake8_enabled: $flake8_enabled"
-	echo "    --mypy_enabled: $mypy_enabled"
-	echo "    --pytest_enabled: $pytest_enabled"
-	echo "    --unittest_enabled: $unittest_enabled"
 	echo "    --overwrite_vscode_launch: $overwrite_vscode_launch"
 	echo "    --line_length: $line_length"
 	echo "    --pre_commit_pylint_entry_prefix: $pre_commit_pylint_entry_prefix"
-	echo "    --remove_parsed_args: $remove_parsed_args"
 	echo ""
 fi
 #endregion
@@ -172,18 +127,6 @@ if [ "$python_version" != "3.8" ] &&
 	error "Invalid python_version option: ($python_version). Valid values are ['3.8', '3.9', '3.10', '3.11']"
 fi
 
-if [ "$include_jumanji_house" != 0 ] && [ "$include_jumanji_house" != 1 ]; then
-	error "Invalid include_jumanji_house option: ($include_jumanji_house). Valid values are [0, 1]"
-fi
-
-if [ "$include_prettier" != 0 ] && [ "$include_prettier" != 1 ]; then
-	error "Invalid include_prettier option: ($include_prettier). Valid values are [0, 1]"
-fi
-
-if [ "$include_isort" != 0 ] && [ "$include_isort" != 1 ]; then
-	error "Invalid include_isort option: ($include_isort). Valid values are [0, 1]"
-fi
-
 if [ "$isort_profile" != "" ] &&
 	[ "$isort_profile" != "black" ] &&
 	[ "$isort_profile" != "django" ] &&
@@ -202,26 +145,6 @@ if [ "$python_formatter" != "" ] &&
 	[ "$python_formatter" != "autopep8" ] &&
 	[ "$python_formatter" != "black" ]; then
 	error "Invalid python_formatter option: ($python_formatter). Valid values are ['', autopep8, black]"
-fi
-
-if [ "$pylint_enabled" != 0 ] && [ "$pylint_enabled" != 1 ]; then
-	error "Invalid pylint_enabled option: ($pylint_enabled). Valid values are [0, 1]"
-fi
-
-if [ "$flake8_enabled" != 0 ] && [ "$flake8_enabled" != 1 ]; then
-	error "Invalid flake8_enabled option: ($flake8_enabled). Valid values are [0, 1]"
-fi
-
-if [ "$mypy_enabled" != 0 ] && [ "$mypy_enabled" != 1 ]; then
-	error "Invalid mypy_enabled option: ($mypy_enabled). Valid values are [0, 1]"
-fi
-
-if [ "$pytest_enabled" != 0 ] && [ "$pytest_enabled" != 1 ]; then
-	error "Invalid pytest_enabled option: ($pytest_enabled). Valid values are [0, 1]"
-fi
-
-if [ "$unittest_enabled" != 0 ] && [ "$unittest_enabled" != 1 ]; then
-	error "Invalid unittest_enabled option: ($unittest_enabled). Valid values are [0, 1]"
 fi
 
 if [ "$overwrite_vscode_launch" != 0 ] && [ "$overwrite_vscode_launch" != 1 ]; then
@@ -337,38 +260,34 @@ fi
 #endregion
 
 #region pylintrc Setup
-if [ "$pylint_enabled" = 1 ]; then
-	if [ "$debug" = 1 ]; then
-		echo "$dash_separator Setup $pylintrc_filename $dash_separator"
-	fi
+if [ "$debug" = 1 ]; then
+	echo "$dash_separator Setup $pylintrc_filename $dash_separator"
+fi
 
-	configupdater_installed=$(find_site_package configupdater configupdater)
-	[ ! -f "$pylintrc_filename" ] && pylintrc_exists=0 || pylintrc_exists=1
-	python "$script_dir"/setup_pylintrc.py "$@" --exists="$pylintrc_exists"
-	uninstall_site_package configupdater "$configupdater_installed"
-	remove_trailing_whitespace "$pylintrc_filename"
+configupdater_installed=$(find_site_package configupdater configupdater)
+[ ! -f "$pylintrc_filename" ] && pylintrc_exists=0 || pylintrc_exists=1
+python "$script_dir"/setup_pylintrc.py "$@" --exists="$pylintrc_exists"
+uninstall_site_package configupdater "$configupdater_installed"
+remove_trailing_whitespace "$pylintrc_filename"
 
-	if [ "$debug" = 1 ]; then
-		echo ""
-	fi
+if [ "$debug" = 1 ]; then
+	echo ""
 fi
 #endregion
 
 #region .flake8 Setup
-if [ "$flake8_enabled" = 1 ]; then
-	if [ "$debug" = 1 ]; then
-		echo "$dash_separator Setup .flake8 $dash_separator"
-	fi
+if [ "$debug" = 1 ]; then
+	echo "$dash_separator Setup .flake8 $dash_separator"
+fi
 
-	configupdater_installed=$(find_site_package configupdater configupdater)
-	[ ! -f ".flake8" ] && flake8_exists=0 || flake8_exists=1
-	python "$script_dir"/setup_flake8.py "$@" --exists="$flake8_exists"
-	uninstall_site_package configupdater "$configupdater_installed"
-	remove_trailing_whitespace .flake8
+configupdater_installed=$(find_site_package configupdater configupdater)
+[ ! -f ".flake8" ] && flake8_exists=0 || flake8_exists=1
+python "$script_dir"/setup_flake8.py "$@" --exists="$flake8_exists"
+uninstall_site_package configupdater "$configupdater_installed"
+remove_trailing_whitespace .flake8
 
-	if [ "$debug" = 1 ]; then
-		echo ""
-	fi
+if [ "$debug" = 1 ]; then
+	echo ""
 fi
 #endregion
 
@@ -409,35 +328,17 @@ elif [ "$package_manager" = "pip-tools" ]; then
 	[ -f "requirements-test.txt" ] && test_requirements=1 || test_requirements=0
 	[ -f "requirements.txt" ] && requirements=1 || requirements=0
 
-	if [ "$debug" = 1 ]; then
-		echo "dev_requirements: $dev_requirements"
-		echo "test_requirements: $test_requirements"
-		echo "requirements: $requirements"
-	fi
-
 	if [ "$dev_requirements" = 1 ] && [ "$test_requirements" = 1 ] && [ "$requirements" = 1 ]; then
-		if [ "$debug" = 1 ]; then
-			echo "Found all requirements files. Installing dev, test and prod requirements"
-		fi
 		pip-sync requirements-dev.txt requirements-test.txt requirements.txt
 		req_installed=1
 	elif [ "$dev_requirements" = 1 ] && [ "$requirements" = 1 ]; then
-		if [ "$debug" = 1 ]; then
-			echo "Found dev and prod requirements files. Installing dev and prod requirements"
-		fi
 		pip-sync requirements-dev.txt requirements.txt
 		req_installed=1
 
 	elif [ "$test_requirements" = 1 ] && [ "$requirements" = 1 ]; then
-		if [ "$debug" = 1 ]; then
-			echo "Found test and prod requirements files. Installing test and prod requirements"
-		fi
 		pip-sync requirements-test.txt requirements.txt
 		req_installed=1
 	elif [ "$requirements" = 1 ]; then
-		if [ "$debug" = 1 ]; then
-			echo "Found prod requirements file. Installing prod requirements"
-		fi
 		pip-sync requirements.txt
 		req_installed=1
 	fi
@@ -573,27 +474,15 @@ if command -v code >/dev/null; then
 	install_vscode_Extension_if_not_installed editorconfig.editorconfig "$installed_extensions"
 	install_vscode_Extension_if_not_installed streetsidesoftware.code-spell-checker "$installed_extensions"
 	install_vscode_Extension_if_not_installed visualstudioexptteam.vscodeintellicode "$installed_extensions"
-
-	if [ "$include_prettier" = 1 ]; then
-		install_vscode_Extension_if_not_installed esbenp.prettier-vscode "$installed_extensions"
-	fi
-
-	if [ "$include_isort" = 1 ]; then
-		install_vscode_Extension_if_not_installed ms-python.isort "$installed_extensions"
-	fi
+	install_vscode_Extension_if_not_installed esbenp.prettier-vscode "$installed_extensions"
+	install_vscode_Extension_if_not_installed ms-python.isort "$installed_extensions"
+	install_vscode_Extension_if_not_installed ms-python.pylint "$installed_extensions"
+	install_vscode_Extension_if_not_installed ms-python.flake8 "$installed_extensions"
 
 	if [ "$python_formatter" = "black" ]; then
 		install_vscode_Extension_if_not_installed ms-python.black-formatter "$installed_extensions"
 	elif [ "$python_formatter" = "autopep8" ]; then
 		install_vscode_Extension_if_not_installed ms-python.autopep8 "$installed_extensions"
-	fi
-
-	if [ "$pylint_enabled" = 1 ]; then
-		install_vscode_Extension_if_not_installed ms-python.pylint "$installed_extensions"
-	fi
-
-	if [ "$flake8_enabled" = 1 ]; then
-		install_vscode_Extension_if_not_installed ms-python.flake8 "$installed_extensions"
 	fi
 else
 	# VS Code Not Found

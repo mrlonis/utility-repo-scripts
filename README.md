@@ -1,16 +1,14 @@
 # utility-repo-scripts
 
-This repository holds common scripts for use in python repositories. The main script of note is [setup_python_app.sh](./setup_python_app.sh).
+This repository holds common scripts for use in python repositories. The main script of note is [setup_python_app.sh](./setup_python_app.sh) which performs all of the actions needed to setup a developer workspace for a Python project.
 
 ## Table of Contents
 
 - [utility-repo-scripts](#utility-repo-scripts)
   - [Table of Contents](#table-of-contents)
-  - [TODO](#todo)
+  - [Prerequisites](#prerequisites)
+    - [Optional](#optional)
   - [Usage](#usage)
-    - [How Python is Determined](#how-python-is-determined)
-      - [pyenv](#pyenv)
-      - [Brew](#brew)
     - [CLI Flags](#cli-flags)
     - [Supported Package Managers](#supported-package-managers)
       - [pip](#pip)
@@ -32,11 +30,17 @@ This repository holds common scripts for use in python repositories. The main sc
       - [Markdownlint](#markdownlint)
     - [(Optional) pyenv](#optional-pyenv)
 
-## TODO
+## Prerequisites
 
-- Add `.prettierrc` file if it doesn't exist
-- Fix for new VS Code extensions and settings
-- Create `pyproject.toml` if it doesn't exist
+In order to use the `[setup_python_app.sh](./setup_python_app.sh), you will need the following:
+
+- [pyenv](https://github.com/pyenv/pyenv)
+- [pyenv-virtualenv](https://github.com/pyenv/pyenv-virtualenv)
+
+### Optional
+
+- [Node.js](https://nodejs.org/en)
+  - Mac/Linux: [nvm](https://github.com/nvm-sh/nvm)
 
 ## Usage
 
@@ -55,58 +59,31 @@ git submodule update --init --remote --force
 source utility-repo-scripts/setup_python_app.sh --package_manager="pip" --python_version="3.8"
 ```
 
-### How Python is Determined
-
-#### pyenv
-
-If you have [pyenv](https://github.com/pyenv/pyenv) installed, the `setup_python_app.sh` script will use `pyenv` commands to make and setup the virtual environment.
-
-The `--python_version` flag will be used to set the version of python to use for the virtual environment in `pyenv`.
-
-#### Brew
-
-If `pyenv` is not installed, the `setup_python_app.sh` script will assume `brew` is being used to install `python`. The `--python_version` flag will be used to set the version of python to use for the virtual environment. This flag is a python version such as `"3.8"`. This will result in the `setup_python_app.sh` script attempting to call the `brew` symlinked `python3.8` command. If this version of python was, for some reason, not installed by `brew`, the script will fail. Installing the version of python you want to use with `brew` is outside the scope of this script. Installing the missing version and re-running the `./setup` script will resolve the issue.
-
-When `brew` is assumed as the python source, the `setup_python_app.sh` script will default to create the virtual environment at your exported `WORKON_HOME` environment variable.
-
-If using [virtualenvwrapper](https://virtualenvwrapper.readthedocs.io/en/latest/install.html#basic-installation), the `setup_python_app.sh` script will default to create the virtual environment at your exported `WORKON_HOME` environment variable.
-
-If this variable is not set or you don't use [virtualenvwrapper](https://virtualenvwrapper.readthedocs.io/en/latest/install.html#basic-installation), it will default to `$HOME/.venvs/<project-name>`.
-
-You can change this by adding an environment variable to your `.zshrc` or `.bashrc` file:
-
-```shell
-export WORKON_HOME="$HOME/SOME/CUSTOM/PATH/FOR/VIRTUAL/ENVIRONMENTS"
-```
-
-This `WORKON_HOME` variable is used by [virtualenvwrapper](https://virtualenvwrapper.readthedocs.io/en/latest/install.html#basic-installation) to determine where to look for virtual environments when invoking `workon <project-name>`.
-
-[Back to Top](#utility-repo-scripts)
-
 ### CLI Flags
 
 The `setup` script accepts a few flags to customize the setup process:
 
 **Note**: `0` is False and `1` is True
 
-| Flag                               | Description                                                                     | Default                 | Valid Values                    |
-| :--------------------------------- | :------------------------------------------------------------------------------ | :---------------------- | :------------------------------ |
-| `-d` or `--debug`                  | Enables or disables debug echo statements                                       | `False`                 |                                 |
-| `--package_manager`                | Specifies which package manager to use                                          | `pip`                   | [`pip`, `pip-tools`, `poetry`]  |
-| `-r` or `--rebuild_venv`           | Specifies whether or not to delete and re-create the virtual environment or not | `False`                 |                                 |
-| `--python_version`                 | Specifies the python version to use                                             | `3.8`                   | [`3.8`, `3.9`, `3.10`, `3.11`]  |
-| `--is_package`                     | Specifies whether or not the project is a package                               | `False`                 |                                 |
-| `--include_jumanji_house`          | Specifies whether or not to include the `jumanjihouse` `pre-commit` hooks       | `False`                 |                                 |
-| `--include_prettier`               | Specifies whether or not to include the `prettier` `pre-commit` hooks           | `False`                 |                                 |
-| `--include_isort`                  | Specifies whether or not to include the `isort` `pre-commit` hooks              | `False`                 |                                 |
-| `--python_formatter`               | Specifies which python formatter to use                                         | `''`                    | [`''`, `autopep8`, `black`]     |
-| `--pylint_enabled`                 | Specifies whether or not to enable `pylint`                                     | `False`                 |                                 |
-| `--flake8_enabled`                 | Specifies whether or not to enable `flake8`                                     | `False`                 |                                 |
-| `--pytest_enabled`                 | Specifies whether or not to enable `pytest`                                     | `False`                 |                                 |
-| `--unittest_enabled`               | Specifies whether or not to enable `unittest`                                   | `False`                 |                                 |
-| `--overwrite_vscode_launch`        | Enables or disables the overriding of the `.vscode/launch.json` file            | `False`                 |                                 |
-| `--line_length`                    | Specifies the line length to use for various settings                           | `125`                   | `Any non-zero positive integer` |
-| `--pre_commit_pylint_entry_prefix` | Specifies the prefix to use for the `pylint` pre-commit hook entry              | `utility-repo-scripts/` |                                 |
+| Flag                        | Description                                                                      | Default  | Valid Values                                                                                                   |
+| :-------------------------- | :------------------------------------------------------------------------------- | :------- | :------------------------------------------------------------------------------------------------------------- |
+| `-d` or `--debug`           | Enables or disables debug echo statements                                        | `False`  |                                                                                                                |
+| `-r` or `--rebuild_venv`    | Whether or not to delete and re-create the virtual environment or not            | `False`  |                                                                                                                |
+| `--python_version`          | The python version to use                                                        | `3.10`   | Any valid [pyenv install](https://github.com/pyenv/pyenv/blob/master/COMMANDS.md#pyenv-install) version string |
+| `--package_manager`         | Specifies which package manager to use                                           | `poetry` | [`pip`, `pip-tools`, `poetry`]                                                                                 |
+| `--is_package`              | Specifies whether or not the project is a package                                | `False`  |                                                                                                                |
+| `--include_jumanji_house`   | Specifies whether or not to include the `jumanjihouse` `pre-commit` hooks        | `True`   |                                                                                                                |
+| `--include_prettier`        | Specifies whether or not to include the `prettier` `pre-commit` hooks            | `True`   |                                                                                                                |
+| `--include_isort`           | Specifies whether or not to include the `isort` `pre-commit` hooks               | `True`   |                                                                                                                |
+| `--isort_profile`           | [isort Profiles](https://pycqa.github.io/isort/docs/configuration/profiles.html) | `black`  | Any valid [isort profile](https://pycqa.github.io/isort/docs/configuration/profiles.html)                      |
+| `--python_formatter`        | Specifies which python formatter to use                                          | `black`  | [`""`, `autopep8`, `black`]                                                                                    |
+| `--pylint_enabled`          | Specifies whether or not to enable `pylint`                                      | `True`   |                                                                                                                |
+| `--flake8_enabled`          | Specifies whether or not to enable `flake8`                                      | `True`   |                                                                                                                |
+| `--mypy_enabled`            | Specifies whether or not to enable `mypy`                                        | `True`   |                                                                                                                |
+| `--pytest_enabled`          | Specifies whether or not to enable `pytest`                                      | `True`   |                                                                                                                |
+| `--unittest_enabled`        | Specifies whether or not to enable `unittest`                                    | `False`  |                                                                                                                |
+| `--overwrite_vscode_launch` | Enables or disables the overriding of the `.vscode/launch.json` file             | `False`  |                                                                                                                |
+| `--line_length`             | Specifies the line length to use for various settings                            | `120`    | `Any non-zero positive integer`                                                                                |
 
 [Back to Top](#utility-repo-scripts)
 

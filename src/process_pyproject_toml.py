@@ -29,12 +29,10 @@ class PyProjectTomlProcessor:
     def __init__(
         self,
         pyproject_toml: TOMLDocument,
-        include_isort: bool = False,
-        python_formatter="",
-        isort_profile: str = "",
-        pytest_enabled: bool = False,
+        python_formatter="black",
+        isort_profile: str = "black",
         line_length: int = DEFAULT_LINE_LENGTH,
-        package_manager: str = "pip",
+        package_manager: str = "poetry",
         is_package: bool = False,
         debug: bool = False,
         test: bool = False,
@@ -42,10 +40,8 @@ class PyProjectTomlProcessor:
         # pylint: disable=too-many-arguments
         """Initialize the class."""
         self.pyproject_toml = pyproject_toml
-        self.include_isort = include_isort
         self.python_formatter = python_formatter
         self.isort_profile = isort_profile
-        self.pytest_enabled = pytest_enabled
         self.line_length = line_length
         self.package_manager = package_manager
         self.is_package = is_package
@@ -54,10 +50,8 @@ class PyProjectTomlProcessor:
 
         if self.debug:
             print("process_pyproject_toml.py CLI Arguments:")
-            print(f"    --include-isort: {self.include_isort}")
             print(f"    --python-formatter: {self.python_formatter}")
             print(f"    --isort-profile: {self.isort_profile}")
-            print(f"    --pytest-enabled: {self.pytest_enabled}")
             print(f"    --line-length: {self.line_length}")
             print(f"    --package-manager: {self.package_manager}")
             print(f"    --is-package: {self.is_package}")
@@ -117,55 +111,49 @@ class PyProjectTomlProcessor:
             tools.pop(PYPROJECT_BLACK_KEY, None)
 
     def _process_isort(self, tools: Table):
-        if not self.include_isort:
-            tools.pop(PYPROJECT_ISORT_KEY, None)
-        else:
-            isort_tool = cast(Optional[Table], tools.get(PYPROJECT_ISORT_KEY))
-            if isort_tool is None:
-                isort_tool = table()
-                tools[PYPROJECT_ISORT_KEY] = isort_tool
-            isort_tool["line_length"] = self.line_length
+        isort_tool = cast(Optional[Table], tools.get(PYPROJECT_ISORT_KEY))
+        if isort_tool is None:
+            isort_tool = table()
+            tools[PYPROJECT_ISORT_KEY] = isort_tool
+        isort_tool["line_length"] = self.line_length
 
-            if self.python_formatter == "black":
-                isort_tool["profile"] = "black"
-            elif self.isort_profile:
-                isort_tool["profile"] = self.isort_profile
-            else:
-                if "profile" in isort_tool:
-                    isort_tool.pop("profile")
+        if self.python_formatter == "black":
+            isort_tool["profile"] = "black"
+        elif self.isort_profile:
+            isort_tool["profile"] = self.isort_profile
+        else:
+            if "profile" in isort_tool:
+                isort_tool.pop("profile")
 
     def _process_pytest(self, tools: Table):
-        if not self.pytest_enabled:
-            tools.pop(PYPROJECT_PYTEST_KEY, None)
-        else:
-            pytest_tool = cast(Optional[Table], tools.get(PYPROJECT_PYTEST_KEY))
-            if pytest_tool is None:
-                pytest_tool = table()
-                tools[PYPROJECT_PYTEST_KEY] = pytest_tool
+        pytest_tool = cast(Optional[Table], tools.get(PYPROJECT_PYTEST_KEY))
+        if pytest_tool is None:
+            pytest_tool = table()
+            tools[PYPROJECT_PYTEST_KEY] = pytest_tool
 
-            ini_options = cast(Optional[Table], pytest_tool.get(PYPROJECT_PYTEST_INI_OPTIONS_KEY))
-            if ini_options is None:
-                ini_options = table()
+        ini_options = cast(Optional[Table], pytest_tool.get(PYPROJECT_PYTEST_INI_OPTIONS_KEY))
+        if ini_options is None:
+            ini_options = table()
 
-            # Special processing for addopts
-            ignore_utility_repo_scripts = f"--ignore=./{REPO_NAME}"
-            existing_addopts = cast(Optional[str], ini_options.get("addopts"))
-            if existing_addopts is None:
-                existing_addopts = ""
+        # Special processing for addopts
+        ignore_utility_repo_scripts = f"--ignore=./{REPO_NAME}"
+        existing_addopts = cast(Optional[str], ini_options.get("addopts"))
+        if existing_addopts is None:
+            existing_addopts = ""
 
-            if ignore_utility_repo_scripts not in existing_addopts:
-                existing_addopts += f" {ignore_utility_repo_scripts}"
-                existing_addopts = existing_addopts.strip()
+        if ignore_utility_repo_scripts not in existing_addopts:
+            existing_addopts += f" {ignore_utility_repo_scripts}"
+            existing_addopts = existing_addopts.strip()
 
-            ini_options["addopts"] = existing_addopts
+        ini_options["addopts"] = existing_addopts
 
-            # Remaining Options
-            ini_options["log_cli"] = False
-            ini_options["log_cli_level"] = "WARNING"
-            ini_options["log_cli_format"] = PYPROJECT_PYTEST_INI_OPTIONS_LOG_CLI_VALUE
-            ini_options["log_cli_date_format"] = PYPROJECT_PYTEST_INI_OPTIONS_LOG_CLI_DATE_FORMAT_VALUE
+        # Remaining Options
+        ini_options["log_cli"] = False
+        ini_options["log_cli_level"] = "WARNING"
+        ini_options["log_cli_format"] = PYPROJECT_PYTEST_INI_OPTIONS_LOG_CLI_VALUE
+        ini_options["log_cli_date_format"] = PYPROJECT_PYTEST_INI_OPTIONS_LOG_CLI_DATE_FORMAT_VALUE
 
-            pytest_tool["ini_options"] = ini_options
+        pytest_tool["ini_options"] = ini_options
 
     def _poetry_package_mode(self, tools: Table):
         if self.package_manager == "poetry" and not self.is_package:

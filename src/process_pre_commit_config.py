@@ -65,36 +65,21 @@ class PreCommitConfigProcessor:
         pre_commit_config: CommentedMap,
         debug: bool = False,
         test: bool = False,
-        include_jumanji_house: bool = False,
-        include_prettier: bool = False,
-        include_isort: bool = False,
-        python_formatter: str = "",
-        pylint_enabled: bool = False,
-        flake8_enabled: bool = False,
+        python_formatter: str = "black",
         pre_commit_pylint_entry_prefix: str = f"{REPO_NAME}/",
     ):  # pylint: disable=too-many-arguments
         """Initialize the PreCommitConfigProcessor class."""
         self.pre_commit_config = pre_commit_config
         self.debug = debug
         self.test = test
-        self.include_jumanji_house = include_jumanji_house
-        self.include_prettier = include_prettier
-        self.include_isort = include_isort
         self.python_formatter = python_formatter
-        self.pylint_enabled = pylint_enabled
-        self.flake8_enabled = flake8_enabled
         self.pre_commit_pylint_entry_prefix = pre_commit_pylint_entry_prefix
 
         if self.debug:
             print("process_pre_commit_config.py CLI Arguments:")
             print(f"    --debug: {self.debug}")
             print(f"    --test: {self.test}")
-            print(f"    --include_jumanji_house: {self.include_jumanji_house}")
-            print(f"    --include_prettier: {self.include_prettier}")
-            print(f"    --include_isort: {self.include_isort}")
             print(f"    --python_formatter: {self.python_formatter}")
-            print(f"    --pylint_enabled: {self.pylint_enabled}")
-            print(f"    --flake8_enabled: {self.flake8_enabled}")
             print(f"    --pylint_entry_prefix: {self.pre_commit_pylint_entry_prefix}")
             print("")
 
@@ -110,26 +95,20 @@ class PreCommitConfigProcessor:
         self._process_jumanji_house_repo()
 
         # include_prettier
-        if not self.include_prettier:
-            remove_hooks(pre_commit_config=self.pre_commit_config, repo_urls=[PRETTIER_REPO_URL])
-        else:
-            update_hook(
-                pre_commit_config=self.pre_commit_config,
-                repo_url=PRETTIER_REPO_URL,
-                repo_default=PRETTIER_REPO,
-                hooks=[(PRETTIER_HOOK_ID, PRETTIER_HOOK)],
-            )
+        update_hook(
+            pre_commit_config=self.pre_commit_config,
+            repo_url=PRETTIER_REPO_URL,
+            repo_default=PRETTIER_REPO,
+            hooks=[(PRETTIER_HOOK_ID, PRETTIER_HOOK)],
+        )
 
         # include_isort
-        if not self.include_isort:
-            remove_hooks(pre_commit_config=self.pre_commit_config, repo_urls=[ISORT_REPO_URL])
-        else:
-            update_hook(
-                pre_commit_config=self.pre_commit_config,
-                repo_url=ISORT_REPO_URL,
-                repo_default=ISORT_REPO,
-                hooks=[(ISORT_HOOK_ID, ISORT_HOOK)],
-            )
+        update_hook(
+            pre_commit_config=self.pre_commit_config,
+            repo_url=ISORT_REPO_URL,
+            repo_default=ISORT_REPO,
+            hooks=[(ISORT_HOOK_ID, ISORT_HOOK)],
+        )
 
         # python_formatter
         self._process_python_formatter_option()
@@ -165,24 +144,18 @@ class PreCommitConfigProcessor:
         )
 
     def _process_jumanji_house_repo(self):
-        if not self.include_jumanji_house:
-            remove_hooks(
-                pre_commit_config=self.pre_commit_config,
-                repo_urls=[JUMANJI_HOUSE_REPO_URL],
-            )
-        else:
-            update_hook(
-                pre_commit_config=self.pre_commit_config,
-                repo_url=JUMANJI_HOUSE_REPO_URL,
-                repo_default=JUMANJI_HOUSE_REPO,
-                hooks=[
-                    (GIT_CHECK_HOOK_ID, GIT_CHECK_HOOK),
-                    (GIT_DIRTY_HOOK_ID, GIT_DIRTY_HOOK),
-                    (MARKDOWN_LINT_HOOK_ID, MARKDOWN_LINT_HOOK),
-                    (SHELLCHECK_HOOK_ID, SHELLCHECK_HOOK),
-                    (SHELL_FORMAT_HOOK_ID, SHELL_FORMAT_HOOK),
-                ],
-            )
+        update_hook(
+            pre_commit_config=self.pre_commit_config,
+            repo_url=JUMANJI_HOUSE_REPO_URL,
+            repo_default=JUMANJI_HOUSE_REPO,
+            hooks=[
+                (GIT_CHECK_HOOK_ID, GIT_CHECK_HOOK),
+                (GIT_DIRTY_HOOK_ID, GIT_DIRTY_HOOK),
+                (MARKDOWN_LINT_HOOK_ID, MARKDOWN_LINT_HOOK),
+                (SHELLCHECK_HOOK_ID, SHELLCHECK_HOOK),
+                (SHELL_FORMAT_HOOK_ID, SHELL_FORMAT_HOOK),
+            ],
+        )
 
     def _process_python_formatter_option(self):
         if self.python_formatter == "autopep8":
@@ -225,28 +198,17 @@ class PreCommitConfigProcessor:
         hooks[pylint_hook_id]["entry"] = f"{self.pre_commit_pylint_entry_prefix}ensure_venv.sh"
 
     def _process_python_linter_options(self):
-        if self.pylint_enabled:
-            update_hook(
-                pre_commit_config=self.pre_commit_config,
-                repo_url=LOCAL_REPO_URL,
-                repo_default=LOCAL_REPO,
-                hooks=[(PYLINT_HOOK_ID, PYLINT_HOOK)],
-            )
-            self._update_pylint_config()
-        else:
-            print("Pylint disabled! Attempting to remove it from the local repo...")
-            remove_hooks(
-                pre_commit_config=self.pre_commit_config,
-                repo_urls=[LOCAL_REPO_URL],
-                local_ids=[PYLINT_HOOK_ID],
-            )
+        update_hook(
+            pre_commit_config=self.pre_commit_config,
+            repo_url=LOCAL_REPO_URL,
+            repo_default=LOCAL_REPO,
+            hooks=[(PYLINT_HOOK_ID, PYLINT_HOOK)],
+        )
+        self._update_pylint_config()
 
-        if not self.flake8_enabled:
-            remove_hooks(pre_commit_config=self.pre_commit_config, repo_urls=[FLAKE8_REPO_URL])
-        else:
-            update_hook(
-                pre_commit_config=self.pre_commit_config,
-                repo_url=FLAKE8_REPO_URL,
-                repo_default=FLAKE8_REPO,
-                hooks=[(FLAKE8_HOOK_ID, FLAKE8_HOOK)],
-            )
+        update_hook(
+            pre_commit_config=self.pre_commit_config,
+            repo_url=FLAKE8_REPO_URL,
+            repo_default=FLAKE8_REPO,
+            hooks=[(FLAKE8_HOOK_ID, FLAKE8_HOOK)],
+        )

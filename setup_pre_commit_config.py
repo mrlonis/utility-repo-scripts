@@ -11,12 +11,7 @@ from src.utils.ruamel.yaml import load_yaml_file
 
 def main(
     debug: bool = False,
-    include_jumanji_house: bool = False,
-    include_prettier: bool = False,
-    include_isort: bool = False,
-    python_formatter="",
-    pylint_enabled: bool = False,
-    flake8_enabled: bool = False,
+    python_formatter="black",
     pre_commit_pylint_entry_prefix=f"{REPO_NAME}/",
     test: bool = False,
     exists: bool = False,
@@ -30,12 +25,7 @@ def main(
         pre_commit_config=pre_commit_config,
         debug=debug,
         test=test,
-        include_jumanji_house=include_jumanji_house,
-        include_prettier=include_prettier,
-        include_isort=include_isort,
         python_formatter=python_formatter,
-        pylint_enabled=pylint_enabled,
-        flake8_enabled=flake8_enabled,
         pre_commit_pylint_entry_prefix=pre_commit_pylint_entry_prefix,
     )
     processor.process_pre_commit_config()
@@ -45,12 +35,7 @@ if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument("-d", "--debug", action="store_true")
     parser.add_argument("--test", action="store_true")
-    parser.add_argument("--include_jumanji_house", action="store_true")
-    parser.add_argument("--include_prettier", action="store_true")
-    parser.add_argument("--include_isort", action="store_true")
     parser.add_argument("--python_formatter", default="black", type=str)
-    parser.add_argument("--pylint_enabled", action="store_true")
-    parser.add_argument("--flake8_enabled", action="store_true")
     parser.add_argument("--pre_commit_pylint_entry_prefix", default=f"{REPO_NAME}/", type=str)
     parser.add_argument("--exists", type=str2bool, default=False)
 
@@ -59,12 +44,7 @@ if __name__ == "__main__":
     main(
         debug=args.debug,
         test=args.test,
-        include_jumanji_house=args.include_jumanji_house,
-        include_prettier=args.include_prettier,
-        include_isort=args.include_isort,
         python_formatter=args.python_formatter,
-        pylint_enabled=args.pylint_enabled,
-        flake8_enabled=args.flake8_enabled,
         pre_commit_pylint_entry_prefix=args.pre_commit_pylint_entry_prefix,
         exists=args.exists,
     )

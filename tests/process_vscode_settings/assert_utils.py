@@ -158,48 +158,23 @@ def assert_python_formatter_settings(data: Dict[str, Any], python_formatter: str
     assert source_organize_imports == "explicit"
 
 
-def assert_python_linting_settings(
-    data: Dict[str, Any], pylint_enabled: bool, flake8_enabled: bool, mypy_enabled: bool
-):
+def assert_python_linting_settings(data: Dict[str, Any]):
     # pylint: disable=too-many-branches too-many-statements
     """Assert that the python linting settings are set correctly."""
-    if pylint_enabled:
-        assert data.get(PYLINT_ARGS_KEY) == [PYLINT_ARGS_RCFILE_VALUE]
-    else:
-        assert data.get(PYLINT_ARGS_KEY) is None
-
-    if flake8_enabled:
-        assert data.get(FLAKE8_ARGS_KEY) == [FLAKE8_ARGS_RCFILE_VALUE]
-    else:
-        assert data.get(FLAKE8_ARGS_KEY) is None
-
-    if mypy_enabled:
-        assert data.get(MYPY_ARGS_KEY) == ["--ignore-missing-imports", "--follow-imports=silent"]
-    else:
-        assert data.get(MYPY_ARGS_KEY) is None
+    assert data.get(PYLINT_ARGS_KEY) == [PYLINT_ARGS_RCFILE_VALUE]
+    assert data.get(FLAKE8_ARGS_KEY) == [FLAKE8_ARGS_RCFILE_VALUE]
+    assert data.get(MYPY_ARGS_KEY) == ["--ignore-missing-imports", "--follow-imports=silent"]
 
 
-def assert_python_testing_settings(data: Dict[str, Any], pytest_enabled: bool, unittest_enabled: bool):
+def assert_python_testing_settings(data: Dict[str, Any]):
     """Assert that the python testing settings are set correctly."""
-    if pytest_enabled:
-        assert data.get(PYTHON_TESTING_PYTEST_ARGS_KEY) is not None
-        assert data.get(PYTHON_TESTING_PYTEST_ENABLED_KEY) is True
-    else:
-        assert data.get(PYTHON_TESTING_PYTEST_ARGS_KEY) is None
-        assert data.get(PYTHON_TESTING_PYTEST_ENABLED_KEY) is False
-
-    if unittest_enabled:
-        assert data.get(PYTHON_TESTING_UNITTEST_ARGS_KEY) is not None
-        assert data.get(PYTHON_TESTING_UNITTEST_ENABLED_KEY) is True
-    else:
-        assert data.get(PYTHON_TESTING_UNITTEST_ARGS_KEY) is None
-        assert data.get(PYTHON_TESTING_UNITTEST_ENABLED_KEY) is False
+    assert data.get(PYTHON_TESTING_PYTEST_ARGS_KEY) is not None
+    assert data.get(PYTHON_TESTING_PYTEST_ENABLED_KEY) is True
+    assert data.get(PYTHON_TESTING_UNITTEST_ARGS_KEY) is None
+    assert data.get(PYTHON_TESTING_UNITTEST_ENABLED_KEY) is False
 
 
-def assert_isort_settings(data: Dict[str, Any], isort_enabled: bool):
+def assert_isort_settings(data: Dict[str, Any]):
     """Assert that the isort settings are set correctly."""
-    if isort_enabled:
-        assert data.get(ISORT_ARGS_KEY) is not None
-        assert data.get(ISORT_ARGS_KEY) == [ISORT_ARGS_VALUE]
-    else:
-        assert data.get(ISORT_ARGS_KEY) is None
+    assert data.get(ISORT_ARGS_KEY) is not None
+    assert data.get(ISORT_ARGS_KEY) == [ISORT_ARGS_VALUE]

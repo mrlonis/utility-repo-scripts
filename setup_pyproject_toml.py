@@ -12,13 +12,11 @@ from src.utils.tomlkit import load_toml_file
 def main(
     debug: bool = False,
     test: bool = False,
-    include_isort: bool = False,
-    python_formatter="",
-    pytest_enabled: bool = False,
+    python_formatter="black",
     line_length: int = DEFAULT_LINE_LENGTH,
     exists: bool = False,
     isort_profile: str = "black",
-    package_manager: str = "pip",
+    package_manager: str = "poetry",
     is_package: bool = False,
 ):
     """Do processing of the pyproject.toml file."""
@@ -27,10 +25,8 @@ def main(
     )
     PyProjectTomlProcessor(
         pyproject_toml=pyproject_toml,
-        include_isort=include_isort,
         python_formatter=python_formatter,
         isort_profile=isort_profile,
-        pytest_enabled=pytest_enabled,
         line_length=line_length,
         package_manager=package_manager,
         is_package=is_package,
@@ -42,9 +38,7 @@ def main(
 if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument("-d", "--debug", action="store_true")
-    parser.add_argument("--include_isort", action="store_true")
     parser.add_argument("--python_formatter", default="black", type=str)
-    parser.add_argument("--pytest_enabled", action="store_true")
     parser.add_argument("--line_length", default=DEFAULT_LINE_LENGTH, type=int)
     parser.add_argument("--exists", type=str2bool, default=False)
     parser.add_argument("--test", action="store_true")
@@ -56,9 +50,7 @@ if __name__ == "__main__":
 
     main(
         debug=args.debug,
-        include_isort=args.include_isort,
         python_formatter=args.python_formatter,
-        pytest_enabled=args.pytest_enabled,
         line_length=args.line_length,
         exists=args.exists,
         test=args.test,
