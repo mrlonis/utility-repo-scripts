@@ -1,7 +1,6 @@
 {
   "recommendations": [
     "ms-python.autopep8",
-    "boto3typed.boto3-ide",
     "ms-python.black-formatter",
     "editorconfig.editorconfig",
     "ms-python.flake8",

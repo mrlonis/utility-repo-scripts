@@ -199,86 +199,6 @@ fi
 echo ""
 #endregion
 
-#region Setup Prettier .prettierrc
-[ ! -f ".prettierrc" ] && prettierrc_exists=0 || prettierrc_exists=1
-
-if [ "$debug" = 1 ]; then
-	echo "$dash_separator .prettierrc Setup $dash_separator"
-fi
-
-ruamel_yaml_installed=$(find_site_package ruamel.yaml ruamel.yaml)
-python "$script_dir"/setup_prettierrc.py "$@" --exists="$prettierrc_exists"
-uninstall_site_package ruamel.yaml "$ruamel_yaml_installed"
-uninstall_site_package ruamel.yaml.clib "$ruamel_yaml_installed"
-prettier_format .prettierrc
-
-if [ "$debug" = 1 ]; then
-	echo ""
-fi
-#endregion
-
-#region pre-commit Setup
-[ ! -f ".pre-commit-config.yaml" ] && pre_commit_config_exists=0 || pre_commit_config_exists=1
-
-if [ "$debug" = 1 ]; then
-	echo "$dash_separator .pre-commit-config.yaml Setup $dash_separator"
-fi
-
-ruamel_yaml_installed=$(find_site_package ruamel.yaml ruamel.yaml)
-python "$script_dir"/setup_pre_commit_config.py "$@" --exists="$pre_commit_config_exists"
-uninstall_site_package ruamel.yaml "$ruamel_yaml_installed"
-uninstall_site_package ruamel.yaml.clib "$ruamel_yaml_installed"
-prettier_format .pre-commit-config.yaml
-
-if [ "$debug" = 1 ]; then
-	echo ""
-fi
-#endregion
-
-#region pyproject.toml Setup
-[ ! -f "pyproject.toml" ] && pyproject_toml_exists=0 || pyproject_toml_exists=1
-
-tomlkit_installed=$(find_site_package tomlkit tomlkit)
-python "$script_dir"/setup_pyproject_toml.py "$@" --exists="$pyproject_toml_exists"
-uninstall_site_package tomlkit "$tomlkit_installed"
-
-if [ "$debug" = 1 ]; then
-	echo ""
-fi
-#endregion
-
-#region pylintrc Setup
-if [ "$debug" = 1 ]; then
-	echo "$dash_separator Setup $pylintrc_filename $dash_separator"
-fi
-
-configupdater_installed=$(find_site_package configupdater configupdater)
-[ ! -f "$pylintrc_filename" ] && pylintrc_exists=0 || pylintrc_exists=1
-python "$script_dir"/setup_pylintrc.py "$@" --exists="$pylintrc_exists"
-uninstall_site_package configupdater "$configupdater_installed"
-remove_trailing_whitespace "$pylintrc_filename"
-
-if [ "$debug" = 1 ]; then
-	echo ""
-fi
-#endregion
-
-#region .flake8 Setup
-if [ "$debug" = 1 ]; then
-	echo "$dash_separator Setup .flake8 $dash_separator"
-fi
-
-configupdater_installed=$(find_site_package configupdater configupdater)
-[ ! -f ".flake8" ] && flake8_exists=0 || flake8_exists=1
-python "$script_dir"/setup_flake8.py "$@" --exists="$flake8_exists"
-uninstall_site_package configupdater "$configupdater_installed"
-remove_trailing_whitespace .flake8
-
-if [ "$debug" = 1 ]; then
-	echo ""
-fi
-#endregion
-
 #region Install Dependencies
 if [ "$debug" = 1 ]; then
 	echo "$dash_separator Installing Dependencies $dash_separator"
@@ -365,6 +285,86 @@ if [ "$req_installed" = "0" ]; then
 fi
 
 echo ""
+#endregion
+
+#region Setup Prettier .prettierrc
+[ ! -f ".prettierrc" ] && prettierrc_exists=0 || prettierrc_exists=1
+
+if [ "$debug" = 1 ]; then
+	echo "$dash_separator .prettierrc Setup $dash_separator"
+fi
+
+ruamel_yaml_installed=$(find_site_package ruamel.yaml ruamel.yaml)
+python "$script_dir"/setup_prettierrc.py "$@" --exists="$prettierrc_exists"
+uninstall_site_package ruamel.yaml "$ruamel_yaml_installed"
+uninstall_site_package ruamel.yaml.clib "$ruamel_yaml_installed"
+prettier_format .prettierrc
+
+if [ "$debug" = 1 ]; then
+	echo ""
+fi
+#endregion
+
+#region pre-commit Setup
+[ ! -f ".pre-commit-config.yaml" ] && pre_commit_config_exists=0 || pre_commit_config_exists=1
+
+if [ "$debug" = 1 ]; then
+	echo "$dash_separator .pre-commit-config.yaml Setup $dash_separator"
+fi
+
+ruamel_yaml_installed=$(find_site_package ruamel.yaml ruamel.yaml)
+python "$script_dir"/setup_pre_commit_config.py "$@" --exists="$pre_commit_config_exists"
+uninstall_site_package ruamel.yaml "$ruamel_yaml_installed"
+uninstall_site_package ruamel.yaml.clib "$ruamel_yaml_installed"
+prettier_format .pre-commit-config.yaml
+
+if [ "$debug" = 1 ]; then
+	echo ""
+fi
+#endregion
+
+#region pyproject.toml Setup
+[ ! -f "pyproject.toml" ] && pyproject_toml_exists=0 || pyproject_toml_exists=1
+
+tomlkit_installed=$(find_site_package tomlkit tomlkit)
+python "$script_dir"/setup_pyproject_toml.py "$@" --exists="$pyproject_toml_exists"
+uninstall_site_package tomlkit "$tomlkit_installed"
+
+if [ "$debug" = 1 ]; then
+	echo ""
+fi
+#endregion
+
+#region pylintrc Setup
+if [ "$debug" = 1 ]; then
+	echo "$dash_separator Setup $pylintrc_filename $dash_separator"
+fi
+
+configupdater_installed=$(find_site_package configupdater configupdater)
+[ ! -f "$pylintrc_filename" ] && pylintrc_exists=0 || pylintrc_exists=1
+python "$script_dir"/setup_pylintrc.py "$@" --exists="$pylintrc_exists"
+uninstall_site_package configupdater "$configupdater_installed"
+remove_trailing_whitespace "$pylintrc_filename"
+
+if [ "$debug" = 1 ]; then
+	echo ""
+fi
+#endregion
+
+#region .flake8 Setup
+if [ "$debug" = 1 ]; then
+	echo "$dash_separator Setup .flake8 $dash_separator"
+fi
+
+configupdater_installed=$(find_site_package configupdater configupdater)
+[ ! -f ".flake8" ] && flake8_exists=0 || flake8_exists=1
+python "$script_dir"/setup_flake8.py "$@" --exists="$flake8_exists"
+uninstall_site_package configupdater "$configupdater_installed"
+remove_trailing_whitespace .flake8
+
+if [ "$debug" = 1 ]; then
+	echo ""
+fi
 #endregion
 
 #region Install pre-commit hooks
@@ -455,7 +455,6 @@ if command -v code >/dev/null; then
 
 	installed_extensions=$(code --list-extensions)
 
-	install_vscode_Extension_if_not_installed Boto3typed.boto3-ide "$installed_extensions"
 	install_vscode_Extension_if_not_installed bungcip.better-toml "$installed_extensions"
 	install_vscode_Extension_if_not_installed ms-python.python "$installed_extensions"
 	install_vscode_Extension_if_not_installed ms-python.vscode-pylance "$installed_extensions"
