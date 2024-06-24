@@ -68,11 +68,7 @@ def process_prettierrc(
 
 
 def build_prettierignore_file_content(patterns: list[str]):
-    return_value = ""
-    for pattern in patterns:
-        return_value = return_value.join(f"{pattern}\n")
-    return_value += "\n"
-    return return_value
+    return "\n".join(patterns)
 
 
 def process_pre_commit_config(
