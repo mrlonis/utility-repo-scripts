@@ -44,7 +44,7 @@ function prettier_format() {
 			echo "prettier_format(): prettier found"
 			echo "prettier_format(): Formatting $file_name"
 		fi
-		prettier --write "$file_name"
+		prettier "$file_name" --write --ignore-path .prettierignore
 		return 0
 	else
 		if [ "$debug" = 1 ]; then
@@ -57,7 +57,7 @@ function prettier_format() {
 				echo "prettier_format(): Installing prettier globally to format $file_name"
 			fi
 			npm install -g prettier
-			prettier --write "$file_name"
+			prettier "$file_name" --write --ignore-path .prettierignore
 			return 0
 		else
 			if [ "$debug" = 1 ]; then

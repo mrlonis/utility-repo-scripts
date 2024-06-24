@@ -1,5 +1,6 @@
 """Do processing of the .flake8 file."""
 
+import os
 from json import dump
 from typing import Any
 
@@ -39,7 +40,39 @@ def process_prettierrc(
         if debug:
             print("TESTING: Not Writing .prettierrc file")
 
+    # Make a .prettierignore file if it does not exist
+    prettierignore_path = ".prettierignore"
+    prettierignore_exists = os.path.exists(prettierignore_path)
+    prettierignore_ignore_patterns = [
+        ".mypy_cache",
+        ".pytest_cache",
+        "dist",
+        "node_modules",
+        ".coverage",
+        ".python-version",
+    ]
+    if not prettierignore_exists:
+        if not test:  # pragma: no cover
+            if debug:  # pragma: no cover
+                print(f"Writing {prettierignore_path} file")  # pragma: no cover
+            with open(".prettierignore", "w", encoding="utf-8") as prettierignore_file:  # pragma: no cover
+                print(build_prettierignore_file_content(prettierignore_ignore_patterns), file=prettierignore_file)
+        else:
+            if debug:
+                print(f"TESTING: Not Writing {prettierignore_path} file")
+    else:
+        if debug:
+            print(f"{prettierignore_path} file already exists")
+
     return prettierrc_data
+
+
+def build_prettierignore_file_content(patterns: list[str]):
+    return_value = ""
+    for pattern in patterns:
+        return_value = return_value.join(f"{pattern}\n")
+    return_value += "\n"
+    return return_value
 
 
 def process_pre_commit_config(

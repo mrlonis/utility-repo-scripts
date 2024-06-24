@@ -1,1 +1,6 @@
-!/.vscode/settings.json
+.mypy_cache
+.pytest_cache
+dist
+node_modules
+.coverage
+.python-version
