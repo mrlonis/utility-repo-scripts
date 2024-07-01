@@ -172,6 +172,7 @@ if [ "$pyenv_installed" = 1 ]; then
 	pyenv local "$project_name"
 	export PYENV_VERSION="$project_name"
 	eval "$(pyenv init -)"
+	eval "$(pyenv virtualenv-init -)"
 	PYENV_VIRTUALENV_DISABLE_PROMPT=1 pyenv shell "$project_name"
 
 	pyenv_python=$(pyenv which python)
