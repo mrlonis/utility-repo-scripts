@@ -19,9 +19,9 @@ tomlkit = "^0.13.2"
 
 [tool.poetry.group.test.dependencies]
 flake8 = "^7.1.1"
-greenlet = "^3.1.0"
+greenlet = "^3.1.1"
 mypy = "^1.11.2"
-pylint = "^3.2.7"
+pylint = "^3.3.0"
 pylint-junit = "^0.3.2"
 pytest = "^8.3.3"
 pytest-cov = "^5.0.0"
