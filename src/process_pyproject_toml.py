@@ -26,7 +26,7 @@ class PyProjectTomlProcessor:
     # pylint: disable=too-many-instance-attributes too-few-public-methods
     """Do processing of the pyproject.toml file."""
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-positional-arguments
         self,
         pyproject_toml: TOMLDocument,
         python_formatter="black",

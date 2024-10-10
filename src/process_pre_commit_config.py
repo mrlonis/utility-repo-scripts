@@ -60,7 +60,7 @@ class PreCommitConfigProcessor:
     # pylint: disable=too-many-instance-attributes too-few-public-methods
     """Process the .pre-commit-config.yaml file."""
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-positional-arguments
         self,
         pre_commit_config: CommentedMap,
         debug: bool = False,
