@@ -9,7 +9,7 @@ from src.utils.core import str2bool
 from src.utils.tomlkit import load_toml_file
 
 
-def main(
+def main(  # pylint: disable=too-many-positional-arguments
     debug: bool = False,
     test: bool = False,
     python_formatter="black",
