@@ -26,7 +26,7 @@ pylint-junit = "^0.3.2"
 pytest = "^8.3.3"
 pytest-cov = "^6.0.0"
 pytest-xdist = { version = "^3.2.1", extras = ["psutil"] }
-tomli = "^2.0.1"
+tomli = "^2.1.0"
 
 [tool.poetry.group.dev.dependencies]
 autopep8 = "^2.0.2"
