@@ -21,12 +21,12 @@ tomlkit = "^0.13.2"
 flake8 = "^7.1.1"
 greenlet = "^3.1.0"
 mypy = "^1.13.0"
-pylint = "^3.2.7"
+pylint = "^3.3.2"
 pylint-junit = "^0.3.2"
-pytest = "^8.3.3"
+pytest = "^8.3.4"
 pytest-cov = "^6.0.0"
 pytest-xdist = { version = "^3.2.1", extras = ["psutil"] }
-tomli = "^2.1.0"
+tomli = "^2.2.1"
 
 [tool.poetry.group.dev.dependencies]
 autopep8 = "^2.0.2"
