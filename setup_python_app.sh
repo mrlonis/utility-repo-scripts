@@ -1,5 +1,5 @@
 #!/bin/bash
-python_version="3.12"
+python_version="3.13"
 
 #region Variables, Script Dir Validation & Load Functions
 current_dir=$PWD
@@ -18,7 +18,7 @@ fi
 
 if [ ! -f "$script_dir"/scripts/functions.sh ]; then
 	echo "Failed to find functions.sh in $script_dir/scripts"
-	echo "Something went teribbly wrong"
+	echo "Something went terribly wrong"
 	exit 1
 fi
 source "$script_dir"/scripts/functions.sh "$@"
@@ -174,6 +174,7 @@ if [ "$pyenv_installed" = 1 ]; then
 	eval "$(pyenv init -)"
 	eval "$(pyenv virtualenv-init -)"
 	PYENV_VIRTUALENV_DISABLE_PROMPT=1 pyenv shell "$project_name"
+	pyenv activate "$project_name"
 
 	pyenv_python=$(pyenv which python)
 	echo "pyenv_python: $pyenv_python"
