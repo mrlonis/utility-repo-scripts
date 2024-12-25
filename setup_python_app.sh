@@ -151,7 +151,7 @@ if command -v pyenv >/dev/null; then
 fi
 
 if [ "$pyenv_installed" = 1 ]; then
-	eval "$(pyenv init - zsh)"
+	eval "$(pyenv init - bash)"
 
 	pyenv install -s "$python_version"
 
@@ -170,11 +170,10 @@ if [ "$pyenv_installed" = 1 ]; then
 		pyenv virtualenv-delete -f "$project_name"
 	fi
 
-	pyenv virtualenv -f -u $python_version "$project_name"
+	pyenv virtualenv -u $python_version "$project_name"
 	pyenv local "$project_name"
 	export PYENV_VERSION="$project_name"
 	PYENV_VIRTUALENV_DISABLE_PROMPT=1 pyenv shell "$project_name"
-	# eval "$(pyenv virtualenv-init -)"
 	pyenv activate "$project_name"
 
 	pyenv_python=$(pyenv which python)
