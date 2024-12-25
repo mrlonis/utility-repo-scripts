@@ -1,5 +1,5 @@
 #!/bin/bash
-python_version="3.13"
+python_version="3.13.1"
 
 #region Variables, Script Dir Validation & Load Functions
 current_dir=$PWD
@@ -151,6 +151,8 @@ if command -v pyenv >/dev/null; then
 fi
 
 if [ "$pyenv_installed" = 1 ]; then
+	eval "$(pyenv init - zsh)"
+
 	pyenv install -s "$python_version"
 
 	if [ "$package_manager" = "poetry" ]; then
@@ -168,12 +170,11 @@ if [ "$pyenv_installed" = 1 ]; then
 		pyenv virtualenv-delete -f "$project_name"
 	fi
 
-	pyenv virtualenv -f "$python_version" "$project_name"
+	pyenv virtualenv -f -u $python_version "$project_name"
 	pyenv local "$project_name"
 	export PYENV_VERSION="$project_name"
-	eval "$(pyenv init -)"
-	eval "$(pyenv virtualenv-init -)"
 	PYENV_VIRTUALENV_DISABLE_PROMPT=1 pyenv shell "$project_name"
+	# eval "$(pyenv virtualenv-init -)"
 	pyenv activate "$project_name"
 
 	pyenv_python=$(pyenv which python)
