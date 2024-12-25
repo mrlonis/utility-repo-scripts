@@ -170,7 +170,7 @@ if [ "$pyenv_installed" = 1 ]; then
 		pyenv virtualenv-delete -f "$project_name"
 	fi
 
-	pyenv virtualenv -u $python_version "$project_name"
+	pyenv virtualenv -f $python_version "$project_name"
 	pyenv local "$project_name"
 	export PYENV_VERSION="$project_name"
 	PYENV_VIRTUALENV_DISABLE_PROMPT=1 pyenv shell "$project_name"
