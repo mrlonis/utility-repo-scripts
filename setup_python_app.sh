@@ -1,5 +1,5 @@
 #!/bin/bash
-python_version="3.13.7"
+python_version="3.13.1"
 
 #region Variables, Script Dir Validation & Load Functions
 current_dir=$PWD
