@@ -39,7 +39,7 @@ def process_pylintrc(
         master_section.add_option(ignore_settings)
     if not ignore_settings.value:
         ignore_settings.value = ""
-    if REPO_NAME not in ignore_settings.value:
+    if REPO_NAME not in ignore_settings.value:  # type: ignore[operator]
         try:
             ignore_settings.value = f"{ignore_settings.value}{',' if ignore_settings.value != '' else ''}{REPO_NAME}"
         except AssignMultilineValueError:
