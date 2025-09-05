@@ -6,9 +6,13 @@ on:
   pull_request:
     branches: ["main"]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
   PYTHON_VERSION: "3.13.1"
-  POETRY_VERSION: "2.0.0"
+  POETRY_VERSION: "2.1.4"
   LINT_PATHS: >
     src
     tests
@@ -24,7 +28,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Install poetry
         run: pipx install poetry==${{ env.POETRY_VERSION }}

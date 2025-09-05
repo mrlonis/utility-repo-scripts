@@ -30,7 +30,7 @@ def process_flake8(
     if not exclude_settings.value:
         exclude_settings.value = ""
 
-    if REPO_NAME not in exclude_settings.value:
+    if REPO_NAME not in exclude_settings.value:  # type: ignore[operator]
         exclude_settings.value = f"{exclude_settings.value}{',' if exclude_settings.value else ''}{REPO_NAME}"
     flake8_config.set("flake8", "exclude", exclude_settings.value)
 
