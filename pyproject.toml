@@ -31,7 +31,7 @@ tomli = "^2.3.0"
 [tool.poetry.group.dev.dependencies]
 autopep8 = "^2.3.2"
 black = "^25.9.0"
-isort = "^6.1.0"
+isort = "^7.0.0"
 pip-tools = "^7.5.1"
 pre-commit = "^4.2.0"
 
