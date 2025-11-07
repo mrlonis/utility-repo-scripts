@@ -12,7 +12,7 @@ readme = "README.md"
 packages = [{ include = "src" }]
 
 [tool.poetry.dependencies]
-python = "^3.13.1"
+python = "^3.13.9"
 configupdater = "^3.1.1"
 ruamel-yaml = "^0.18.16"
 tomlkit = "^0.13.3"
