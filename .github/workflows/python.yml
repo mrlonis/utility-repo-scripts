@@ -30,14 +30,14 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
+      - name: Install poetry
+        run: pipx install poetry==${{ env.POETRY_VERSION }}
+
       - name: Set up Python ${{ env.PYTHON_VERSION }}
         uses: actions/setup-python@v6
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: poetry
-
-      - name: Install poetry
-        run: pipx install poetry==${{ env.POETRY_VERSION }}
 
       - name: Install Dependencies
         run: poetry install --no-interaction --no-root --without dev
