@@ -1,5 +1,5 @@
 #!/bin/bash
-python_version="3.13.1"
+python_version="3.13.9"
 
 #region Variables, Script Dir Validation & Load Functions
 current_dir=$PWD
@@ -263,7 +263,7 @@ elif [ "$package_manager" = "poetry" ]; then
 		echo "Found pyproject.toml. Installing requirements via Poetry"
 	fi
 
-	poetry install --sync
+	poetry sync
 	echo "Calling poetry show -o to list outdated packages"
 	poetry show -o
 	echo "Consider running poetry update and using poetry show -o to update your packages."

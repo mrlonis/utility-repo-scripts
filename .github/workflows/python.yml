@@ -11,8 +11,8 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  PYTHON_VERSION: "3.13.1"
-  POETRY_VERSION: "2.1.4"
+  PYTHON_VERSION: "3.13.9"
+  POETRY_VERSION: "2.2.1"
   LINT_PATHS: >
     src
     tests
