@@ -19,18 +19,18 @@ tomlkit = "^0.13.3"
 
 [tool.poetry.group.test.dependencies]
 flake8 = "^7.2.0"
-greenlet = "^3.2.2"
+greenlet = "^3.3.0"
 mypy = "^1.19.0"
 pylint = "^4.0.4"
 pylint-junit = "^0.3.5"
-pytest = "^9.0.1"
+pytest = "^9.0.2"
 pytest-cov = "^7.0.0"
 pytest-xdist = { version = "^3.2.1", extras = ["psutil"] }
 tomli = "^2.3.0"
 
 [tool.poetry.group.dev.dependencies]
 autopep8 = "^2.3.2"
-black = "^25.11.0"
+black = "^25.12.0"
 isort = "^7.0.0"
 pip-tools = "^7.5.2"
 pre-commit = "^4.5.0"
