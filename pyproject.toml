@@ -20,7 +20,7 @@ tomlkit = "^0.13.3"
 [tool.poetry.group.test.dependencies]
 flake8 = "^7.2.0"
 greenlet = "^3.3.0"
-mypy = "^1.19.0"
+mypy = "^1.19.1"
 pylint = "^4.0.4"
 pylint-junit = "^0.3.5"
 pytest = "^9.0.2"
