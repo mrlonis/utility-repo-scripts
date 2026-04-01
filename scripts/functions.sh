@@ -21,12 +21,12 @@ except (ImportError, ModuleNotFoundError):
 except Exception:
     traceback.print_exc()
     raise
+else:
+    if package_spec is None:
+        print("missing")
     else:
-        if package_spec is None:
-            print("missing")
-        else:
-            package_location = package_spec.origin or "<namespace>"
-            print(f"present:{package_location}")
+        package_location = package_spec.origin or "<namespace>"
+        print(f"present:{package_location}")
 ' "$package_name")
 	local package_probe_status=$?
 	if [ "$package_probe_status" -ne 0 ]; then
