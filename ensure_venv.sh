@@ -47,7 +47,7 @@ if [ -z "$VIRTUAL_ENV" ]; then
 	done
 
 	if [ "$activated" -ne 1 ]; then
-		echo "Command is run without a virtual environment in place and none of the candidate virtual environments exist or can be activated: ${candidate_venv_paths[*]}. This may cause pylint to fail"
+		echo "Command is run without a virtual environment in place and none of the candidate virtual environments exist or can be activated: ${candidate_venv_paths[*]}. This may cause the command to fail" >&2
 	fi
 fi
 "$@"

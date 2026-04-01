@@ -106,7 +106,7 @@ def test_ensure_venv_prefers_workon_home_when_provided(tmp_path: Path) -> None:
 
 
 def test_ensure_venv_falls_back_to_pyenv_when_workon_home_cannot_activate(tmp_path: Path) -> None:
-    """A missing WORKON_HOME environment should fall back to the pyenv location."""
+    """A non-activatable WORKON_HOME candidate should fall back to the pyenv location."""
     project_dir = tmp_path / "sample-project"
     project_dir.mkdir()
 
@@ -146,6 +146,5 @@ def test_ensure_venv_warns_and_runs_command_when_virtual_env_is_missing(tmp_path
     result = run_ensure_venv(project_dir=project_dir, env=env)
 
     assert result.returncode == 0
-    assert "none of the candidate virtual environments exist or can be activated" in result.stdout
+    assert "none of the candidate virtual environments exist or can be activated" in result.stderr
     assert extract_virtual_env(result.stdout) == ""
-    assert result.stderr == ""
