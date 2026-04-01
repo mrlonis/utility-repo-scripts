@@ -533,12 +533,10 @@ if command -v code >/dev/null; then
 
 	installed_extensions=$(code --list-extensions)
 
-	install_vscode_Extension_if_not_installed bungcip.better-toml "$installed_extensions"
 	install_vscode_Extension_if_not_installed ms-python.python "$installed_extensions"
 	install_vscode_Extension_if_not_installed ms-python.vscode-pylance "$installed_extensions"
 	install_vscode_Extension_if_not_installed editorconfig.editorconfig "$installed_extensions"
 	install_vscode_Extension_if_not_installed streetsidesoftware.code-spell-checker "$installed_extensions"
-	install_vscode_Extension_if_not_installed visualstudioexptteam.vscodeintellicode "$installed_extensions"
 	install_vscode_Extension_if_not_installed esbenp.prettier-vscode "$installed_extensions"
 	install_vscode_Extension_if_not_installed ms-python.isort "$installed_extensions"
 	install_vscode_Extension_if_not_installed ms-python.pylint "$installed_extensions"
