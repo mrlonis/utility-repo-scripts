@@ -259,7 +259,8 @@ def test_setup_python_app_requires_pyenv_when_missing(tmp_path: Path) -> None:
     )
 
     assert result.returncode == 1
-    assert "pyenv not installed! Please installl pyenv to use this setup script." in result.stdout
+    assert "pyenv not installed!" in result.stdout
+    assert "Please install pyenv to use this setup script." in result.stdout
     assert calls == ""
 
 

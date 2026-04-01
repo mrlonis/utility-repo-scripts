@@ -32,12 +32,15 @@ This repository holds common scripts for use in python repositories. The main sc
 
 ## Prerequisites
 
-In order to use the `[setup_python_app.sh](./setup_python_app.sh), you will need the following:
+In order to use [setup_python_app.sh](./setup_python_app.sh), you will need the following:
 
 - [pyenv](https://github.com/pyenv/pyenv)
 - [pyenv-virtualenv](https://github.com/pyenv/pyenv-virtualenv)
-- [Node.js](https://nodejs.org/en) (for `prettier` and `sort-json` pre-commit hooks)
-  - Mac/Linux: [nvm](https://github.com/nvm-sh/nvm)
+
+Optional but recommended:
+
+- [Node.js](https://nodejs.org/en) if you want the `prettier`/`sort-json` formatting steps and related `pre-commit` hooks to work locally when those tools are not already installed
+- Mac/Linux Node.js version management: [nvm](https://github.com/nvm-sh/nvm)
 
 ## Usage
 
@@ -84,7 +87,7 @@ The `setup_python_app.sh` script accepts a few flags to customize the setup proc
 
 `setup_python_app.sh` always runs `pre-commit install` when a `.pre-commit-config.yaml` file exists. `pre-commit autoupdate` is opt-in and only runs when `--pre_commit_autoupdate` is enabled.
 
-Formatting quirk: if `prettier` or `sort-json` is missing and `npm` is available, the helper functions in this repo install them globally with `npm install -g`. This is intentional for this personal workflow.
+Formatting quirk: if `--include_prettier=1`, `prettier` or `sort-json` is missing, and `npm` is available, the helper functions in this repo install them globally with `npm install -g`. If Node.js/npm is unavailable, the setup still completes and simply skips those formatting steps. This is intentional for this personal workflow.
 
 [Back to Top](#utility-repo-scripts)
 

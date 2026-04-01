@@ -271,7 +271,7 @@ if [ "$pyenv_installed" = 1 ]; then
 		exit 1
 	fi
 else
-	echo "pyenv not installed! Please installl pyenv to use this setup script."
+	echo "pyenv not installed! Please install pyenv to use this setup script."
 	echo "To Install run the following command using brew:"
 	echo ""
 	echo "brew install pyenv pyenv-virtualenv"
