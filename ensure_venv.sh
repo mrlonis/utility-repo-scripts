@@ -13,8 +13,8 @@
 # ./ensure_venv.sh pylint src
 
 try_activate_venv() {
-	venv_path="$1"
-	activate_path="$venv_path/bin/activate"
+	local venv_path="$1"
+	local activate_path="$venv_path/bin/activate"
 
 	if [ ! -f "$activate_path" ]; then
 		return 1
