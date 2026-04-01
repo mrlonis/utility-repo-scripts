@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # make sure we're in a virtual environment (useful for running pre-commit hooks from vscode git integration (pylint, etc))
-# If there there is no virtual environment active, tries to activate one in the default location ~/.venvs/<project_folder_name>
+# If there there is no virtual environment active, tries to activate one in the default location $HOME/.pyenv/versions/<project_folder_name>
 #
 # Example
 # cd my/python/package
