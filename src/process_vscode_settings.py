@@ -50,8 +50,17 @@ from src.constants.vscode_settings import (
 from src.utils.core import validate_python_formatter_option
 
 
-def process_vscode_settings(
-    vscode_settings: Dict[str, Any], debug: bool = False, test: bool = False, python_formatter: str = "black"
+def process_vscode_settings(  # pylint: disable=too-many-positional-arguments
+    vscode_settings: Dict[str, Any],
+    debug: bool = False,
+    test: bool = False,
+    include_isort: bool = True,
+    python_formatter: str = "black",
+    pylint_enabled: bool = True,
+    flake8_enabled: bool = True,
+    mypy_enabled: bool = True,
+    pytest_enabled: bool = True,
+    unittest_enabled: bool = False,
 ):
     """Do processing of the .vscode/settings.json file."""
     # pylint: disable=too-many-arguments too-many-locals
@@ -59,7 +68,13 @@ def process_vscode_settings(
         print("process_vs_code_settings.py CLI Arguments:")
         print(f"    --debug: {debug}")
         print(f"    --test: {test}")
+        print(f"    --include_isort: {include_isort}")
         print(f"    --python_formatter: {python_formatter}")
+        print(f"    --pylint_enabled: {pylint_enabled}")
+        print(f"    --flake8_enabled: {flake8_enabled}")
+        print(f"    --mypy_enabled: {mypy_enabled}")
+        print(f"    --pytest_enabled: {pytest_enabled}")
+        print(f"    --unittest_enabled: {unittest_enabled}")
         print("")
 
     # Validate String Inputs
@@ -78,13 +93,22 @@ def process_vscode_settings(
     _process_python_formatter_option(data=vscode_settings, python_formatter=python_formatter)
 
     # Process Linter Options
-    _process_python_linter_options(data=vscode_settings)
+    _process_python_linter_options(
+        data=vscode_settings,
+        pylint_enabled=pylint_enabled,
+        flake8_enabled=flake8_enabled,
+        mypy_enabled=mypy_enabled,
+    )
 
     # python_testing_framework
-    _process_python_testing_options(data=vscode_settings)
+    _process_python_testing_options(
+        data=vscode_settings,
+        pytest_enabled=pytest_enabled,
+        unittest_enabled=unittest_enabled,
+    )
 
     # include_isort
-    _process_isort_options(data=vscode_settings)
+    _process_isort_options(data=vscode_settings, include_isort=include_isort)
 
     # python.analysis.packageIndexDepths
     _process_python_analysis_package_index_depths(data=vscode_settings)
@@ -198,21 +222,46 @@ def _process_python_formatter_option(data: Dict[str, Any], python_formatter: str
     code_actions_on_save[SOURCE_ORGANIZE_IMPORTS_KEY] = "explicit"
 
 
-def _process_python_linter_options(data: Dict[str, Any]):
-    data[PYLINT_ARGS_KEY] = [PYLINT_ARGS_RCFILE_VALUE]
-    data[FLAKE8_ARGS_KEY] = [FLAKE8_ARGS_RCFILE_VALUE]
-    data[MYPY_ARGS_KEY] = ["--ignore-missing-imports", "--follow-imports=silent"]
+def _process_python_linter_options(
+    data: Dict[str, Any], pylint_enabled: bool, flake8_enabled: bool, mypy_enabled: bool
+):
+    if pylint_enabled:
+        data[PYLINT_ARGS_KEY] = [PYLINT_ARGS_RCFILE_VALUE]
+    else:
+        data.pop(PYLINT_ARGS_KEY, None)
+
+    if flake8_enabled:
+        data[FLAKE8_ARGS_KEY] = [FLAKE8_ARGS_RCFILE_VALUE]
+    else:
+        data.pop(FLAKE8_ARGS_KEY, None)
+
+    if mypy_enabled:
+        data[MYPY_ARGS_KEY] = ["--ignore-missing-imports", "--follow-imports=silent"]
+    else:
+        data.pop(MYPY_ARGS_KEY, None)
 
 
-def _process_python_testing_options(data: Dict[str, Any]):
-    data[PYTHON_TESTING_PYTEST_ARGS_KEY] = [f"--ignore=./{REPO_NAME}"]
-    data[PYTHON_TESTING_PYTEST_ENABLED_KEY] = True
-    data.pop(PYTHON_TESTING_UNITTEST_ARGS_KEY, None)
-    data[PYTHON_TESTING_UNITTEST_ENABLED_KEY] = False
+def _process_python_testing_options(data: Dict[str, Any], pytest_enabled: bool, unittest_enabled: bool):
+    if pytest_enabled:
+        data[PYTHON_TESTING_PYTEST_ARGS_KEY] = [f"--ignore=./{REPO_NAME}"]
+        data[PYTHON_TESTING_PYTEST_ENABLED_KEY] = True
+    else:
+        data.pop(PYTHON_TESTING_PYTEST_ARGS_KEY, None)
+        data[PYTHON_TESTING_PYTEST_ENABLED_KEY] = False
+
+    if unittest_enabled:
+        data[PYTHON_TESTING_UNITTEST_ARGS_KEY] = ["-v", "-s", ".", "-p", "*test*.py"]
+        data[PYTHON_TESTING_UNITTEST_ENABLED_KEY] = True
+    else:
+        data.pop(PYTHON_TESTING_UNITTEST_ARGS_KEY, None)
+        data[PYTHON_TESTING_UNITTEST_ENABLED_KEY] = False
 
 
-def _process_isort_options(data: Dict[str, Any]):
-    data[ISORT_ARGS_KEY] = [ISORT_ARGS_VALUE]
+def _process_isort_options(data: Dict[str, Any], include_isort: bool):
+    if include_isort:
+        data[ISORT_ARGS_KEY] = [ISORT_ARGS_VALUE]
+    else:
+        data.pop(ISORT_ARGS_KEY, None)
 
 
 def _process_python_analysis_package_index_depths(data: Dict[str, Any]):

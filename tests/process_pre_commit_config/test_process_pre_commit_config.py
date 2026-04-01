@@ -9,9 +9,11 @@ from src.constants.pre_commit_config import (
     BLACK_REPO_URL,
     CHECK_YAML_HOOK_ID,
     END_OF_FILE_FIXER_HOOK_ID,
+    FLAKE8_HOOK_ID,
     FLAKE8_REPO_URL,
     GIT_CHECK_HOOK_ID,
     GIT_DIRTY_HOOK_ID,
+    ISORT_HOOK_ID,
     ISORT_REPO_URL,
     JUMANJI_HOUSE_REPO_URL,
     JUMANJI_HOUSE_REV,
@@ -19,6 +21,7 @@ from src.constants.pre_commit_config import (
     MARKDOWN_LINT_HOOK_ID,
     PRE_COMMIT_REPO_URL,
     PRE_COMMIT_REV,
+    PRETTIER_HOOK_ID,
     PRETTIER_REPO_URL,
     PYLINT_HOOK_ID,
     SHELL_FORMAT_HOOK_ID,
@@ -231,6 +234,64 @@ def test_process_pre_commit_config_include_isort():
 
     repo = _find_repo(pre_commit_config=result, repo_url=ISORT_REPO_URL)
     assert repo is not None
+
+
+def test_process_pre_commit_config_disable_optional_repos_and_linters():
+    """Disabling optional hooks should remove their repos while preserving other local hooks."""
+    result = PreCommitConfigProcessor(
+        pre_commit_config=cast(
+            CommentedMap,
+            {
+                "repos": [
+                    {"repo": JUMANJI_HOUSE_REPO_URL, "rev": JUMANJI_HOUSE_REV, "hooks": [{"id": GIT_CHECK_HOOK_ID}]},
+                    {"repo": PRETTIER_REPO_URL, "rev": "v3.1.0", "hooks": [{"id": PRETTIER_HOOK_ID}]},
+                    {"repo": ISORT_REPO_URL, "rev": "5.12.0", "hooks": [{"id": ISORT_HOOK_ID}]},
+                    {
+                        "repo": LOCAL_REPO_URL,
+                        "hooks": [
+                            {
+                                "id": "fake-local-hook-id",
+                                "name": "fake-local-hook",
+                                "entry": FAKE_ENTRY,
+                                "language": "script",
+                                "types": ["python"],
+                            },
+                            {
+                                "id": PYLINT_HOOK_ID,
+                                "name": "pylint",
+                                "entry": PYLINT_IMPROPER_ENTRY,
+                                "language": "script",
+                                "types": ["python"],
+                                "args": ["pylint", "-v", RC_FILE_ARG],
+                            },
+                        ],
+                    },
+                    {"repo": FLAKE8_REPO_URL, "rev": "6.0.0", "hooks": [{"id": FLAKE8_HOOK_ID}]},
+                ]
+            },
+        ),
+        include_jumanji_house=False,
+        include_prettier=False,
+        include_isort=False,
+        pylint_enabled=False,
+        flake8_enabled=False,
+        test=True,
+        debug=True,
+    ).process_pre_commit_config()
+
+    assert result is not None
+    assert _find_repo(pre_commit_config=result, repo_url=JUMANJI_HOUSE_REPO_URL) is None
+    assert _find_repo(pre_commit_config=result, repo_url=PRETTIER_REPO_URL) is None
+    assert _find_repo(pre_commit_config=result, repo_url=ISORT_REPO_URL) is None
+    assert _find_repo(pre_commit_config=result, repo_url=FLAKE8_REPO_URL) is None
+
+    repo = _find_repo(pre_commit_config=result, repo_url=LOCAL_REPO_URL)
+    assert repo is not None
+
+    hooks = cast(List[Dict[str, Any]], repo.get("hooks", []))
+    assert len(hooks) == 1
+    assert hooks[0]["id"] == "fake-local-hook-id"
+    assert hooks[0]["entry"] == FAKE_ENTRY
 
 
 # Testing python_formatter options
@@ -459,6 +520,38 @@ def test_process_pre_commit_config_with_existing_random_local():
     assert hook2["language"] == "script"
     assert hook2["types"] == ["python"]
     assert hook2["args"] == ["pylint", "-v", RC_FILE_ARG]
+
+
+def test_process_pre_commit_config_disable_only_pylint_removes_empty_local_repo():
+    """Disabling pylint should remove the local repo if it only contains the pylint hook."""
+    result = PreCommitConfigProcessor(
+        pre_commit_config=cast(
+            CommentedMap,
+            {
+                "repos": [
+                    {
+                        "repo": LOCAL_REPO_URL,
+                        "hooks": [
+                            {
+                                "id": PYLINT_HOOK_ID,
+                                "name": "pylint",
+                                "entry": PYLINT_IMPROPER_ENTRY,
+                                "language": "script",
+                                "types": ["python"],
+                                "args": ["pylint", "-v", RC_FILE_ARG],
+                            }
+                        ],
+                    }
+                ]
+            },
+        ),
+        pylint_enabled=False,
+        test=True,
+        debug=True,
+    ).process_pre_commit_config()
+
+    assert result is not None
+    assert _find_repo(pre_commit_config=result, repo_url=LOCAL_REPO_URL) is None
 
 
 # Happy Path Test

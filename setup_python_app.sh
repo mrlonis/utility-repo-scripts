@@ -29,8 +29,16 @@ debug=0
 rebuild_venv=0
 package_manager="poetry"
 is_package=0
+include_jumanji_house=1
+include_prettier=1
+include_isort=1
 isort_profile="black"
 python_formatter="black"
+pylint_enabled=1
+flake8_enabled=1
+mypy_enabled=1
+pytest_enabled=1
+unittest_enabled=0
 overwrite_vscode_launch=0
 line_length=120
 pre_commit_pylint_entry_prefix="utility-repo-scripts/"
@@ -55,11 +63,35 @@ while getopts d:v:r:-: OPT; do
 	is_package)
 		is_package=1
 		;;
+	include_jumanji_house)
+		include_jumanji_house=${OPTARG:-1}
+		;;
+	include_prettier)
+		include_prettier=${OPTARG:-1}
+		;;
+	include_isort)
+		include_isort=${OPTARG:-1}
+		;;
 	isort_profile)
 		isort_profile=${OPTARG}
 		;;
 	python_formatter)
 		python_formatter=${OPTARG}
+		;;
+	pylint_enabled)
+		pylint_enabled=${OPTARG:-1}
+		;;
+	flake8_enabled)
+		flake8_enabled=${OPTARG:-1}
+		;;
+	mypy_enabled)
+		mypy_enabled=${OPTARG:-1}
+		;;
+	pytest_enabled)
+		pytest_enabled=${OPTARG:-1}
+		;;
+	unittest_enabled)
+		unittest_enabled=${OPTARG:-1}
 		;;
 	overwrite_vscode_launch)
 		overwrite_vscode_launch=1
@@ -87,8 +119,16 @@ if [ "$debug" = 1 ]; then
 	echo "    -r (--rebuild_venv): $rebuild_venv"
 	echo "    --package_manager: $package_manager"
 	echo "    --is_package: $is_package"
+	echo "    --include_jumanji_house: $include_jumanji_house"
+	echo "    --include_prettier: $include_prettier"
+	echo "    --include_isort: $include_isort"
 	echo "    --isort_profile: $isort_profile"
 	echo "    --python_formatter: $python_formatter"
+	echo "    --pylint_enabled: $pylint_enabled"
+	echo "    --flake8_enabled: $flake8_enabled"
+	echo "    --mypy_enabled: $mypy_enabled"
+	echo "    --pytest_enabled: $pytest_enabled"
+	echo "    --unittest_enabled: $unittest_enabled"
 	echo "    --overwrite_vscode_launch: $overwrite_vscode_launch"
 	echo "    --line_length: $line_length"
 	echo "    --pre_commit_pylint_entry_prefix: $pre_commit_pylint_entry_prefix"
@@ -115,6 +155,18 @@ else
 	fi
 fi
 
+if [ "$include_jumanji_house" != 0 ] && [ "$include_jumanji_house" != 1 ]; then
+	error "Invalid include_jumanji_house option: ($include_jumanji_house). Valid values are [0, 1]"
+fi
+
+if [ "$include_prettier" != 0 ] && [ "$include_prettier" != 1 ]; then
+	error "Invalid include_prettier option: ($include_prettier). Valid values are [0, 1]"
+fi
+
+if [ "$include_isort" != 0 ] && [ "$include_isort" != 1 ]; then
+	error "Invalid include_isort option: ($include_isort). Valid values are [0, 1]"
+fi
+
 if [ "$isort_profile" != "" ] &&
 	[ "$isort_profile" != "black" ] &&
 	[ "$isort_profile" != "django" ] &&
@@ -133,6 +185,26 @@ if [ "$python_formatter" != "" ] &&
 	[ "$python_formatter" != "autopep8" ] &&
 	[ "$python_formatter" != "black" ]; then
 	error "Invalid python_formatter option: ($python_formatter). Valid values are ['', autopep8, black]"
+fi
+
+if [ "$pylint_enabled" != 0 ] && [ "$pylint_enabled" != 1 ]; then
+	error "Invalid pylint_enabled option: ($pylint_enabled). Valid values are [0, 1]"
+fi
+
+if [ "$flake8_enabled" != 0 ] && [ "$flake8_enabled" != 1 ]; then
+	error "Invalid flake8_enabled option: ($flake8_enabled). Valid values are [0, 1]"
+fi
+
+if [ "$mypy_enabled" != 0 ] && [ "$mypy_enabled" != 1 ]; then
+	error "Invalid mypy_enabled option: ($mypy_enabled). Valid values are [0, 1]"
+fi
+
+if [ "$pytest_enabled" != 0 ] && [ "$pytest_enabled" != 1 ]; then
+	error "Invalid pytest_enabled option: ($pytest_enabled). Valid values are [0, 1]"
+fi
+
+if [ "$unittest_enabled" != 0 ] && [ "$unittest_enabled" != 1 ]; then
+	error "Invalid unittest_enabled option: ($unittest_enabled). Valid values are [0, 1]"
 fi
 
 if [ "$overwrite_vscode_launch" != 0 ] && [ "$overwrite_vscode_launch" != 1 ]; then
