@@ -19,7 +19,9 @@ def run_ensure_venv(project_dir: Path, env: dict[str, str]) -> subprocess.Comple
             "bash",
             str(ENSURE_VENV_SCRIPT),
             "bash",
-            "-lc",
+            "--noprofile",
+            "--norc",
+            "-c",
             f'printf "{VENV_MARKER}%s" "${{VIRTUAL_ENV:-}}"',
         ],
         cwd=project_dir,
@@ -103,6 +105,31 @@ def test_ensure_venv_prefers_workon_home_when_provided(tmp_path: Path) -> None:
     assert result.stderr == ""
 
 
+def test_ensure_venv_falls_back_to_pyenv_when_workon_home_cannot_activate(tmp_path: Path) -> None:
+    """A missing WORKON_HOME environment should fall back to the pyenv location."""
+    project_dir = tmp_path / "sample-project"
+    project_dir.mkdir()
+
+    workon_home = tmp_path / "workon-home"
+    (workon_home / project_dir.name).mkdir(parents=True)
+
+    home_dir = tmp_path / "home"
+    pyenv_venv_dir = home_dir / ".pyenv" / "versions" / project_dir.name
+    write_activate_script(pyenv_venv_dir)
+
+    env = os.environ.copy()
+    env["HOME"] = str(home_dir)
+    env["WORKON_HOME"] = str(workon_home)
+    env.pop("VIRTUAL_ENV", None)
+    env.pop("PYENV_ROOT", None)
+
+    result = run_ensure_venv(project_dir=project_dir, env=env)
+
+    assert result.returncode == 0
+    assert extract_virtual_env(result.stdout) == str(pyenv_venv_dir)
+    assert result.stderr == ""
+
+
 def test_ensure_venv_warns_and_runs_command_when_virtual_env_is_missing(tmp_path: Path) -> None:
     """Missing fallback environments should warn without blocking the command."""
     project_dir = tmp_path / "sample-project"
@@ -119,6 +146,6 @@ def test_ensure_venv_warns_and_runs_command_when_virtual_env_is_missing(tmp_path
     result = run_ensure_venv(project_dir=project_dir, env=env)
 
     assert result.returncode == 0
-    assert "does not exist" in result.stdout
+    assert "none of the candidate virtual environments exist or can be activated" in result.stdout
     assert extract_virtual_env(result.stdout) == ""
     assert result.stderr == ""
