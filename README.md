@@ -87,7 +87,7 @@ The `setup_python_app.sh` script accepts a few flags to customize the setup proc
 
 `setup_python_app.sh` always runs `pre-commit install` when a `.pre-commit-config.yaml` file exists. `pre-commit autoupdate` is opt-in and only runs when `--pre_commit_autoupdate` is enabled.
 
-Formatting quirk: if `--include_prettier=1`, `prettier` or `sort-json` is missing, and `npm` is available, the helper functions in this repo install them globally with `npm install -g`. If Node.js/npm is unavailable, the setup still completes and simply skips those formatting steps. This is intentional for this personal workflow.
+Formatting quirk: whenever the script calls `prettier_format` or `json_sort` (for example when formatting `.prettierrc`, `.pre-commit-config.yaml`, or `.vscode/settings.json`), missing `prettier` or `sort-json` binaries are installed globally with `npm install -g` if `npm` is available. If Node.js/npm is unavailable, the setup still completes and simply skips those formatting steps. `--include_prettier` only controls the optional Prettier-specific pre-commit hook fix later in the script. This is intentional for this personal workflow.
 
 [Back to Top](#utility-repo-scripts)
 

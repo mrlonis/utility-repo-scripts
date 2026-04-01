@@ -63,6 +63,7 @@ def write_fake_tools(bin_dir: Path, unavailable: Collection[str] = ()) -> None:
                 if [ ! -f pyproject.toml ]; then
                     printf '[tool.poetry]\\nname = "sample-project"\\nversion = "0.1.0"\\n' > pyproject.toml
                 fi
+                :
                 ;;
             setup_pylintrc.py)
                 printf '[MASTER]\\n' > .pylintrc
