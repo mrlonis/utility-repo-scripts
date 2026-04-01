@@ -7,7 +7,6 @@ This repository holds common scripts for use in python repositories. The main sc
 - [utility-repo-scripts](#utility-repo-scripts)
   - [Table of Contents](#table-of-contents)
   - [Prerequisites](#prerequisites)
-    - [Optional](#optional)
   - [Usage](#usage)
     - [CLI Flags](#cli-flags)
     - [Supported Package Managers](#supported-package-managers)
@@ -37,10 +36,7 @@ In order to use the `[setup_python_app.sh](./setup_python_app.sh), you will need
 
 - [pyenv](https://github.com/pyenv/pyenv)
 - [pyenv-virtualenv](https://github.com/pyenv/pyenv-virtualenv)
-
-### Optional
-
-- [Node.js](https://nodejs.org/en)
+- [Node.js](https://nodejs.org/en) (for `prettier` and `sort-json` pre-commit hooks)
   - Mac/Linux: [nvm](https://github.com/nvm-sh/nvm)
 
 ## Usage
@@ -62,7 +58,7 @@ source utility-repo-scripts/setup_python_app.sh --package_manager="pip"
 
 ### CLI Flags
 
-The `setup` script accepts a few flags to customize the setup process:
+The `setup_python_app.sh` script accepts a few flags to customize the setup process:
 
 **Note**: `0` is False and `1` is True
 
