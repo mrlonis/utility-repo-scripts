@@ -90,10 +90,14 @@ def run_find_site_package_flow(
     command = f"""
 source "{normalized_functions_script}"
 debug={debug_enabled}
-python() {{
+    python() {{
 \tcase "{package_probe_result}" in
 \tpresent)
 \t\tprintf 'present:/tmp/fake_package.py\\n'
+\t\treturn 0
+\t\t;;
+\tnamespace)
+\t\tprintf 'present:<namespace>\\n'
 \t\treturn 0
 \t\t;;
 \tmissing)
@@ -254,6 +258,17 @@ def test_find_site_package_propagates_unexpected_probe_errors(tmp_path: Path) ->
     assert calls == ""
 
 
+def test_find_site_package_treats_namespace_packages_as_present(tmp_path: Path) -> None:
+    """Namespace packages should be treated as present without a temporary install."""
+    result, calls = run_find_site_package_flow(tmp_path=tmp_path, package_probe_result="namespace")
+
+    assert result.returncode == 0
+    assert extract_marker_value(result.stdout, STATE_MARKER) == "1"
+    assert extract_marker_value(result.stdout, STATUS_MARKER) == "0"
+    assert result.stderr == ""
+    assert calls == ""
+
+
 def test_find_site_distribution_reports_existing_state(tmp_path: Path) -> None:
     """Existing distributions should report state=1."""
     result = run_find_site_distribution_flow(tmp_path=tmp_path, distribution_probe_result="present")
@@ -272,6 +287,30 @@ def test_find_site_distribution_reports_missing_state(tmp_path: Path) -> None:
     assert extract_marker_value(result.stdout, STATE_MARKER) == "0"
     assert extract_marker_value(result.stdout, STATUS_MARKER) == "0"
     assert result.stderr == ""
+
+
+def test_find_site_distribution_propagates_probe_errors(tmp_path: Path) -> None:
+    """Unexpected distribution probe errors should surface as a nonzero status."""
+    result = run_find_site_distribution_flow(tmp_path=tmp_path, distribution_probe_result="error")
+
+    assert result.returncode == 0
+    assert extract_marker_value(result.stdout, STATE_MARKER) == ""
+    assert extract_marker_value(result.stdout, STATUS_MARKER) == "1"
+    assert "unexpected distribution probe error" in result.stderr
+
+
+def test_find_site_distribution_debug_logs_go_to_stderr(tmp_path: Path) -> None:
+    """Debug logging should stay off stdout for distribution-state capture."""
+    result = run_find_site_distribution_flow(
+        tmp_path=tmp_path,
+        distribution_probe_result="present",
+        debug_enabled=1,
+    )
+
+    assert result.returncode == 0
+    assert extract_marker_value(result.stdout, STATE_MARKER) == "1"
+    assert extract_marker_value(result.stdout, STATUS_MARKER) == "0"
+    assert "find_site_distribution(): fake-distribution exists = 1" in result.stderr
 
 
 def test_install_vscode_extension_helper_installs_missing_extension(tmp_path: Path) -> None:

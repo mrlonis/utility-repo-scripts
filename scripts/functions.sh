@@ -21,12 +21,12 @@ except (ImportError, ModuleNotFoundError):
 except Exception:
     traceback.print_exc()
     raise
-else:
-    if package_spec is None:
-        print("missing")
-    else:
-        package_location = package_spec.origin or ""
-        print(f"present:{package_location}")
+	else:
+	    if package_spec is None:
+	        print("missing")
+	    else:
+	        package_location = package_spec.origin or "<namespace>"
+	        print(f"present:{package_location}")
 ' "$package_name")
 	local package_probe_status=$?
 	if [ "$package_probe_status" -ne 0 ]; then
@@ -36,9 +36,11 @@ else:
 	case "$package_probe_result" in
 	"missing")
 		package_location=""
+		package_previously_installed=0
 		;;
 	"present:"*)
 		package_location="${package_probe_result#present:}"
+		package_previously_installed=1
 		;;
 	*)
 		echo "find_site_package(): Unexpected probe result for $package_name: $package_probe_result" >&2
@@ -50,7 +52,7 @@ else:
 		echo "find_site_package(): $package_location" >&2
 	fi
 
-	if [ "$package_location" = "" ]; then
+	if [ "$package_previously_installed" = 0 ]; then
 		if [ "$debug" = 1 ]; then
 			echo "find_site_package(): $pypi_name not found" >&2
 			echo "find_site_package(): Installing $pypi_name temporarily for this setup step" >&2
@@ -58,12 +60,10 @@ else:
 		if ! pip install "$pypi_name"; then
 			return 1
 		fi
-		package_previously_installed=0
 	else
 		if [ "$debug" = 1 ]; then
 			echo "find_site_package(): $pypi_name found" >&2
 		fi
-		package_previously_installed=1
 	fi
 	if [ "$debug" = 1 ]; then
 		echo "find_site_package(): $package_name exists = $package_previously_installed" >&2

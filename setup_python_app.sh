@@ -296,11 +296,11 @@ if [ "$debug" = 1 ]; then
 	echo "$dash_separator .prettierrc Setup $dash_separator"
 fi
 
-if ! ruamel_yaml_installed=$(find_site_package ruamel.yaml ruamel.yaml); then
-	error "Failed to locate or temporarily install ruamel.yaml"
-fi
 if ! ruamel_yaml_clib_installed=$(find_site_distribution ruamel.yaml.clib); then
 	error "Failed to determine whether ruamel.yaml.clib is installed"
+fi
+if ! ruamel_yaml_installed=$(find_site_package ruamel.yaml ruamel.yaml); then
+	error "Failed to locate or temporarily install ruamel.yaml"
 fi
 python "$script_dir"/setup_prettierrc.py "$@" --exists="$prettierrc_exists"
 uninstall_site_package ruamel.yaml "$ruamel_yaml_installed"
@@ -319,11 +319,11 @@ if [ "$debug" = 1 ]; then
 	echo "$dash_separator .pre-commit-config.yaml Setup $dash_separator"
 fi
 
-if ! ruamel_yaml_installed=$(find_site_package ruamel.yaml ruamel.yaml); then
-	error "Failed to locate or temporarily install ruamel.yaml"
-fi
 if ! ruamel_yaml_clib_installed=$(find_site_distribution ruamel.yaml.clib); then
 	error "Failed to determine whether ruamel.yaml.clib is installed"
+fi
+if ! ruamel_yaml_installed=$(find_site_package ruamel.yaml ruamel.yaml); then
+	error "Failed to locate or temporarily install ruamel.yaml"
 fi
 python "$script_dir"/setup_pre_commit_config.py "$@" --exists="$pre_commit_config_exists"
 uninstall_site_package ruamel.yaml "$ruamel_yaml_installed"
@@ -405,11 +405,11 @@ fi
 
 [ ! -f ".pre-commit-config.yaml" ] && pre_commit_config_exists=0 || pre_commit_config_exists=1
 
-if ! ruamel_yaml_installed=$(find_site_package ruamel.yaml ruamel.yaml); then
-	error "Failed to locate or temporarily install ruamel.yaml"
-fi
 if ! ruamel_yaml_clib_installed=$(find_site_distribution ruamel.yaml.clib); then
 	error "Failed to determine whether ruamel.yaml.clib is installed"
+fi
+if ! ruamel_yaml_installed=$(find_site_package ruamel.yaml ruamel.yaml); then
+	error "Failed to locate or temporarily install ruamel.yaml"
 fi
 python "$script_dir"/setup_fix_prettier_pre_commit.py "$@" --pre_commit_config_exists="$pre_commit_config_exists"
 uninstall_site_package ruamel.yaml "$ruamel_yaml_installed"
