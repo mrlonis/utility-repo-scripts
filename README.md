@@ -328,14 +328,14 @@ To then easily run and re-build the virtual environment on the fly without modif
 
 The [`ensure_venv.sh`](./ensure_venv.sh) script is used by the generated local `pylint` `pre-commit` hook. Its job is to make sure a virtual environment is active before running a command, which is especially helpful when hooks are triggered from the VS Code Git UI or another shell that does not already have `VIRTUAL_ENV` set.
 
-When no virtual environment is active, the script looks for one in the following order:
+When no virtual environment is active, the script tries to activate a virtual environment in the following order:
 
 1. `$WORKON_HOME/<project_folder_name>`
 1. `${PYENV_ROOT:-$HOME/.pyenv}/versions/<project_folder_name>`
 
 This matches the environment layout created by [`setup_python_app.sh`](./setup_python_app.sh), which creates project environments under the `pyenv` path by default.
 
-If you keep your environments somewhere else, set `WORKON_HOME` to the parent directory that contains your project environments:
+If you keep your environments somewhere else, set `WORKON_HOME` to the parent directory that contains your project environments. The script will try that location first and then fall back to the pyenv location if the project environment is missing there or cannot be activated:
 
 ```sh
 export WORKON_HOME="$HOME/.venvs"
