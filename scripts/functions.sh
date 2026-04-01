@@ -134,8 +134,7 @@ function install_vscode_Extension_if_not_installed() {
 	extension_name="$1"
 	installed_extensions="$2"
 
-	in_list "$installed_extensions" " " "$extension_name" && extension_installed=0 || extension_installed=1
-	if [ "$extension_installed" = 0 ]; then
+	if ! printf '%s\n' "$installed_extensions" | grep -Fxq "$extension_name"; then
 		code --install-extension "$extension_name" --force >/dev/null
 	fi
 }
