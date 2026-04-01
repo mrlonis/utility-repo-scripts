@@ -299,9 +299,12 @@ fi
 if ! ruamel_yaml_installed=$(find_site_package ruamel.yaml ruamel.yaml); then
 	error "Failed to locate or temporarily install ruamel.yaml"
 fi
+if ! ruamel_yaml_clib_installed=$(find_site_distribution ruamel.yaml.clib); then
+	error "Failed to determine whether ruamel.yaml.clib is installed"
+fi
 python "$script_dir"/setup_prettierrc.py "$@" --exists="$prettierrc_exists"
 uninstall_site_package ruamel.yaml "$ruamel_yaml_installed"
-uninstall_site_package ruamel.yaml.clib "$ruamel_yaml_installed"
+uninstall_site_package ruamel.yaml.clib "$ruamel_yaml_clib_installed"
 prettier_format .prettierrc
 
 if [ "$debug" = 1 ]; then
@@ -319,9 +322,12 @@ fi
 if ! ruamel_yaml_installed=$(find_site_package ruamel.yaml ruamel.yaml); then
 	error "Failed to locate or temporarily install ruamel.yaml"
 fi
+if ! ruamel_yaml_clib_installed=$(find_site_distribution ruamel.yaml.clib); then
+	error "Failed to determine whether ruamel.yaml.clib is installed"
+fi
 python "$script_dir"/setup_pre_commit_config.py "$@" --exists="$pre_commit_config_exists"
 uninstall_site_package ruamel.yaml "$ruamel_yaml_installed"
-uninstall_site_package ruamel.yaml.clib "$ruamel_yaml_installed"
+uninstall_site_package ruamel.yaml.clib "$ruamel_yaml_clib_installed"
 prettier_format .pre-commit-config.yaml
 
 if [ "$debug" = 1 ]; then
@@ -402,9 +408,12 @@ fi
 if ! ruamel_yaml_installed=$(find_site_package ruamel.yaml ruamel.yaml); then
 	error "Failed to locate or temporarily install ruamel.yaml"
 fi
+if ! ruamel_yaml_clib_installed=$(find_site_distribution ruamel.yaml.clib); then
+	error "Failed to determine whether ruamel.yaml.clib is installed"
+fi
 python "$script_dir"/setup_fix_prettier_pre_commit.py "$@" --pre_commit_config_exists="$pre_commit_config_exists"
 uninstall_site_package ruamel.yaml "$ruamel_yaml_installed"
-uninstall_site_package ruamel.yaml.clib "$ruamel_yaml_installed"
+uninstall_site_package ruamel.yaml.clib "$ruamel_yaml_clib_installed"
 prettier_format .pre-commit-config.yaml
 
 if [ "$debug" = 1 ]; then

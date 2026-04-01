@@ -6,7 +6,46 @@ function find_site_package() {
 	local pypi_name="$2"
 	local package_location
 	local package_previously_installed
-	package_location=$(python -c "import $package_name; print($package_name.__file__)" 2>/dev/null)
+	local package_probe_result
+	package_probe_result=$(python -c '
+import importlib.util
+import sys
+import traceback
+
+package_name = sys.argv[1]
+
+try:
+    package_spec = importlib.util.find_spec(package_name)
+except (ImportError, ModuleNotFoundError):
+    print("missing")
+except Exception:
+    traceback.print_exc()
+    raise
+else:
+    if package_spec is None:
+        print("missing")
+    else:
+        package_location = package_spec.origin or ""
+        print(f"present:{package_location}")
+' "$package_name")
+	local package_probe_status=$?
+	if [ "$package_probe_status" -ne 0 ]; then
+		return 1
+	fi
+
+	case "$package_probe_result" in
+	"missing")
+		package_location=""
+		;;
+	"present:"*)
+		package_location="${package_probe_result#present:}"
+		;;
+	*)
+		echo "find_site_package(): Unexpected probe result for $package_name: $package_probe_result" >&2
+		return 1
+		;;
+	esac
+
 	if [ "$debug" = 1 ]; then
 		echo "find_site_package(): $package_location" >&2
 	fi
@@ -14,7 +53,7 @@ function find_site_package() {
 	if [ "$package_location" = "" ]; then
 		if [ "$debug" = 1 ]; then
 			echo "find_site_package(): $pypi_name not found" >&2
-			echo "find_site_package(): Installing $pypi_name temporarily for pre-commit setup" >&2
+			echo "find_site_package(): Installing $pypi_name temporarily for this setup step" >&2
 		fi
 		if ! pip install "$pypi_name"; then
 			return 1
@@ -30,6 +69,52 @@ function find_site_package() {
 		echo "find_site_package(): $package_name exists = $package_previously_installed" >&2
 	fi
 	printf '%s' "$package_previously_installed"
+}
+
+function find_site_distribution() {
+	local distribution_name="$1"
+	local distribution_previously_installed
+	local distribution_probe_result
+	distribution_probe_result=$(python -c '
+from importlib import metadata
+import sys
+import traceback
+
+distribution_name = sys.argv[1]
+
+try:
+    metadata.distribution(distribution_name)
+except metadata.PackageNotFoundError:
+    print("missing")
+except Exception:
+    traceback.print_exc()
+    raise
+else:
+    print("present")
+' "$distribution_name")
+	local distribution_probe_status=$?
+	if [ "$distribution_probe_status" -ne 0 ]; then
+		return 1
+	fi
+
+	case "$distribution_probe_result" in
+	"missing")
+		distribution_previously_installed=0
+		;;
+	"present")
+		distribution_previously_installed=1
+		;;
+	*)
+		echo "find_site_distribution(): Unexpected probe result for $distribution_name: $distribution_probe_result" >&2
+		return 1
+		;;
+	esac
+
+	if [ "$debug" = 1 ]; then
+		echo "find_site_distribution(): $distribution_name exists = $distribution_previously_installed" >&2
+	fi
+
+	printf '%s' "$distribution_previously_installed"
 }
 
 function uninstall_site_package() {
