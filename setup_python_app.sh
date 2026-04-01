@@ -39,6 +39,7 @@ flake8_enabled=1
 mypy_enabled=1
 pytest_enabled=1
 unittest_enabled=0
+pre_commit_autoupdate=0
 overwrite_vscode_launch=0
 line_length=120
 pre_commit_pylint_entry_prefix="utility-repo-scripts/"
@@ -93,6 +94,9 @@ while getopts d:v:r:-: OPT; do
 	unittest_enabled)
 		unittest_enabled=${OPTARG:-1}
 		;;
+	pre_commit_autoupdate)
+		pre_commit_autoupdate=${OPTARG:-1}
+		;;
 	overwrite_vscode_launch)
 		overwrite_vscode_launch=1
 		;;
@@ -129,6 +133,7 @@ if [ "$debug" = 1 ]; then
 	echo "    --mypy_enabled: $mypy_enabled"
 	echo "    --pytest_enabled: $pytest_enabled"
 	echo "    --unittest_enabled: $unittest_enabled"
+	echo "    --pre_commit_autoupdate: $pre_commit_autoupdate"
 	echo "    --overwrite_vscode_launch: $overwrite_vscode_launch"
 	echo "    --line_length: $line_length"
 	echo "    --pre_commit_pylint_entry_prefix: $pre_commit_pylint_entry_prefix"
@@ -205,6 +210,10 @@ fi
 
 if [ "$unittest_enabled" != 0 ] && [ "$unittest_enabled" != 1 ]; then
 	error "Invalid unittest_enabled option: ($unittest_enabled). Valid values are [0, 1]"
+fi
+
+if [ "$pre_commit_autoupdate" != 0 ] && [ "$pre_commit_autoupdate" != 1 ]; then
+	error "Invalid pre_commit_autoupdate option: ($pre_commit_autoupdate). Valid values are [0, 1]"
 fi
 
 if [ "$overwrite_vscode_launch" != 0 ] && [ "$overwrite_vscode_launch" != 1 ]; then
@@ -460,13 +469,27 @@ fi
 #region Install pre-commit hooks
 if [ -f ".pre-commit-config.yaml" ]; then
 	if [ "$debug" = 1 ]; then
-		echo "$dash_separator pre-commit install & pre-commit autoupdate $dash_separator"
+		echo "$dash_separator pre-commit install $dash_separator"
 	fi
 	pre-commit install
+	if [ "$debug" = 1 ]; then
+		echo ""
+	fi
+fi
+#endregion
+
+#region pre-commit autoupdate
+if [ -f ".pre-commit-config.yaml" ] && [ "$pre_commit_autoupdate" = 1 ]; then
+	if [ "$debug" = 1 ]; then
+		echo "$dash_separator pre-commit autoupdate $dash_separator"
+	fi
 	pre-commit autoupdate
 	if [ "$debug" = 1 ]; then
 		echo ""
 	fi
+elif [ -f ".pre-commit-config.yaml" ] && [ "$debug" = 1 ]; then
+	echo "Skipping pre-commit autoupdate because --pre_commit_autoupdate is disabled"
+	echo ""
 fi
 #endregion
 

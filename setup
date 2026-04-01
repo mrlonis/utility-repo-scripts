@@ -14,6 +14,7 @@ source setup_python_app.sh \
 	--flake8_enabled \
 	--mypy_enabled \
 	--pytest_enabled \
+	--pre_commit_autoupdate \
 	--overwrite_vscode_launch \
 	--line_length=120 \
 	--pre_commit_pylint_entry_prefix=""

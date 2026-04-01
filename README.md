@@ -82,8 +82,13 @@ The `setup` script accepts a few flags to customize the setup process:
 | `--mypy_enabled`            | Specifies whether or not to enable `mypy`                                                                               | `True`   |                                                                                           |
 | `--pytest_enabled`          | Specifies whether or not to enable `pytest`                                                                             | `True`   |                                                                                           |
 | `--unittest_enabled`        | Specifies whether or not to enable `unittest`                                                                           | `False`  |                                                                                           |
+| `--pre_commit_autoupdate`   | Runs `pre-commit autoupdate` after installing hooks                                                                     | `False`  |                                                                                           |
 | `--overwrite_vscode_launch` | Overwrites an existing `.vscode/launch.json`; a missing file is created automatically from `.vscode/launch.sample.json` | `False`  |                                                                                           |
 | `--line_length`             | Specifies the line length to use for various settings                                                                   | `120`    | `Any non-zero positive integer`                                                           |
+
+`setup_python_app.sh` always runs `pre-commit install` when a `.pre-commit-config.yaml` file exists. `pre-commit autoupdate` is opt-in and only runs when `--pre_commit_autoupdate` is enabled.
+
+Formatting quirk: if `prettier` or `sort-json` is missing and `npm` is available, the helper functions in this repo install them globally with `npm install -g`. This is intentional for this personal workflow.
 
 [Back to Top](#utility-repo-scripts)
 
