@@ -2,35 +2,39 @@
 debug=${debug:-0} # Load debug cli option if it already exists
 
 function find_site_package() {
-	package_name="$1"
-	pypi_name="$2"
-	package_location=$(python -c "import $package_name; print($package_name.__file__)")
+	local package_name="$1"
+	local pypi_name="$2"
+	local package_location
+	local package_previously_installed
+	package_location=$(python -c "import $package_name; print($package_name.__file__)" 2>/dev/null)
 	if [ "$debug" = 1 ]; then
-		echo "find_site_package(): $package_location"
+		echo "find_site_package(): $package_location" >&2
 	fi
 
 	if [ "$package_location" = "" ]; then
 		if [ "$debug" = 1 ]; then
-			echo "find_site_package(): $pypi_name not found"
-			echo "find_site_package(): Installing $pypi_name temporarily for pre-commit setup"
+			echo "find_site_package(): $pypi_name not found" >&2
+			echo "find_site_package(): Installing $pypi_name temporarily for pre-commit setup" >&2
 		fi
-		pip install "$pypi_name"
-		exists=0
+		if ! pip install "$pypi_name"; then
+			return 1
+		fi
+		package_previously_installed=0
 	else
 		if [ "$debug" = 1 ]; then
-			echo "find_site_package(): $pypi_name found"
+			echo "find_site_package(): $pypi_name found" >&2
 		fi
-		exists=1
+		package_previously_installed=1
 	fi
 	if [ "$debug" = 1 ]; then
-		echo "find_site_package(): $package_name exists = $exists"
+		echo "find_site_package(): $package_name exists = $package_previously_installed" >&2
 	fi
-	return $exists
+	printf '%s' "$package_previously_installed"
 }
 
 function uninstall_site_package() {
-	package_name="$1"
-	package_installed="$2"
+	local package_name="$1"
+	local package_installed="$2"
 	if [ "$package_installed" = 0 ]; then
 		echo "Uninstalling $package_name since it did not exist in the virtual environment prior to running this script. Consider adding $package_name as a dev dependency to stop seeing message."
 		pip uninstall -y "$package_name"
