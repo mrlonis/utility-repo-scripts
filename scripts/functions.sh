@@ -139,6 +139,39 @@ function install_vscode_Extension_if_not_installed() {
 	fi
 }
 
+function ensure_vscode_launch_file() {
+	local sample_launch_path="$1"
+	local launch_path="$2"
+	local overwrite_launch="$3"
+	local debug_enabled="$4"
+
+	if [ ! -e "$sample_launch_path" ]; then
+		if [ "$debug_enabled" = 1 ]; then
+			echo "Skipping $launch_path creation. No $sample_launch_path file found."
+		fi
+		return 0
+	fi
+
+	if [ ! -e "$launch_path" ]; then
+		if [ "$debug_enabled" = 1 ]; then
+			echo "Creating $launch_path file from $sample_launch_path template"
+		fi
+		cp "$sample_launch_path" "$launch_path"
+		return $?
+	fi
+
+	if [ "$overwrite_launch" = 1 ]; then
+		if [ "$debug_enabled" = 1 ]; then
+			echo "Overwriting $launch_path file from $sample_launch_path template"
+		fi
+		cp "$sample_launch_path" "$launch_path"
+	elif [ "$debug_enabled" = 1 ]; then
+		echo "Skipping $launch_path creation. File already exists."
+		echo "To overwrite, run this script with the --overwrite_vscode_launch flag"
+		echo "Please make a backup of your existing file before performing this action."
+	fi
+}
+
 function error() {
 	# complain to STDERR and exit with error
 	echo "$*" >&2

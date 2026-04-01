@@ -421,24 +421,7 @@ if [ "$debug" = 1 ]; then
 	echo "$dash_separator VS Code launch.json $dash_separator"
 fi
 
-if [ ! -e .vscode/launch.json ] && [ -e .vscode/launch.sample.json ]; then
-	if [ "$overwrite_vscode_launch" = 1 ]; then
-		if [ "$debug" = 1 ]; then
-			echo "Creating .vscode/launch.json file from .vscode/launch.sample.json template"
-		fi
-		cp .vscode/launch.sample.json .vscode/launch.json
-	else
-		if [ "$debug" = 1 ]; then
-			echo "Skipping .vscode/launch.json creation. File already exists."
-			echo "To overwrite, run this script with the --overwrite_vscode_launch flag"
-			echo "Please make a backup of your existing file before performing this action."
-		fi
-	fi
-else
-	if [ "$debug" = 1 ]; then
-		echo "Skipping .vscode/launch.json creation. No .vscode/launch.sample.json file found."
-	fi
-fi
+ensure_vscode_launch_file ".vscode/launch.sample.json" ".vscode/launch.json" "$overwrite_vscode_launch" "$debug"
 
 if [ "$debug" = 1 ]; then
 	echo ""

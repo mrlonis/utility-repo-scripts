@@ -14,11 +14,7 @@ def run_install_extension_helper(
 ) -> Tuple[subprocess.CompletedProcess[str], str]:
     """Run the VS Code extension helper and capture attempted installs."""
     calls_file = tmp_path / "code_calls.txt"
-    normalized_functions_script = tmp_path / "functions.sh"
-    normalized_functions_script.write_text(
-        FUNCTIONS_SCRIPT.read_text(encoding="utf-8").replace("\r\n", "\n"),
-        encoding="utf-8",
-    )
+    normalized_functions_script = write_normalized_functions_script(tmp_path)
     command = f"""
 source "{normalized_functions_script}"
 code() {{
@@ -37,6 +33,47 @@ install_vscode_Extension_if_not_installed "{extension_name}" "{installed_extensi
 
     calls = calls_file.read_text(encoding="utf-8") if calls_file.exists() else ""
     return result, calls
+
+
+def write_normalized_functions_script(tmp_path: Path) -> Path:
+    """Write an LF-normalized copy of scripts/functions.sh for shell tests."""
+    normalized_functions_script = tmp_path / "functions.sh"
+    normalized_functions_script.write_text(
+        FUNCTIONS_SCRIPT.read_text(encoding="utf-8").replace("\r\n", "\n"),
+        encoding="utf-8",
+    )
+    return normalized_functions_script
+
+
+def run_ensure_vscode_launch_file(
+    tmp_path: Path, sample_exists: bool, launch_exists: bool, overwrite_launch: int
+) -> Tuple[subprocess.CompletedProcess[str], str]:
+    """Run the VS Code launch helper and return the resulting launch file content."""
+    sample_launch_path = tmp_path / "launch.sample.json"
+    launch_path = tmp_path / "launch.json"
+
+    if sample_exists:
+        sample_launch_path.write_text('{"version":"sample"}\n', encoding="utf-8")
+
+    if launch_exists:
+        launch_path.write_text('{"version":"existing"}\n', encoding="utf-8")
+
+    normalized_functions_script = write_normalized_functions_script(tmp_path)
+    command = f"""
+source "{normalized_functions_script}"
+ensure_vscode_launch_file "{sample_launch_path}" "{launch_path}" "{overwrite_launch}" 0
+"""
+
+    result = subprocess.run(
+        ["bash", "--noprofile", "--norc", "-c", command],
+        cwd=REPO_ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+
+    launch_contents = launch_path.read_text(encoding="utf-8") if launch_path.exists() else ""
+    return result, launch_contents
 
 
 def test_install_vscode_extension_helper_skips_existing_extension(tmp_path: Path) -> None:
@@ -78,3 +115,63 @@ def test_install_vscode_extension_helper_skips_dash_prefixed_existing_extension(
     assert result.stdout == ""
     assert result.stderr == ""
     assert calls == ""
+
+
+def test_ensure_vscode_launch_file_creates_missing_launch_without_overwrite_flag(tmp_path: Path) -> None:
+    """A missing launch.json should be created from the sample by default."""
+    result, launch_contents = run_ensure_vscode_launch_file(
+        tmp_path=tmp_path,
+        sample_exists=True,
+        launch_exists=False,
+        overwrite_launch=0,
+    )
+
+    assert result.returncode == 0
+    assert result.stdout == ""
+    assert result.stderr == ""
+    assert launch_contents == '{"version":"sample"}\n'
+
+
+def test_ensure_vscode_launch_file_overwrites_existing_launch_when_requested(tmp_path: Path) -> None:
+    """The overwrite flag should replace an existing launch.json from the sample."""
+    result, launch_contents = run_ensure_vscode_launch_file(
+        tmp_path=tmp_path,
+        sample_exists=True,
+        launch_exists=True,
+        overwrite_launch=1,
+    )
+
+    assert result.returncode == 0
+    assert result.stdout == ""
+    assert result.stderr == ""
+    assert launch_contents == '{"version":"sample"}\n'
+
+
+def test_ensure_vscode_launch_file_is_noop_when_sample_is_missing(tmp_path: Path) -> None:
+    """A missing launch sample should leave launch.json untouched."""
+    result, launch_contents = run_ensure_vscode_launch_file(
+        tmp_path=tmp_path,
+        sample_exists=False,
+        launch_exists=False,
+        overwrite_launch=0,
+    )
+
+    assert result.returncode == 0
+    assert result.stdout == ""
+    assert result.stderr == ""
+    assert launch_contents == ""
+
+
+def test_ensure_vscode_launch_file_preserves_existing_launch_without_overwrite_flag(tmp_path: Path) -> None:
+    """An existing launch.json should be preserved unless overwrite is requested."""
+    result, launch_contents = run_ensure_vscode_launch_file(
+        tmp_path=tmp_path,
+        sample_exists=True,
+        launch_exists=True,
+        overwrite_launch=0,
+    )
+
+    assert result.returncode == 0
+    assert result.stdout == ""
+    assert result.stderr == ""
+    assert launch_contents == '{"version":"existing"}\n'
