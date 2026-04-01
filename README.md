@@ -7,7 +7,6 @@ This repository holds common scripts for use in python repositories. The main sc
 - [utility-repo-scripts](#utility-repo-scripts)
   - [Table of Contents](#table-of-contents)
   - [Prerequisites](#prerequisites)
-    - [Optional](#optional)
   - [Usage](#usage)
     - [CLI Flags](#cli-flags)
     - [Supported Package Managers](#supported-package-managers)
@@ -33,15 +32,15 @@ This repository holds common scripts for use in python repositories. The main sc
 
 ## Prerequisites
 
-In order to use the `[setup_python_app.sh](./setup_python_app.sh), you will need the following:
+In order to use [setup_python_app.sh](./setup_python_app.sh), you will need the following:
 
 - [pyenv](https://github.com/pyenv/pyenv)
 - [pyenv-virtualenv](https://github.com/pyenv/pyenv-virtualenv)
 
-### Optional
+Optional but recommended:
 
-- [Node.js](https://nodejs.org/en)
-  - Mac/Linux: [nvm](https://github.com/nvm-sh/nvm)
+- [Node.js](https://nodejs.org/en) if you want the `prettier`/`sort-json` formatting steps and related `pre-commit` hooks to work locally when those tools are not already installed
+- Mac/Linux Node.js version management: [nvm](https://github.com/nvm-sh/nvm)
 
 ## Usage
 
@@ -62,7 +61,7 @@ source utility-repo-scripts/setup_python_app.sh --package_manager="pip"
 
 ### CLI Flags
 
-The `setup` script accepts a few flags to customize the setup process:
+The `setup_python_app.sh` script accepts a few flags to customize the setup process:
 
 **Note**: `0` is False and `1` is True
 
@@ -88,7 +87,7 @@ The `setup` script accepts a few flags to customize the setup process:
 
 `setup_python_app.sh` always runs `pre-commit install` when a `.pre-commit-config.yaml` file exists. `pre-commit autoupdate` is opt-in and only runs when `--pre_commit_autoupdate` is enabled.
 
-Formatting quirk: if `prettier` or `sort-json` is missing and `npm` is available, the helper functions in this repo install them globally with `npm install -g`. This is intentional for this personal workflow.
+Formatting quirk: whenever the script calls `prettier_format` or `json_sort` (for example when formatting `.prettierrc`, `.pre-commit-config.yaml`, or `.vscode/settings.json`), missing `prettier` or `sort-json` binaries are installed globally with `npm install -g` if `npm` is available. If Node.js/npm is unavailable, the setup still completes and simply skips those formatting steps. `--include_prettier` only controls the optional Prettier-specific pre-commit hook fix later in the script. This is intentional for this personal workflow.
 
 [Back to Top](#utility-repo-scripts)
 
