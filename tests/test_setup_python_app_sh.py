@@ -5,7 +5,7 @@ import stat
 import subprocess
 import textwrap
 from pathlib import Path
-from typing import Collection, Tuple
+from typing import Collection, Sequence, Tuple
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SETUP_PYTHON_APP_SCRIPT = REPO_ROOT / "setup_python_app.sh"
@@ -181,7 +181,7 @@ exit 0
 def run_setup_python_app(
     project_dir: Path,
     tmp_path: Path,
-    args: Collection[str] = (),
+    args: Sequence[str] = (),
     unavailable_tools: Collection[str] = (),
     code_extensions: str = "",
 ) -> Tuple[subprocess.CompletedProcess[str], str, Path]:
