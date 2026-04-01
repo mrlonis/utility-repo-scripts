@@ -145,3 +145,33 @@ def test_ensure_vscode_launch_file_overwrites_existing_launch_when_requested(tmp
     assert result.stdout == ""
     assert result.stderr == ""
     assert launch_contents == '{"version":"sample"}\n'
+
+
+def test_ensure_vscode_launch_file_is_noop_when_sample_is_missing(tmp_path: Path) -> None:
+    """A missing launch sample should leave launch.json untouched."""
+    result, launch_contents = run_ensure_vscode_launch_file(
+        tmp_path=tmp_path,
+        sample_exists=False,
+        launch_exists=False,
+        overwrite_launch=0,
+    )
+
+    assert result.returncode == 0
+    assert result.stdout == ""
+    assert result.stderr == ""
+    assert launch_contents == ""
+
+
+def test_ensure_vscode_launch_file_preserves_existing_launch_without_overwrite_flag(tmp_path: Path) -> None:
+    """An existing launch.json should be preserved unless overwrite is requested."""
+    result, launch_contents = run_ensure_vscode_launch_file(
+        tmp_path=tmp_path,
+        sample_exists=True,
+        launch_exists=True,
+        overwrite_launch=0,
+    )
+
+    assert result.returncode == 0
+    assert result.stdout == ""
+    assert result.stderr == ""
+    assert launch_contents == '{"version":"existing"}\n'

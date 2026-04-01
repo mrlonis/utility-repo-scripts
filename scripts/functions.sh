@@ -157,7 +157,7 @@ function ensure_vscode_launch_file() {
 			echo "Creating $launch_path file from $sample_launch_path template"
 		fi
 		cp "$sample_launch_path" "$launch_path"
-		return 0
+		return $?
 	fi
 
 	if [ "$overwrite_launch" = 1 ]; then
