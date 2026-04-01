@@ -2,35 +2,124 @@
 debug=${debug:-0} # Load debug cli option if it already exists
 
 function find_site_package() {
-	package_name="$1"
-	pypi_name="$2"
-	package_location=$(python -c "import $package_name; print($package_name.__file__)")
-	if [ "$debug" = 1 ]; then
-		echo "find_site_package(): $package_location"
+	local package_name="$1"
+	local pypi_name="$2"
+	local package_location
+	local package_previously_installed
+	local package_probe_result
+	package_probe_result=$(python -c '
+import importlib.util
+import sys
+import traceback
+
+package_name = sys.argv[1]
+
+try:
+    package_spec = importlib.util.find_spec(package_name)
+except (ImportError, ModuleNotFoundError):
+    print("missing")
+except Exception:
+    traceback.print_exc()
+    raise
+else:
+    if package_spec is None:
+        print("missing")
+    else:
+        package_location = package_spec.origin or "<namespace>"
+        print(f"present:{package_location}")
+' "$package_name")
+	local package_probe_status=$?
+	if [ "$package_probe_status" -ne 0 ]; then
+		return 1
 	fi
 
-	if [ "$package_location" = "" ]; then
+	case "$package_probe_result" in
+	"missing")
+		package_location=""
+		package_previously_installed=0
+		;;
+	"present:"*)
+		package_location="${package_probe_result#present:}"
+		package_previously_installed=1
+		;;
+	*)
+		echo "find_site_package(): Unexpected probe result for $package_name: $package_probe_result" >&2
+		return 1
+		;;
+	esac
+
+	if [ "$debug" = 1 ]; then
+		echo "find_site_package(): $package_location" >&2
+	fi
+
+	if [ "$package_previously_installed" = 0 ]; then
 		if [ "$debug" = 1 ]; then
-			echo "find_site_package(): $pypi_name not found"
-			echo "find_site_package(): Installing $pypi_name temporarily for pre-commit setup"
+			echo "find_site_package(): $pypi_name not found" >&2
+			echo "find_site_package(): Installing $pypi_name temporarily for this setup step" >&2
 		fi
-		pip install "$pypi_name"
-		exists=0
+		if ! pip install "$pypi_name"; then
+			return 1
+		fi
 	else
 		if [ "$debug" = 1 ]; then
-			echo "find_site_package(): $pypi_name found"
+			echo "find_site_package(): $pypi_name found" >&2
 		fi
-		exists=1
 	fi
 	if [ "$debug" = 1 ]; then
-		echo "find_site_package(): $package_name exists = $exists"
+		echo "find_site_package(): $package_name exists = $package_previously_installed" >&2
 	fi
-	return $exists
+	printf '%s' "$package_previously_installed"
+}
+
+function find_site_distribution() {
+	local distribution_name="$1"
+	local distribution_previously_installed
+	local distribution_probe_result
+	distribution_probe_result=$(python -c '
+from importlib import metadata
+import sys
+import traceback
+
+distribution_name = sys.argv[1]
+
+try:
+    metadata.distribution(distribution_name)
+except metadata.PackageNotFoundError:
+    print("missing")
+except Exception:
+    traceback.print_exc()
+    raise
+else:
+    print("present")
+' "$distribution_name")
+	local distribution_probe_status=$?
+	if [ "$distribution_probe_status" -ne 0 ]; then
+		return 1
+	fi
+
+	case "$distribution_probe_result" in
+	"missing")
+		distribution_previously_installed=0
+		;;
+	"present")
+		distribution_previously_installed=1
+		;;
+	*)
+		echo "find_site_distribution(): Unexpected probe result for $distribution_name: $distribution_probe_result" >&2
+		return 1
+		;;
+	esac
+
+	if [ "$debug" = 1 ]; then
+		echo "find_site_distribution(): $distribution_name exists = $distribution_previously_installed" >&2
+	fi
+
+	printf '%s' "$distribution_previously_installed"
 }
 
 function uninstall_site_package() {
-	package_name="$1"
-	package_installed="$2"
+	local package_name="$1"
+	local package_installed="$2"
 	if [ "$package_installed" = 0 ]; then
 		echo "Uninstalling $package_name since it did not exist in the virtual environment prior to running this script. Consider adding $package_name as a dev dependency to stop seeing message."
 		pip uninstall -y "$package_name"

@@ -7,6 +7,8 @@ from typing import Tuple
 REPO_ROOT = Path(__file__).resolve().parents[1]
 FUNCTIONS_SCRIPT = REPO_ROOT / "scripts" / "functions.sh"
 TEST_EXTENSION = "ms-python.python"
+STATE_MARKER = "state="
+STATUS_MARKER = "find_status="
 
 
 def run_install_extension_helper(
@@ -76,6 +78,115 @@ ensure_vscode_launch_file "{sample_launch_path}" "{launch_path}" "{overwrite_lau
     return result, launch_contents
 
 
+def run_find_site_package_flow(
+    tmp_path: Path,
+    package_probe_result: str,
+    debug_enabled: int = 0,
+    pip_install_status: int = 0,
+) -> Tuple[subprocess.CompletedProcess[str], str]:
+    """Run the find/uninstall helper flow and capture pip invocations."""
+    calls_file = tmp_path / "pip_calls.txt"
+    normalized_functions_script = write_normalized_functions_script(tmp_path)
+    command = f"""
+source "{normalized_functions_script}"
+debug={debug_enabled}
+    python() {{
+\tcase "{package_probe_result}" in
+\tpresent)
+\t\tprintf 'present:/tmp/fake_package.py\\n'
+\t\treturn 0
+\t\t;;
+\tnamespace)
+\t\tprintf 'present:<namespace>\\n'
+\t\treturn 0
+\t\t;;
+\tmissing)
+\t\tprintf 'missing\\n'
+\t\treturn 0
+\t\t;;
+\terror)
+\t\techo 'unexpected package probe error' >&2
+\t\treturn 1
+\t\t;;
+\tesac
+\treturn 1
+}}
+pip() {{
+\tprintf '%s\\n' "$*" >> "{calls_file}"
+\tif [ "$1" = "install" ]; then
+\t\treturn {pip_install_status}
+\tfi
+\treturn 0
+}}
+state="$(find_site_package fake_package fake-package)"
+find_status=$?
+printf '{STATE_MARKER}%s\\n' "$state"
+printf '{STATUS_MARKER}%s\\n' "$find_status"
+if [ "$find_status" -eq 0 ]; then
+\tuninstall_site_package fake-package "$state"
+fi
+"""
+
+    result = subprocess.run(
+        ["bash", "--noprofile", "--norc", "-c", command],
+        cwd=REPO_ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+
+    calls = calls_file.read_text(encoding="utf-8") if calls_file.exists() else ""
+    return result, calls
+
+
+def run_find_site_distribution_flow(
+    tmp_path: Path, distribution_probe_result: str, debug_enabled: int = 0
+) -> subprocess.CompletedProcess[str]:
+    """Run the distribution-state helper and capture its markers."""
+    normalized_functions_script = write_normalized_functions_script(tmp_path)
+    command = f"""
+source "{normalized_functions_script}"
+debug={debug_enabled}
+python() {{
+\tcase "{distribution_probe_result}" in
+\tpresent)
+\t\tprintf 'present\\n'
+\t\treturn 0
+\t\t;;
+\tmissing)
+\t\tprintf 'missing\\n'
+\t\treturn 0
+\t\t;;
+\terror)
+\t\techo 'unexpected distribution probe error' >&2
+\t\treturn 1
+\t\t;;
+\tesac
+\treturn 1
+}}
+state="$(find_site_distribution fake-distribution)"
+find_status=$?
+printf '{STATE_MARKER}%s\\n' "$state"
+printf '{STATUS_MARKER}%s\\n' "$find_status"
+"""
+
+    return subprocess.run(
+        ["bash", "--noprofile", "--norc", "-c", command],
+        cwd=REPO_ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+
+
+def extract_marker_value(stdout: str, marker: str) -> str:
+    """Extract a single marker value from captured stdout."""
+    for line in stdout.splitlines():
+        if line.startswith(marker):
+            return line[len(marker) :]  # noqa: E203
+    raise AssertionError(f"Missing marker {marker!r} in stdout: {stdout!r}")
+
+
 def test_install_vscode_extension_helper_skips_existing_extension(tmp_path: Path) -> None:
     """Existing extensions should not be reinstalled."""
     installed_extensions = "\n".join(["bungcip.better-toml", TEST_EXTENSION, "ms-python.flake8"])
@@ -86,6 +197,120 @@ def test_install_vscode_extension_helper_skips_existing_extension(tmp_path: Path
     assert result.stdout == ""
     assert result.stderr == ""
     assert calls == ""
+
+
+def test_find_site_package_returns_existing_state_without_installing(tmp_path: Path) -> None:
+    """Existing packages should report state=1 and skip install/uninstall calls."""
+    result, calls = run_find_site_package_flow(tmp_path=tmp_path, package_probe_result="present")
+
+    assert result.returncode == 0
+    assert extract_marker_value(result.stdout, STATE_MARKER) == "1"
+    assert extract_marker_value(result.stdout, STATUS_MARKER) == "0"
+    assert result.stderr == ""
+    assert calls == ""
+
+
+def test_find_site_package_reports_temporary_install_and_uninstalls_afterward(tmp_path: Path) -> None:
+    """Missing packages should report state=0 and uninstall after temporary install."""
+    result, calls = run_find_site_package_flow(tmp_path=tmp_path, package_probe_result="missing")
+
+    assert result.returncode == 0
+    assert extract_marker_value(result.stdout, STATE_MARKER) == "0"
+    assert extract_marker_value(result.stdout, STATUS_MARKER) == "0"
+    assert "Uninstalling fake-package" in result.stdout
+    assert result.stderr == ""
+    assert calls == "install fake-package\nuninstall -y fake-package\n"
+
+
+def test_find_site_package_debug_logs_do_not_pollute_captured_state(tmp_path: Path) -> None:
+    """Debug logging should go to stderr so command substitution captures only the state value."""
+    result, calls = run_find_site_package_flow(tmp_path=tmp_path, package_probe_result="present", debug_enabled=1)
+
+    assert result.returncode == 0
+    assert extract_marker_value(result.stdout, STATE_MARKER) == "1"
+    assert extract_marker_value(result.stdout, STATUS_MARKER) == "0"
+    assert "find_site_package(): fake-package found" in result.stderr
+    assert calls == ""
+
+
+def test_find_site_package_propagates_install_failure(tmp_path: Path) -> None:
+    """A temporary install failure should surface as a nonzero helper status."""
+    result, calls = run_find_site_package_flow(
+        tmp_path=tmp_path,
+        package_probe_result="missing",
+        pip_install_status=1,
+    )
+
+    assert result.returncode == 0
+    assert extract_marker_value(result.stdout, STATE_MARKER) == ""
+    assert extract_marker_value(result.stdout, STATUS_MARKER) == "1"
+    assert calls == "install fake-package\n"
+
+
+def test_find_site_package_propagates_unexpected_probe_errors(tmp_path: Path) -> None:
+    """Unexpected probe errors should not be treated as missing packages."""
+    result, calls = run_find_site_package_flow(tmp_path=tmp_path, package_probe_result="error")
+
+    assert result.returncode == 0
+    assert extract_marker_value(result.stdout, STATE_MARKER) == ""
+    assert extract_marker_value(result.stdout, STATUS_MARKER) == "1"
+    assert "unexpected package probe error" in result.stderr
+    assert calls == ""
+
+
+def test_find_site_package_treats_namespace_packages_as_present(tmp_path: Path) -> None:
+    """Namespace packages should be treated as present without a temporary install."""
+    result, calls = run_find_site_package_flow(tmp_path=tmp_path, package_probe_result="namespace")
+
+    assert result.returncode == 0
+    assert extract_marker_value(result.stdout, STATE_MARKER) == "1"
+    assert extract_marker_value(result.stdout, STATUS_MARKER) == "0"
+    assert result.stderr == ""
+    assert calls == ""
+
+
+def test_find_site_distribution_reports_existing_state(tmp_path: Path) -> None:
+    """Existing distributions should report state=1."""
+    result = run_find_site_distribution_flow(tmp_path=tmp_path, distribution_probe_result="present")
+
+    assert result.returncode == 0
+    assert extract_marker_value(result.stdout, STATE_MARKER) == "1"
+    assert extract_marker_value(result.stdout, STATUS_MARKER) == "0"
+    assert result.stderr == ""
+
+
+def test_find_site_distribution_reports_missing_state(tmp_path: Path) -> None:
+    """Missing distributions should report state=0."""
+    result = run_find_site_distribution_flow(tmp_path=tmp_path, distribution_probe_result="missing")
+
+    assert result.returncode == 0
+    assert extract_marker_value(result.stdout, STATE_MARKER) == "0"
+    assert extract_marker_value(result.stdout, STATUS_MARKER) == "0"
+    assert result.stderr == ""
+
+
+def test_find_site_distribution_propagates_probe_errors(tmp_path: Path) -> None:
+    """Unexpected distribution probe errors should surface as a nonzero status."""
+    result = run_find_site_distribution_flow(tmp_path=tmp_path, distribution_probe_result="error")
+
+    assert result.returncode == 0
+    assert extract_marker_value(result.stdout, STATE_MARKER) == ""
+    assert extract_marker_value(result.stdout, STATUS_MARKER) == "1"
+    assert "unexpected distribution probe error" in result.stderr
+
+
+def test_find_site_distribution_debug_logs_go_to_stderr(tmp_path: Path) -> None:
+    """Debug logging should stay off stdout for distribution-state capture."""
+    result = run_find_site_distribution_flow(
+        tmp_path=tmp_path,
+        distribution_probe_result="present",
+        debug_enabled=1,
+    )
+
+    assert result.returncode == 0
+    assert extract_marker_value(result.stdout, STATE_MARKER) == "1"
+    assert extract_marker_value(result.stdout, STATUS_MARKER) == "0"
+    assert "find_site_distribution(): fake-distribution exists = 1" in result.stderr
 
 
 def test_install_vscode_extension_helper_installs_missing_extension(tmp_path: Path) -> None:

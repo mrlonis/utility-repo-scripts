@@ -296,10 +296,15 @@ if [ "$debug" = 1 ]; then
 	echo "$dash_separator .prettierrc Setup $dash_separator"
 fi
 
-ruamel_yaml_installed=$(find_site_package ruamel.yaml ruamel.yaml)
+if ! ruamel_yaml_clib_installed=$(find_site_distribution ruamel.yaml.clib); then
+	error "Failed to determine whether ruamel.yaml.clib is installed"
+fi
+if ! ruamel_yaml_installed=$(find_site_package ruamel.yaml ruamel.yaml); then
+	error "Failed to locate or temporarily install ruamel.yaml"
+fi
 python "$script_dir"/setup_prettierrc.py "$@" --exists="$prettierrc_exists"
 uninstall_site_package ruamel.yaml "$ruamel_yaml_installed"
-uninstall_site_package ruamel.yaml.clib "$ruamel_yaml_installed"
+uninstall_site_package ruamel.yaml.clib "$ruamel_yaml_clib_installed"
 prettier_format .prettierrc
 
 if [ "$debug" = 1 ]; then
@@ -314,10 +319,15 @@ if [ "$debug" = 1 ]; then
 	echo "$dash_separator .pre-commit-config.yaml Setup $dash_separator"
 fi
 
-ruamel_yaml_installed=$(find_site_package ruamel.yaml ruamel.yaml)
+if ! ruamel_yaml_clib_installed=$(find_site_distribution ruamel.yaml.clib); then
+	error "Failed to determine whether ruamel.yaml.clib is installed"
+fi
+if ! ruamel_yaml_installed=$(find_site_package ruamel.yaml ruamel.yaml); then
+	error "Failed to locate or temporarily install ruamel.yaml"
+fi
 python "$script_dir"/setup_pre_commit_config.py "$@" --exists="$pre_commit_config_exists"
 uninstall_site_package ruamel.yaml "$ruamel_yaml_installed"
-uninstall_site_package ruamel.yaml.clib "$ruamel_yaml_installed"
+uninstall_site_package ruamel.yaml.clib "$ruamel_yaml_clib_installed"
 prettier_format .pre-commit-config.yaml
 
 if [ "$debug" = 1 ]; then
@@ -328,7 +338,9 @@ fi
 #region pyproject.toml Setup
 [ ! -f "pyproject.toml" ] && pyproject_toml_exists=0 || pyproject_toml_exists=1
 
-tomlkit_installed=$(find_site_package tomlkit tomlkit)
+if ! tomlkit_installed=$(find_site_package tomlkit tomlkit); then
+	error "Failed to locate or temporarily install tomlkit"
+fi
 python "$script_dir"/setup_pyproject_toml.py "$@" --exists="$pyproject_toml_exists"
 uninstall_site_package tomlkit "$tomlkit_installed"
 
@@ -342,7 +354,9 @@ if [ "$debug" = 1 ]; then
 	echo "$dash_separator Setup $pylintrc_filename $dash_separator"
 fi
 
-configupdater_installed=$(find_site_package configupdater configupdater)
+if ! configupdater_installed=$(find_site_package configupdater configupdater); then
+	error "Failed to locate or temporarily install configupdater"
+fi
 [ ! -f "$pylintrc_filename" ] && pylintrc_exists=0 || pylintrc_exists=1
 python "$script_dir"/setup_pylintrc.py "$@" --exists="$pylintrc_exists"
 uninstall_site_package configupdater "$configupdater_installed"
@@ -358,7 +372,9 @@ if [ "$debug" = 1 ]; then
 	echo "$dash_separator Setup .flake8 $dash_separator"
 fi
 
-configupdater_installed=$(find_site_package configupdater configupdater)
+if ! configupdater_installed=$(find_site_package configupdater configupdater); then
+	error "Failed to locate or temporarily install configupdater"
+fi
 [ ! -f ".flake8" ] && flake8_exists=0 || flake8_exists=1
 python "$script_dir"/setup_flake8.py "$@" --exists="$flake8_exists"
 uninstall_site_package configupdater "$configupdater_installed"
@@ -389,10 +405,15 @@ fi
 
 [ ! -f ".pre-commit-config.yaml" ] && pre_commit_config_exists=0 || pre_commit_config_exists=1
 
-ruamel_yaml_installed=$(find_site_package ruamel.yaml ruamel.yaml)
+if ! ruamel_yaml_clib_installed=$(find_site_distribution ruamel.yaml.clib); then
+	error "Failed to determine whether ruamel.yaml.clib is installed"
+fi
+if ! ruamel_yaml_installed=$(find_site_package ruamel.yaml ruamel.yaml); then
+	error "Failed to locate or temporarily install ruamel.yaml"
+fi
 python "$script_dir"/setup_fix_prettier_pre_commit.py "$@" --pre_commit_config_exists="$pre_commit_config_exists"
 uninstall_site_package ruamel.yaml "$ruamel_yaml_installed"
-uninstall_site_package ruamel.yaml.clib "$ruamel_yaml_installed"
+uninstall_site_package ruamel.yaml.clib "$ruamel_yaml_clib_installed"
 prettier_format .pre-commit-config.yaml
 
 if [ "$debug" = 1 ]; then
