@@ -17,7 +17,7 @@ def _find_repo(pre_commit_config: Dict[str, Any], repo_url: str):
 
 
 def test_process_prettier_pre_commit_config_does_not_add_missing_repo():
-    """The prettier fixer should not re-add the repo when prettier is disabled."""
+    """The prettier fixer should not add the repo when it is not already configured."""
     result = process_pre_commit_config(pre_commit_config=cast(CommentedMap, {"repos": []}), test=True, debug=True)
 
     assert result is not None
