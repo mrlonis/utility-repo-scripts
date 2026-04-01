@@ -7,9 +7,15 @@ from src.process_vscode_settings import process_vscode_settings
 from src.utils.core import load_json_file, str2bool
 
 
-def main(
+def main(  # pylint: disable=too-many-positional-arguments
     debug: bool = False,
+    include_isort: bool = True,
     python_formatter="black",
+    pylint_enabled: bool = True,
+    flake8_enabled: bool = True,
+    mypy_enabled: bool = True,
+    pytest_enabled: bool = True,
+    unittest_enabled: bool = False,
     test: bool = False,
     exists: bool = False,
 ):
@@ -23,21 +29,39 @@ def main(
         vscode_settings=vscode_settings,
         debug=debug,
         test=test,
+        include_isort=include_isort,
         python_formatter=python_formatter,
+        pylint_enabled=pylint_enabled,
+        flake8_enabled=flake8_enabled,
+        mypy_enabled=mypy_enabled,
+        pytest_enabled=pytest_enabled,
+        unittest_enabled=unittest_enabled,
     )
 
 
 if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument("-d", "--debug", action="store_true")
+    parser.add_argument("--include_isort", nargs="?", const=True, default=True, type=str2bool)
     parser.add_argument("--python_formatter", default="black", type=str)
+    parser.add_argument("--pylint_enabled", nargs="?", const=True, default=True, type=str2bool)
+    parser.add_argument("--flake8_enabled", nargs="?", const=True, default=True, type=str2bool)
+    parser.add_argument("--mypy_enabled", nargs="?", const=True, default=True, type=str2bool)
+    parser.add_argument("--pytest_enabled", nargs="?", const=True, default=True, type=str2bool)
+    parser.add_argument("--unittest_enabled", nargs="?", const=True, default=False, type=str2bool)
     parser.add_argument("--test", action="store_true")
     parser.add_argument("--exists", type=str2bool, default=False)
     args, unknown = parser.parse_known_args()
 
     main(
         debug=args.debug,
+        include_isort=args.include_isort,
         python_formatter=args.python_formatter,
+        pylint_enabled=args.pylint_enabled,
+        flake8_enabled=args.flake8_enabled,
+        mypy_enabled=args.mypy_enabled,
+        pytest_enabled=args.pytest_enabled,
+        unittest_enabled=args.unittest_enabled,
         test=args.test,
         exists=args.exists,
     )

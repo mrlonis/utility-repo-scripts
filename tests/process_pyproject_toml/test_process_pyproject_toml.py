@@ -53,14 +53,12 @@ def test_process_pyproject_toml_autopep8_python_formatter_existing_values():
     """Test the process_pyproject_toml function with autopep8 python formatter."""
     python_formatter = "autopep8"
     result = PyProjectTomlProcessor(
-        pyproject_toml=parse(
-            f"""
+        pyproject_toml=parse(f"""
 [{PYPROJECT_TOOL_KEY}.{PYPROJECT_AUTOPEP8_KEY}]
 experimental = false
 max_line_length = 100
 test = "test"
-        """
-        ),
+        """),
         python_formatter=python_formatter,
         debug=True,
         test=True,
@@ -101,13 +99,11 @@ def test_process_pyproject_toml_black_python_formatter_existing_values():
     """Test the process_pyproject_toml function with black python formatter."""
     python_formatter = "black"
     result = PyProjectTomlProcessor(
-        pyproject_toml=parse(
-            f"""
+        pyproject_toml=parse(f"""
 [{PYPROJECT_TOOL_KEY}.{PYPROJECT_BLACK_KEY}]
 line-length = 100
 test = "test"
-        """
-        ),
+        """),
         python_formatter=python_formatter,
         debug=True,
         test=True,
@@ -145,13 +141,11 @@ def test_process_pyproject_toml_isort():
 def test_process_pyproject_toml_isort_existing_values():
     """Test the process_pyproject_toml function with isort."""
     result = PyProjectTomlProcessor(
-        pyproject_toml=parse(
-            f"""
+        pyproject_toml=parse(f"""
 [{PYPROJECT_TOOL_KEY}.{PYPROJECT_ISORT_KEY}]
 line_length = 100
 test = "test"
-        """
-        ),
+        """),
         debug=True,
         test=True,
     ).process_pyproject_toml()
@@ -166,6 +160,25 @@ test = "test"
     assert len(isort_tool.keys()) == 3
     assert isort_tool.get("line_length") == DEFAULT_LINE_LENGTH
     assert isort_tool.get("test") == "test"
+
+
+def test_process_pyproject_toml_disable_isort_removes_existing_config():
+    """Disabling isort should remove the tool section entirely."""
+    result = PyProjectTomlProcessor(
+        pyproject_toml=parse(f"""
+[{PYPROJECT_TOOL_KEY}.{PYPROJECT_ISORT_KEY}]
+line_length = 100
+profile = "black"
+        """),
+        include_isort=False,
+        debug=True,
+        test=True,
+    ).process_pyproject_toml()
+    assert result is not None
+
+    tool = cast(Dict[str, Any], result.get(PYPROJECT_TOOL_KEY))
+    assert tool is not None
+    assert tool.get(PYPROJECT_ISORT_KEY) is None
 
 
 # Test pytest Options
@@ -195,8 +208,7 @@ def test_process_pyproject_toml_pytest():
 def test_process_pyproject_toml_pytest_existing_values():
     """Test the process_pyproject_toml function with pytest."""
     result = PyProjectTomlProcessor(
-        pyproject_toml=parse(
-            f"""
+        pyproject_toml=parse(f"""
 [{PYPROJECT_TOOL_KEY}.{PYPROJECT_PYTEST_KEY}.{PYPROJECT_PYTEST_INI_OPTIONS_KEY}]
 addopts = "-m fake_mark"
 log_cli = true
@@ -204,8 +216,7 @@ log_cli_level = "INFO"
 log_cli_format = "{PYPROJECT_PYTEST_INI_OPTIONS_LOG_CLI_VALUE}"
 log_cli_date_format = "{PYPROJECT_PYTEST_INI_OPTIONS_LOG_CLI_DATE_FORMAT_VALUE}"
 test = "test"
-        """
-        ),
+        """),
         debug=True,
         test=True,
     ).process_pyproject_toml()
@@ -233,8 +244,7 @@ test = "test"
 def test_process_pyproject_toml_pytest_existing_value_addopts_has_ignore():
     """Test the process_pyproject_toml function with pytest."""
     result = PyProjectTomlProcessor(
-        pyproject_toml=parse(
-            f"""
+        pyproject_toml=parse(f"""
 [{PYPROJECT_TOOL_KEY}.{PYPROJECT_PYTEST_KEY}.{PYPROJECT_PYTEST_INI_OPTIONS_KEY}]
 addopts = "{TEST_PYPROJECT_PYTEST_INI_OPTIONS_ADDOPTS_VALUE}"
 log_cli = true
@@ -242,8 +252,7 @@ log_cli_level = "INFO"
 log_cli_format = "{PYPROJECT_PYTEST_INI_OPTIONS_LOG_CLI_VALUE}"
 log_cli_date_format = "{PYPROJECT_PYTEST_INI_OPTIONS_LOG_CLI_DATE_FORMAT_VALUE}"
 test = "test"
-        """
-        ),
+        """),
         debug=True,
         test=True,
     ).process_pyproject_toml()
@@ -266,6 +275,25 @@ test = "test"
     assert ini_options.get("log_cli_format") == PYPROJECT_PYTEST_INI_OPTIONS_LOG_CLI_VALUE
     assert ini_options.get("log_cli_date_format") == PYPROJECT_PYTEST_INI_OPTIONS_LOG_CLI_DATE_FORMAT_VALUE
     assert ini_options.get("test") == "test"
+
+
+def test_process_pyproject_toml_disable_pytest_removes_existing_config():
+    """Disabling pytest should remove the pytest tool section entirely."""
+    result = PyProjectTomlProcessor(
+        pyproject_toml=parse(f"""
+[{PYPROJECT_TOOL_KEY}.{PYPROJECT_PYTEST_KEY}.{PYPROJECT_PYTEST_INI_OPTIONS_KEY}]
+addopts = "{TEST_PYPROJECT_PYTEST_INI_OPTIONS_ADDOPTS_VALUE}"
+log_cli = true
+        """),
+        pytest_enabled=False,
+        debug=True,
+        test=True,
+    ).process_pyproject_toml()
+    assert result is not None
+
+    tool = cast(Dict[str, Any], result.get(PYPROJECT_TOOL_KEY))
+    assert tool is not None
+    assert tool.get(PYPROJECT_PYTEST_KEY) is None
 
 
 # Happy Path Test
