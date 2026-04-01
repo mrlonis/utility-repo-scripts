@@ -51,11 +51,9 @@ def _remove_local_hook(
     repos: List[Dict[str, Any]],
     repo_url: str,
     local_ids: Optional[List[str]],
+    debug: bool = False,
 ):
-    test_log = False
-    if local_ids:
-        test_log = True
-    if test_log:
+    if debug and local_ids:
         print(f"Removing local hook(s) {local_ids} from repo: {repo_url}")
     try:
         hook_index = find_repo_index(pre_commit_config, repo_url)
@@ -86,14 +84,23 @@ def _remove_local_hook(
 
 
 def remove_hooks(
-    pre_commit_config: Dict[str, Any], repo_urls: List[str], local_ids: Optional[List[str]] = None
+    pre_commit_config: Dict[str, Any],
+    repo_urls: List[str],
+    local_ids: Optional[List[str]] = None,
+    debug: bool = False,
 ) -> None:
     """Remove hooks from the .pre-commit-config.yaml file."""
     repos = cast(List[Dict[str, Any]], pre_commit_config.get("repos", []))
 
     for repo_url in repo_urls:
         if repo_url == "local":
-            _remove_local_hook(pre_commit_config=pre_commit_config, repos=repos, repo_url=repo_url, local_ids=local_ids)
+            _remove_local_hook(
+                pre_commit_config=pre_commit_config,
+                repos=repos,
+                repo_url=repo_url,
+                local_ids=local_ids,
+                debug=debug,
+            )
         else:
             try:
                 hook_index = find_repo_index(pre_commit_config, repo_url)

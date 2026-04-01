@@ -10,7 +10,7 @@ from ruamel.yaml.comments import CommentedMap
 from src.constants.pre_commit_config import PRETTIER_REPO, PRETTIER_REPO_URL
 from src.constants.prettier import PRINT_WIDTH_KEY
 from src.constants.shared import DEFAULT_LINE_LENGTH
-from src.utils.ruamel.yaml import update_repo_rev
+from src.utils.ruamel.yaml import find_repo_index, update_repo_rev
 
 
 def process_prettierrc(
@@ -87,14 +87,20 @@ def process_pre_commit_config(
         print("")
 
     # Fixing prettier pre-commit hook since it updates to an alpha version
-    if debug:
-        print("Updating prettier pre-commit hook")
-    update_repo_rev(
-        pre_commit_config=pre_commit_config,
-        repo_url=PRETTIER_REPO_URL,
-        repo_default=PRETTIER_REPO,
-        rev="v3.1.0",
-    )
+    try:
+        find_repo_index(pre_commit_config, PRETTIER_REPO_URL)
+    except ValueError:
+        if debug:
+            print("Skipping prettier pre-commit hook rev update because the repo is not configured")
+    else:
+        if debug:
+            print("Updating prettier pre-commit hook")
+        update_repo_rev(
+            pre_commit_config=pre_commit_config,
+            repo_url=PRETTIER_REPO_URL,
+            repo_default=PRETTIER_REPO,
+            rev="v3.1.0",
+        )
 
     # Write .pre-commit-config.yaml
     if not test:  # pragma: no cover

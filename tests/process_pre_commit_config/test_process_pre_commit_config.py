@@ -554,6 +554,40 @@ def test_process_pre_commit_config_disable_only_pylint_removes_empty_local_repo(
     assert _find_repo(pre_commit_config=result, repo_url=LOCAL_REPO_URL) is None
 
 
+def test_process_pre_commit_config_disabling_pylint_is_silent_without_debug(capsys):
+    """Removing the local pylint hook should not write to stdout in non-debug runs."""
+    result = PreCommitConfigProcessor(
+        pre_commit_config=cast(
+            CommentedMap,
+            {
+                "repos": [
+                    {
+                        "repo": LOCAL_REPO_URL,
+                        "hooks": [
+                            {
+                                "id": PYLINT_HOOK_ID,
+                                "name": "pylint",
+                                "entry": PYLINT_IMPROPER_ENTRY,
+                                "language": "script",
+                                "types": ["python"],
+                                "args": ["pylint", "-v", RC_FILE_ARG],
+                            }
+                        ],
+                    }
+                ]
+            },
+        ),
+        pylint_enabled=False,
+        test=True,
+        debug=False,
+    ).process_pre_commit_config()
+
+    captured = capsys.readouterr()
+    assert result is not None
+    assert captured.out == ""
+    assert captured.err == ""
+
+
 # Happy Path Test
 def test_process_pre_commit_config():
     """Test the process_pre_commit_config function with all options set."""

@@ -111,7 +111,7 @@ class PreCommitConfigProcessor:
 
         # include_prettier
         if not self.include_prettier:
-            remove_hooks(pre_commit_config=self.pre_commit_config, repo_urls=[PRETTIER_REPO_URL])
+            remove_hooks(pre_commit_config=self.pre_commit_config, repo_urls=[PRETTIER_REPO_URL], debug=self.debug)
         else:
             update_hook(
                 pre_commit_config=self.pre_commit_config,
@@ -122,7 +122,7 @@ class PreCommitConfigProcessor:
 
         # include_isort
         if not self.include_isort:
-            remove_hooks(pre_commit_config=self.pre_commit_config, repo_urls=[ISORT_REPO_URL])
+            remove_hooks(pre_commit_config=self.pre_commit_config, repo_urls=[ISORT_REPO_URL], debug=self.debug)
         else:
             update_hook(
                 pre_commit_config=self.pre_commit_config,
@@ -166,7 +166,11 @@ class PreCommitConfigProcessor:
 
     def _process_jumanji_house_repo(self):
         if not self.include_jumanji_house:
-            remove_hooks(pre_commit_config=self.pre_commit_config, repo_urls=[JUMANJI_HOUSE_REPO_URL])
+            remove_hooks(
+                pre_commit_config=self.pre_commit_config,
+                repo_urls=[JUMANJI_HOUSE_REPO_URL],
+                debug=self.debug,
+            )
         else:
             update_hook(
                 pre_commit_config=self.pre_commit_config,
@@ -193,6 +197,7 @@ class PreCommitConfigProcessor:
             remove_hooks(
                 pre_commit_config=self.pre_commit_config,
                 repo_urls=[BLACK_REPO_URL],
+                debug=self.debug,
             )
         elif self.python_formatter == "black":
             update_hook(
@@ -205,11 +210,13 @@ class PreCommitConfigProcessor:
             remove_hooks(
                 pre_commit_config=self.pre_commit_config,
                 repo_urls=[AUTOPEP8_REPO_URL],
+                debug=self.debug,
             )
         else:
             remove_hooks(
                 pre_commit_config=self.pre_commit_config,
                 repo_urls=[AUTOPEP8_REPO_URL, BLACK_REPO_URL],
+                debug=self.debug,
             )
 
     def _update_pylint_config(self):
@@ -235,6 +242,7 @@ class PreCommitConfigProcessor:
                 pre_commit_config=self.pre_commit_config,
                 repo_urls=[LOCAL_REPO_URL],
                 local_ids=[PYLINT_HOOK_ID],
+                debug=self.debug,
             )
 
         if self.flake8_enabled:
@@ -245,4 +253,4 @@ class PreCommitConfigProcessor:
                 hooks=[(FLAKE8_HOOK_ID, FLAKE8_HOOK)],
             )
         else:
-            remove_hooks(pre_commit_config=self.pre_commit_config, repo_urls=[FLAKE8_REPO_URL])
+            remove_hooks(pre_commit_config=self.pre_commit_config, repo_urls=[FLAKE8_REPO_URL], debug=self.debug)

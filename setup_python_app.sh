@@ -471,24 +471,29 @@ fi
 #endregion
 
 #region Fix Prettier pre-commit hook
-if [ "$debug" = 1 ]; then
-	echo "$dash_separator .pre-commit-config.yaml Setup $dash_separator"
-fi
+if [ "$include_prettier" = 1 ]; then
+	if [ "$debug" = 1 ]; then
+		echo "$dash_separator .pre-commit-config.yaml Setup $dash_separator"
+	fi
 
-[ ! -f ".pre-commit-config.yaml" ] && pre_commit_config_exists=0 || pre_commit_config_exists=1
+	[ ! -f ".pre-commit-config.yaml" ] && pre_commit_config_exists=0 || pre_commit_config_exists=1
 
-if ! ruamel_yaml_clib_installed=$(find_site_distribution ruamel.yaml.clib); then
-	error "Failed to determine whether ruamel.yaml.clib is installed"
-fi
-if ! ruamel_yaml_installed=$(find_site_package ruamel.yaml ruamel.yaml); then
-	error "Failed to locate or temporarily install ruamel.yaml"
-fi
-python "$script_dir"/setup_fix_prettier_pre_commit.py "$@" --pre_commit_config_exists="$pre_commit_config_exists"
-uninstall_site_package ruamel.yaml "$ruamel_yaml_installed"
-uninstall_site_package ruamel.yaml.clib "$ruamel_yaml_clib_installed"
-prettier_format .pre-commit-config.yaml
+	if ! ruamel_yaml_clib_installed=$(find_site_distribution ruamel.yaml.clib); then
+		error "Failed to determine whether ruamel.yaml.clib is installed"
+	fi
+	if ! ruamel_yaml_installed=$(find_site_package ruamel.yaml ruamel.yaml); then
+		error "Failed to locate or temporarily install ruamel.yaml"
+	fi
+	python "$script_dir"/setup_fix_prettier_pre_commit.py "$@" --pre_commit_config_exists="$pre_commit_config_exists"
+	uninstall_site_package ruamel.yaml "$ruamel_yaml_installed"
+	uninstall_site_package ruamel.yaml.clib "$ruamel_yaml_clib_installed"
+	prettier_format .pre-commit-config.yaml
 
-if [ "$debug" = 1 ]; then
+	if [ "$debug" = 1 ]; then
+		echo ""
+	fi
+elif [ "$debug" = 1 ]; then
+	echo "Skipping Prettier pre-commit hook fix because --include_prettier is disabled"
 	echo ""
 fi
 #endregion
