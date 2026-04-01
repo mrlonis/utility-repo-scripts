@@ -1,7 +1,12 @@
 #!/bin/bash
 
 # make sure we're in a virtual environment (useful for running pre-commit hooks from vscode git integration (pylint, etc))
-# If there there is no virtual environment active, tries to activate one in the default location $HOME/.pyenv/versions/<project_folder_name>
+# If there is no active virtual environment, tries to activate one using the following precedence:
+# 1. $WORKON_HOME/<project_folder_name>
+# 2. ${PYENV_ROOT:-$HOME/.pyenv}/versions/<project_folder_name>
+#
+# setup_python_app.sh creates project environments in the pyenv location above, so the fallback works out of the box.
+# Set WORKON_HOME if your environments live somewhere else.
 #
 # Example
 # cd my/python/package

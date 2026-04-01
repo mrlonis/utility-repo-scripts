@@ -20,6 +20,7 @@ This repository holds common scripts for use in python repositories. The main sc
       - [poetry](#poetry)
         - [Poetry: Setup](#poetry-setup)
         - [poetry: Rebuilding Virtual Environment](#poetry-rebuilding-virtual-environment)
+    - [`ensure_venv.sh`](#ensure_venvsh)
   - [Testing](#testing)
   - [Linting](#linting)
   - [Brew Packages](#brew-packages)
@@ -320,6 +321,27 @@ To then easily run and re-build the virtual environment on the fly without modif
 ```sh
 ./setup 1
 ```
+
+[Back to Top](#utility-repo-scripts)
+
+### `ensure_venv.sh`
+
+The [`ensure_venv.sh`](./ensure_venv.sh) script is used by the generated local `pylint` `pre-commit` hook. Its job is to make sure a virtual environment is active before running a command, which is especially helpful when hooks are triggered from the VS Code Git UI or another shell that does not already have `VIRTUAL_ENV` set.
+
+When no virtual environment is active, the script looks for one in the following order:
+
+1. `$WORKON_HOME/<project_folder_name>`
+1. `${PYENV_ROOT:-$HOME/.pyenv}/versions/<project_folder_name>`
+
+This matches the environment layout created by [`setup_python_app.sh`](./setup_python_app.sh), which creates project environments under the `pyenv` path by default.
+
+If you keep your environments somewhere else, set `WORKON_HOME` to the parent directory that contains your project environments:
+
+```sh
+export WORKON_HOME="$HOME/.venvs"
+```
+
+For example, if your project folder is named `my-python-app`, `ensure_venv.sh` will look for either `$WORKON_HOME/my-python-app` or `${PYENV_ROOT:-$HOME/.pyenv}/versions/my-python-app`.
 
 [Back to Top](#utility-repo-scripts)
 
