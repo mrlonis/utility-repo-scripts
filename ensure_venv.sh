@@ -9,7 +9,8 @@
 
 if [ -z "$VIRTUAL_ENV" ]; then
 	venv_name=$(basename "$PWD")
-	venv_folder_location="${WORKON_HOME:-'~/.pyenv/versions'}"
+	pyenv_root="${PYENV_ROOT:-$HOME/.pyenv}"
+	venv_folder_location="${WORKON_HOME:-$pyenv_root/versions}"
 	venv_path="$venv_folder_location/$venv_name"
 	if [ -d "$venv_path" ]; then
 		source "$venv_path/bin/activate"
