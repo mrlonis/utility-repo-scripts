@@ -65,7 +65,7 @@ def process_vscode_settings(  # pylint: disable=too-many-positional-arguments
     """Do processing of the .vscode/settings.json file."""
     # pylint: disable=too-many-arguments too-many-locals
     if debug:
-        print("process_vs_code_settings.py CLI Arguments:")
+        print("process_vscode_settings.py CLI Arguments:")
         print(f"    --debug: {debug}")
         print(f"    --test: {test}")
         print(f"    --include_isort: {include_isort}")
