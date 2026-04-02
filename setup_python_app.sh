@@ -25,7 +25,7 @@ source "$script_dir"/scripts/functions.sh "$@"
 #region Process CLI Options
 debug=0
 rebuild_venv=0
-python_version="3.13.9"
+python_version="3.14.3"
 package_manager="poetry"
 is_package=0
 include_jumanji_house=1

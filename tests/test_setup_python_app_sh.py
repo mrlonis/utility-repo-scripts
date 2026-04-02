@@ -340,8 +340,8 @@ def test_setup_python_app_poetry_happy_path_uses_mocked_tools(tmp_path: Path) ->
     assert custom_script.exists()
     assert os.access(custom_script, os.X_OK)
 
-    assert "pyenv install -s 3.13.9" in calls
-    assert "pyenv virtualenv -f 3.13.9 sample-project" in calls
+    assert "pyenv install -s 3.14.3" in calls
+    assert "pyenv virtualenv -f 3.14.3 sample-project" in calls
     assert "pyenv virtualenv-delete -f sample-project" not in calls
     assert "poetry env remove --all" in calls
     assert "poetry sync" in calls
@@ -448,3 +448,20 @@ def test_setup_wrapper_forwards_python_version_override(tmp_path: Path) -> None:
     assert "pyenv install -s 3.12.7" in calls
     assert "pyenv virtualenv-delete -f sample-project" in calls
     assert "pyenv virtualenv -f 3.12.7 sample-project" in calls
+
+
+def test_setup_wrapper_rejects_invalid_positional_rebuild_value(tmp_path: Path) -> None:
+    """The setup wrapper should fail fast for invalid positional rebuild_venv values."""
+    project_dir = tmp_path / "sample-project"
+    project_dir.mkdir()
+    create_setup_project(project_dir)
+
+    result, calls, _home_dir = run_setup_wrapper(
+        project_dir=project_dir,
+        tmp_path=tmp_path,
+        args=["2"],
+    )
+
+    assert result.returncode == 2
+    assert "Invalid rebuild_venv positional argument: (2)" in result.stderr
+    assert calls == ""
