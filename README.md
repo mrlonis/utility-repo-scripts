@@ -71,12 +71,12 @@ To override the default Python version, pass `--python_version` with any version
 
 The `setup_python_app.sh` script accepts a few flags to customize the setup process:
 
-**Note**: `0` is False and `1` is True
+**Note**: For options that take `0`/`1`, `0` is False and `1` is True. `--debug`/`-d` is a presence-only flag, so including it enables debug output.
 
 | Flag                        | Description                                                                                                             | Default  | Valid Values                                                                                                       |
 | :-------------------------- | :---------------------------------------------------------------------------------------------------------------------- | :------- | :----------------------------------------------------------------------------------------------------------------- |
-| `-d` or `--debug`           | Enables or disables debug echo statements                                                                               | `False`  |                                                                                                                    |
-| `-r` or `--rebuild_venv`    | Whether or not to delete and re-create the virtual environment or not                                                   | `False`  |                                                                                                                    |
+| `-d` or `--debug`           | Enables debug echo statements when the flag is present                                                                  | `False`  | Presence-only flag; omit to leave debug disabled                                                                   |
+| `-r` or `--rebuild_venv`    | Controls whether the virtual environment should be deleted and re-created                                               | `0`      | `0`, `1`                                                                                                           |
 | `--python_version`          | Specifies which Python version `pyenv` should install and use for the project virtual environment                       | `3.14.3` | Any non-empty [pyenv install](https://github.com/pyenv/pyenv/blob/master/COMMANDS.md#pyenv-install) version string |
 | `--package_manager`         | Specifies which package manager to use                                                                                  | `poetry` | [`pip`, `pip-tools`, `poetry`]                                                                                     |
 | `--is_package`              | Specifies whether or not the project is a package                                                                       | `False`  |                                                                                                                    |
@@ -93,6 +93,8 @@ The `setup_python_app.sh` script accepts a few flags to customize the setup proc
 | `--pre_commit_autoupdate`   | Runs `pre-commit autoupdate` after installing hooks                                                                     | `False`  |                                                                                                                    |
 | `--overwrite_vscode_launch` | Overwrites an existing `.vscode/launch.json`; a missing file is created automatically from `.vscode/launch.sample.json` | `False`  |                                                                                                                    |
 | `--line_length`             | Specifies the line length to use for various settings                                                                   | `120`    | `Any non-zero positive integer`                                                                                    |
+
+Example semantics: use `--debug` to turn debug output on, and use `--rebuild_venv=1` to force a rebuild or `--rebuild_venv=0` to leave rebuild behavior off.
 
 `setup_python_app.sh` always runs `pre-commit install` when a `.pre-commit-config.yaml` file exists. `pre-commit autoupdate` is opt-in and only runs when `--pre_commit_autoupdate` is enabled.
 
