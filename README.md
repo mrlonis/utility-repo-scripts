@@ -2,6 +2,8 @@
 
 This repository holds common scripts for use in python repositories. The main script of note is [setup_python_app.sh](./setup_python_app.sh) which performs all of the actions needed to setup a developer workspace for a Python project.
 
+The root [`setup`](./setup) file in this repository is only a local helper for working on `utility-repo-scripts` itself. It is not the supported downstream entrypoint and should not be treated as part of the consumer-facing interface for repositories that add this project as a submodule.
+
 ## Table of Contents
 
 - [utility-repo-scripts](#utility-repo-scripts)
@@ -51,7 +53,11 @@ git submodule add -b main https://github.com/mrlonis/utility-repo-scripts.git
 git commit -m "Adding utility-repo-scripts"
 ```
 
-This will add the `utility-repo-scripts` repository as a submodule in the `utility-repo-scripts` folder within your project. Submodules are not cloned by default so you should add a step to your `setup` script in the project to initialize it if it wasn't cloned already. This `setup` script should work for most projects:
+This will add the `utility-repo-scripts` repository as a submodule in the `utility-repo-scripts` folder within your project. Submodules are not cloned by default so you should add a step to your `setup` script in the project to initialize it if it wasn't cloned already.
+
+In the examples below, `setup` means a script in your downstream project, not this repository's own root [`setup`](./setup) file. Downstream repositories should source [`setup_python_app.sh`](./setup_python_app.sh); that is the supported entrypoint intended for reuse.
+
+This downstream `setup` script should work for most projects:
 
 ```sh
 #!/bin/bash
@@ -90,7 +96,7 @@ The `setup_python_app.sh` script accepts a few flags to customize the setup proc
 
 `setup_python_app.sh` always runs `pre-commit install` when a `.pre-commit-config.yaml` file exists. `pre-commit autoupdate` is opt-in and only runs when `--pre_commit_autoupdate` is enabled.
 
-`setup_python_app.sh` defaults to Python `3.14.3`. This repository's [`setup`](./setup) wrapper also defaults to `3.14.3`, and forwards additional CLI arguments to `setup_python_app.sh`, so commands like `./setup 1 --python_version=3.12.9` rebuild the virtual environment with that Python version when you need an override.
+`setup_python_app.sh` defaults to Python `3.14.3`. This repository's local-only [`setup`](./setup) wrapper also defaults to `3.14.3`, and forwards additional CLI arguments to `setup_python_app.sh`, so commands like `./setup 1 --python_version=3.12.9` rebuild the virtual environment with that Python version when you need an override while working on this repository itself.
 
 Formatting quirk: whenever the script calls `prettier_format` or `json_sort` (for example when formatting `.prettierrc`, `.pre-commit-config.yaml`, or `.vscode/settings.json`), missing `prettier` or `sort-json` binaries are installed globally with `npm install -g` if `npm` is available. If Node.js/npm is unavailable, the setup still completes and simply skips those formatting steps. `--include_prettier` only controls the optional Prettier-specific pre-commit hook fix later in the script. This is intentional for this personal workflow.
 
