@@ -289,6 +289,43 @@ def test_setup_python_app_rejects_invalid_package_manager(tmp_path: Path) -> Non
     assert "Invalid package_manager option: (invalid)" in result.stderr
 
 
+def test_setup_python_app_short_debug_flag_does_not_consume_next_argument(tmp_path: Path) -> None:
+    """The -d flag should enable debug mode without consuming the following argument."""
+    project_dir = tmp_path / "sample-project"
+    project_dir.mkdir()
+    (project_dir / "pyproject.toml").write_text(
+        '[tool.poetry]\nname = "sample-project"\nversion = "0.1.0"\n',
+        encoding="utf-8",
+    )
+
+    result, calls, _home_dir = run_setup_python_app(
+        project_dir=project_dir,
+        tmp_path=tmp_path,
+        args=["-d", "--package_manager=poetry"],
+    )
+
+    assert result.returncode == 0
+    assert "setup_python_app.sh CLI Arguments" in result.stdout
+    assert "--package_manager: poetry" in result.stdout
+    assert "poetry sync" in calls
+
+
+def test_setup_python_app_rejects_python_version_that_looks_like_an_option(tmp_path: Path) -> None:
+    """python_version values that start with '-' should fail validation."""
+    project_dir = tmp_path / "sample-project"
+    project_dir.mkdir()
+
+    result, calls, _home_dir = run_setup_python_app(
+        project_dir=project_dir,
+        tmp_path=tmp_path,
+        args=["--python_version=--help"],
+    )
+
+    assert result.returncode == 2
+    assert "Invalid python_version option: (--help)" in result.stderr
+    assert calls == ""
+
+
 def test_setup_python_app_requires_pyenv_when_missing(tmp_path: Path) -> None:
     """The script should stop with a clear message when pyenv is unavailable."""
     project_dir = tmp_path / "sample-project"

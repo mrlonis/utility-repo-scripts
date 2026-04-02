@@ -43,7 +43,7 @@ overwrite_vscode_launch=0
 line_length=120
 pre_commit_pylint_entry_prefix="utility-repo-scripts/"
 
-while getopts d:v:r:-: OPT; do
+while getopts dr:-: OPT; do
 	# support long options: https://stackoverflow.com/a/28466267/519360
 	if [ "$OPT" = "-" ]; then  # long option: reformulate OPT and OPTARG
 		OPT="${OPTARG%%=*}"       # extract long option name
@@ -163,7 +163,7 @@ else
 	fi
 fi
 
-if [ -z "$python_version" ]; then
+if [ -z "$python_version" ] || [[ "$python_version" == -* ]]; then
 	error "Invalid python_version option: ($python_version). Valid values are any non-empty pyenv install version string"
 fi
 
