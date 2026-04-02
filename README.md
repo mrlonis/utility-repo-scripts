@@ -90,7 +90,7 @@ The `setup_python_app.sh` script accepts a few flags to customize the setup proc
 
 `setup_python_app.sh` always runs `pre-commit install` when a `.pre-commit-config.yaml` file exists. `pre-commit autoupdate` is opt-in and only runs when `--pre_commit_autoupdate` is enabled.
 
-`setup_python_app.sh` defaults to Python `3.13.9`. The repository's [`setup`](./setup) wrapper forwards additional CLI arguments to `setup_python_app.sh`, so commands like `./setup 1 --python_version=3.12.9` rebuild the virtual environment with that Python version while keeping the default behavior when no override is provided.
+`setup_python_app.sh` defaults to Python `3.13.9`. This repository's [`setup`](./setup) wrapper pins `3.14.3` by default, and also forwards additional CLI arguments to `setup_python_app.sh`, so commands like `./setup 1 --python_version=3.12.9` rebuild the virtual environment with that Python version when you need an override.
 
 Formatting quirk: whenever the script calls `prettier_format` or `json_sort` (for example when formatting `.prettierrc`, `.pre-commit-config.yaml`, or `.vscode/settings.json`), missing `prettier` or `sort-json` binaries are installed globally with `npm install -g` if `npm` is available. If Node.js/npm is unavailable, the setup still completes and simply skips those formatting steps. `--include_prettier` only controls the optional Prettier-specific pre-commit hook fix later in the script. This is intentional for this personal workflow.
 

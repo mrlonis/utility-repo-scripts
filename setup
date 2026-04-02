@@ -1,6 +1,10 @@
 #!/bin/bash
-rebuild_venv="$1"
-rebuild_venv="${rebuild_venv:-0}"
+rebuild_venv=0
+if [ $# -gt 0 ] && { [ "$1" = "0" ] || [ "$1" = "1" ]; }; then
+	rebuild_venv="$1"
+	shift
+fi
+
 source setup_python_app.sh \
 	--debug \
 	--python_version="3.14.3" \
@@ -18,4 +22,5 @@ source setup_python_app.sh \
 	--pre_commit_autoupdate \
 	--overwrite_vscode_launch \
 	--line_length=120 \
-	--pre_commit_pylint_entry_prefix=""
+	--pre_commit_pylint_entry_prefix="" \
+	"$@"
