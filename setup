@@ -3,6 +3,7 @@ rebuild_venv="$1"
 rebuild_venv="${rebuild_venv:-0}"
 source setup_python_app.sh \
 	--debug \
+	--python_version="3.13.9" \
 	--package_manager="poetry" \
 	--rebuild_venv="$rebuild_venv" \
 	--include_jumanji_house \

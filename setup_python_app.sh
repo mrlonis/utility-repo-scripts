@@ -1,6 +1,4 @@
 #!/bin/bash
-python_version="3.13.9"
-
 #region Variables, Script Dir Validation & Load Functions
 current_dir=$PWD
 project_name=$(basename "$current_dir")
@@ -27,6 +25,7 @@ source "$script_dir"/scripts/functions.sh "$@"
 #region Process CLI Options
 debug=0
 rebuild_venv=0
+python_version="3.13.9"
 package_manager="poetry"
 is_package=0
 include_jumanji_house=1
@@ -57,6 +56,9 @@ while getopts d:v:r:-: OPT; do
 		;;
 	r | rebuild_venv)
 		rebuild_venv=${OPTARG}
+		;;
+	python_version)
+		python_version=${OPTARG}
 		;;
 	package_manager)
 		package_manager=${OPTARG}
@@ -121,6 +123,7 @@ if [ "$debug" = 1 ]; then
 	echo "$dash_separator setup_python_app.sh CLI Arguments $dash_separator"
 	echo "    -d (--debug): $debug"
 	echo "    -r (--rebuild_venv): $rebuild_venv"
+	echo "    --python_version: $python_version"
 	echo "    --package_manager: $package_manager"
 	echo "    --is_package: $is_package"
 	echo "    --include_jumanji_house: $include_jumanji_house"
@@ -158,6 +161,10 @@ else
 	if [ "$is_package" != 0 ] && [ "$is_package" != 1 ]; then
 		error "Invalid is_package option: ($is_package). Valid values are [0, 1]"
 	fi
+fi
+
+if [ -z "$python_version" ]; then
+	error "Invalid python_version option: ($python_version). Valid values are any non-empty pyenv install version string"
 fi
 
 if [ "$include_jumanji_house" != 0 ] && [ "$include_jumanji_house" != 1 ]; then
@@ -251,7 +258,7 @@ if [ "$pyenv_installed" = 1 ]; then
 		pyenv virtualenv-delete -f "$project_name"
 	fi
 
-	pyenv virtualenv -f $python_version "$project_name"
+	pyenv virtualenv -f "$python_version" "$project_name"
 	pyenv local "$project_name"
 	export PYENV_VERSION="$project_name"
 	PYENV_VIRTUALENV_DISABLE_PROMPT=1 pyenv shell "$project_name"

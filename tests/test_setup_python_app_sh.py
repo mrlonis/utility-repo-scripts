@@ -1,6 +1,7 @@
 """Integration tests for setup_python_app.sh using PATH-based command shims."""
 
 import os
+import shutil
 import stat
 import subprocess
 import textwrap
@@ -215,6 +216,50 @@ def run_setup_python_app(
     return result, calls, home_dir
 
 
+def create_setup_project(project_dir: Path) -> None:
+    """Create a minimal project layout for exercising the repository setup wrapper."""
+    for relative_path in (Path("setup"), Path("setup_python_app.sh"), Path("scripts/functions.sh")):
+        destination = project_dir / relative_path
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(REPO_ROOT / relative_path, destination)
+
+
+def run_setup_wrapper(
+    project_dir: Path,
+    tmp_path: Path,
+    args: Sequence[str] = (),
+    unavailable_tools: Collection[str] = (),
+    code_extensions: str = "",
+) -> Tuple[subprocess.CompletedProcess[str], str, Path]:
+    """Run the repository's setup wrapper with isolated fake tools and return command logs."""
+    home_dir = tmp_path / "home"
+    home_dir.mkdir()
+    bin_dir = tmp_path / "bin"
+    bin_dir.mkdir()
+    calls_file = tmp_path / "calls.log"
+    write_fake_tools(bin_dir=bin_dir, unavailable=unavailable_tools)
+
+    env = os.environ.copy()
+    env["HOME"] = str(home_dir)
+    env["PATH"] = f"{bin_dir}:/usr/bin:/bin"
+    env["SHELL"] = "/bin/bash"
+    env[CALLS_FILE_ENV] = str(calls_file)
+    env[BIN_DIR_ENV] = str(bin_dir)
+    env[CODE_EXTENSIONS_ENV] = code_extensions
+
+    result = subprocess.run(
+        ["bash", "--noprofile", "--norc", str(project_dir / "setup"), *args],
+        cwd=project_dir,
+        env=env,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+
+    calls = calls_file.read_text(encoding="utf-8") if calls_file.exists() else ""
+    return result, calls, home_dir
+
+
 def test_setup_python_app_rejects_invalid_package_manager(tmp_path: Path) -> None:
     """Invalid package_manager values should fail during argument validation."""
     project_dir = tmp_path / "sample-project"
@@ -314,6 +359,26 @@ def test_setup_python_app_poetry_happy_path_uses_mocked_tools(tmp_path: Path) ->
     assert "code --install-extension ms-python.black-formatter --force" in calls
 
 
+def test_setup_python_app_uses_custom_python_version_when_provided(tmp_path: Path) -> None:
+    """The script should pass a provided python version through to pyenv."""
+    project_dir = tmp_path / "sample-project"
+    project_dir.mkdir()
+    (project_dir / "pyproject.toml").write_text(
+        '[tool.poetry]\nname = "sample-project"\nversion = "0.1.0"\n',
+        encoding="utf-8",
+    )
+
+    result, calls, _home_dir = run_setup_python_app(
+        project_dir=project_dir,
+        tmp_path=tmp_path,
+        args=["--package_manager=poetry", "--python_version=3.12.7"],
+    )
+
+    assert result.returncode == 0
+    assert "pyenv install -s 3.12.7" in calls
+    assert "pyenv virtualenv -f 3.12.7 sample-project" in calls
+
+
 def test_setup_python_app_pip_flow_rebuilds_virtualenv_and_installs_requirements(tmp_path: Path) -> None:
     """The pip flow should rebuild the virtualenv and install requirements-dev.txt."""
     project_dir = tmp_path / "sample-project"
@@ -358,3 +423,28 @@ def test_setup_python_app_can_mock_npm_fallback_for_formatting_tools(tmp_path: P
     assert "npm install -g sort-json" in calls
     assert "prettier .prettierrc --write --ignore-path .prettierignore" in calls
     assert "sort-json .vscode/settings.json" in calls
+
+
+def test_setup_wrapper_forwards_python_version_override(tmp_path: Path) -> None:
+    """The setup wrapper should forward optional overrides like python_version."""
+    project_dir = tmp_path / "sample-project"
+    project_dir.mkdir()
+    create_setup_project(project_dir)
+    (project_dir / "pyproject.toml").write_text(
+        '[tool.poetry]\nname = "sample-project"\nversion = "0.1.0"\n',
+        encoding="utf-8",
+    )
+    vscode_dir = project_dir / ".vscode"
+    vscode_dir.mkdir()
+    (vscode_dir / "launch.sample.json").write_text('{"version":"sample"}\n', encoding="utf-8")
+
+    result, calls, _home_dir = run_setup_wrapper(
+        project_dir=project_dir,
+        tmp_path=tmp_path,
+        args=["1", "--python_version=3.12.7"],
+    )
+
+    assert result.returncode == 0
+    assert "pyenv install -s 3.12.7" in calls
+    assert "pyenv virtualenv-delete -f sample-project" in calls
+    assert "pyenv virtualenv -f 3.12.7 sample-project" in calls
