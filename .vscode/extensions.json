@@ -4,8 +4,6 @@
     "ms-python.black-formatter",
     "editorconfig.editorconfig",
     "ms-python.flake8",
-    "visualstudioexptteam.vscodeintellicode",
-    "visualstudioexptteam.intellicode-api-usage-examples",
     "ms-python.isort",
     "yzhang.markdown-all-in-one",
     "davidanson.vscode-markdownlint",

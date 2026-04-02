@@ -2,6 +2,8 @@
 
 This repository holds common scripts for use in python repositories. The main script of note is [setup_python_app.sh](./setup_python_app.sh) which performs all of the actions needed to setup a developer workspace for a Python project.
 
+The root [`setup`](./setup) file in this repository is only a local helper for working on `utility-repo-scripts` itself. It is not the supported downstream entrypoint and should not be treated as part of the consumer-facing interface for repositories that add this project as a submodule.
+
 ## Table of Contents
 
 - [utility-repo-scripts](#utility-repo-scripts)
@@ -51,7 +53,11 @@ git submodule add -b main https://github.com/mrlonis/utility-repo-scripts.git
 git commit -m "Adding utility-repo-scripts"
 ```
 
-This will add the `utility-repo-scripts` repository as a submodule in the `utility-repo-scripts` folder within your project. Submodules are not cloned by default so you should add a step to your `setup` script in the project to initialize it if it wasn't cloned already. This `setup` script should work for most projects:
+This will add the `utility-repo-scripts` repository as a submodule in the `utility-repo-scripts` folder within your project. Submodules are not cloned by default so you should add a step to your `setup` script in the project to initialize it if it wasn't cloned already.
+
+In the examples below, `setup` means a script in your downstream project, not this repository's own root [`setup`](./setup) file. Downstream repositories should source [`setup_python_app.sh`](./setup_python_app.sh); that is the supported entrypoint intended for reuse.
+
+This downstream `setup` script should work for most projects:
 
 ```sh
 #!/bin/bash
@@ -59,33 +65,40 @@ git submodule update --init --remote --force
 source utility-repo-scripts/setup_python_app.sh --package_manager="pip"
 ```
 
+To override the default Python version, pass `--python_version` with any version string supported by `pyenv install`, for example `--python_version="3.12.9"`.
+
 ### CLI Flags
 
 The `setup_python_app.sh` script accepts a few flags to customize the setup process:
 
-**Note**: `0` is False and `1` is True
+**Note**: For options that take `0`/`1`, `0` is False and `1` is True. `--debug`/`-d` is a presence-only flag, so including it enables debug output.
 
-| Flag                        | Description                                                                                                             | Default  | Valid Values                                                                              |
-| :-------------------------- | :---------------------------------------------------------------------------------------------------------------------- | :------- | :---------------------------------------------------------------------------------------- |
-| `-d` or `--debug`           | Enables or disables debug echo statements                                                                               | `False`  |                                                                                           |
-| `-r` or `--rebuild_venv`    | Whether or not to delete and re-create the virtual environment or not                                                   | `False`  |                                                                                           |
-| `--package_manager`         | Specifies which package manager to use                                                                                  | `poetry` | [`pip`, `pip-tools`, `poetry`]                                                            |
-| `--is_package`              | Specifies whether or not the project is a package                                                                       | `False`  |                                                                                           |
-| `--include_jumanji_house`   | Specifies whether or not to include the `jumanjihouse` `pre-commit` hooks                                               | `True`   |                                                                                           |
-| `--include_prettier`        | Specifies whether or not to include the `prettier` `pre-commit` hooks                                                   | `True`   |                                                                                           |
-| `--include_isort`           | Specifies whether or not to include the `isort` `pre-commit` hooks                                                      | `True`   |                                                                                           |
-| `--isort_profile`           | [isort Profiles](https://pycqa.github.io/isort/docs/configuration/profiles.html)                                        | `black`  | Any valid [isort profile](https://pycqa.github.io/isort/docs/configuration/profiles.html) |
-| `--python_formatter`        | Specifies which python formatter to use                                                                                 | `black`  | [`""`, `autopep8`, `black`]                                                               |
-| `--pylint_enabled`          | Specifies whether or not to enable `pylint`                                                                             | `True`   |                                                                                           |
-| `--flake8_enabled`          | Specifies whether or not to enable `flake8`                                                                             | `True`   |                                                                                           |
-| `--mypy_enabled`            | Specifies whether or not to enable `mypy`                                                                               | `True`   |                                                                                           |
-| `--pytest_enabled`          | Specifies whether or not to enable `pytest`                                                                             | `True`   |                                                                                           |
-| `--unittest_enabled`        | Specifies whether or not to enable `unittest`                                                                           | `False`  |                                                                                           |
-| `--pre_commit_autoupdate`   | Runs `pre-commit autoupdate` after installing hooks                                                                     | `False`  |                                                                                           |
-| `--overwrite_vscode_launch` | Overwrites an existing `.vscode/launch.json`; a missing file is created automatically from `.vscode/launch.sample.json` | `False`  |                                                                                           |
-| `--line_length`             | Specifies the line length to use for various settings                                                                   | `120`    | `Any non-zero positive integer`                                                           |
+| Flag                        | Description                                                                                                             | Default  | Valid Values                                                                                                       |
+| :-------------------------- | :---------------------------------------------------------------------------------------------------------------------- | :------- | :----------------------------------------------------------------------------------------------------------------- |
+| `-d` or `--debug`           | Enables debug echo statements when the flag is present                                                                  | `False`  | Presence-only flag; omit to leave debug disabled                                                                   |
+| `-r` or `--rebuild_venv`    | Controls whether the virtual environment should be deleted and re-created                                               | `0`      | `0`, `1`                                                                                                           |
+| `--python_version`          | Specifies which Python version `pyenv` should install and use for the project virtual environment                       | `3.14.3` | Any non-empty [pyenv install](https://github.com/pyenv/pyenv/blob/master/COMMANDS.md#pyenv-install) version string |
+| `--package_manager`         | Specifies which package manager to use                                                                                  | `poetry` | [`pip`, `pip-tools`, `poetry`]                                                                                     |
+| `--is_package`              | Specifies whether or not the project is a package                                                                       | `False`  |                                                                                                                    |
+| `--include_jumanji_house`   | Specifies whether or not to include the `jumanjihouse` `pre-commit` hooks                                               | `True`   |                                                                                                                    |
+| `--include_prettier`        | Specifies whether or not to include the `prettier` `pre-commit` hooks                                                   | `True`   |                                                                                                                    |
+| `--include_isort`           | Specifies whether or not to include the `isort` `pre-commit` hooks                                                      | `True`   |                                                                                                                    |
+| `--isort_profile`           | [isort Profiles](https://pycqa.github.io/isort/docs/configuration/profiles.html)                                        | `black`  | Any valid [isort profile](https://pycqa.github.io/isort/docs/configuration/profiles.html)                          |
+| `--python_formatter`        | Specifies which python formatter to use                                                                                 | `black`  | [`""`, `autopep8`, `black`]                                                                                        |
+| `--pylint_enabled`          | Specifies whether or not to enable `pylint`                                                                             | `True`   |                                                                                                                    |
+| `--flake8_enabled`          | Specifies whether or not to enable `flake8`                                                                             | `True`   |                                                                                                                    |
+| `--mypy_enabled`            | Specifies whether or not to enable `mypy`                                                                               | `True`   |                                                                                                                    |
+| `--pytest_enabled`          | Specifies whether or not to enable `pytest`                                                                             | `True`   |                                                                                                                    |
+| `--unittest_enabled`        | Specifies whether or not to enable `unittest`                                                                           | `False`  |                                                                                                                    |
+| `--pre_commit_autoupdate`   | Runs `pre-commit autoupdate` after installing hooks                                                                     | `False`  |                                                                                                                    |
+| `--overwrite_vscode_launch` | Overwrites an existing `.vscode/launch.json`; a missing file is created automatically from `.vscode/launch.sample.json` | `False`  |                                                                                                                    |
+| `--line_length`             | Specifies the line length to use for various settings                                                                   | `120`    | `Any non-zero positive integer`                                                                                    |
+
+Example semantics: use `--debug` to turn debug output on, and use `--rebuild_venv=1` to force a rebuild or `--rebuild_venv=0` to leave rebuild behavior off.
 
 `setup_python_app.sh` always runs `pre-commit install` when a `.pre-commit-config.yaml` file exists. `pre-commit autoupdate` is opt-in and only runs when `--pre_commit_autoupdate` is enabled.
+
+`setup_python_app.sh` defaults to Python `3.14.3`. This repository's local-only [`setup`](./setup) wrapper also defaults to `3.14.3`, and forwards additional CLI arguments to `setup_python_app.sh`, so commands like `./setup 1 --python_version=3.12.9` rebuild the virtual environment with that Python version when you need an override while working on this repository itself.
 
 Formatting quirk: whenever the script calls `prettier_format` or `json_sort` (for example when formatting `.prettierrc`, `.pre-commit-config.yaml`, or `.vscode/settings.json`), missing `prettier` or `sort-json` binaries are installed globally with `npm install -g` if `npm` is available. If Node.js/npm is unavailable, the setup still completes and simply skips those formatting steps. `--include_prettier` only controls the optional Prettier-specific pre-commit hook fix later in the script. This is intentional for this personal workflow.
 
@@ -254,6 +267,12 @@ To then easily run and re-build the virtual environment on the fly without modif
 ./setup 1
 ```
 
+To rebuild with a different Python version at the same time, run:
+
+```sh
+./setup 1 --python_version=3.12.9
+```
+
 [Back to Top](#utility-repo-scripts)
 
 #### poetry
@@ -324,6 +343,12 @@ To then easily run and re-build the virtual environment on the fly without modif
 
 ```sh
 ./setup 1
+```
+
+To rebuild with a different Python version at the same time, run:
+
+```sh
+./setup 1 --python_version=3.12.9
 ```
 
 [Back to Top](#utility-repo-scripts)
