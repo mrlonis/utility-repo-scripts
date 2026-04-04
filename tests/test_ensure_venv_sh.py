@@ -62,17 +62,15 @@ def test_ensure_venv_preserves_existing_virtual_env(tmp_path: Path) -> None:
     assert result.stderr == ""
 
 
-def test_ensure_venv_activates_default_pyenv_virtual_env(tmp_path: Path) -> None:
-    """The fallback should activate $HOME/.pyenv/versions/<project>."""
+def test_ensure_venv_activates_local_project_venv_first(tmp_path: Path) -> None:
+    """The helper should activate the in-repo .venv created by setup_python_app.sh."""
     project_dir = tmp_path / "sample-project"
     project_dir.mkdir()
 
-    home_dir = tmp_path / "home"
-    venv_dir = home_dir / ".pyenv" / "versions" / project_dir.name
+    venv_dir = project_dir / ".venv"
     write_activate_script(venv_dir)
 
     env = os.environ.copy()
-    env["HOME"] = str(home_dir)
     env.pop("VIRTUAL_ENV", None)
     env.pop("WORKON_HOME", None)
     env.pop("PYENV_ROOT", None)
@@ -84,8 +82,32 @@ def test_ensure_venv_activates_default_pyenv_virtual_env(tmp_path: Path) -> None
     assert result.stderr == ""
 
 
-def test_ensure_venv_prefers_workon_home_when_provided(tmp_path: Path) -> None:
-    """WORKON_HOME should override the pyenv fallback location."""
+def test_ensure_venv_prefers_local_project_venv_over_workon_home(tmp_path: Path) -> None:
+    """A project-local .venv should win even when WORKON_HOME is configured."""
+    project_dir = tmp_path / "sample-project"
+    project_dir.mkdir()
+
+    local_venv_dir = project_dir / ".venv"
+    write_activate_script(local_venv_dir)
+
+    workon_home = tmp_path / "workon-home"
+    workon_venv_dir = workon_home / project_dir.name
+    write_activate_script(workon_venv_dir)
+
+    env = os.environ.copy()
+    env["WORKON_HOME"] = str(workon_home)
+    env.pop("VIRTUAL_ENV", None)
+    env.pop("PYENV_ROOT", None)
+
+    result = run_ensure_venv(project_dir=project_dir, env=env)
+
+    assert result.returncode == 0
+    assert extract_virtual_env(result.stdout) == str(local_venv_dir)
+    assert result.stderr == ""
+
+
+def test_ensure_venv_uses_workon_home_when_local_project_venv_is_missing(tmp_path: Path) -> None:
+    """WORKON_HOME should be the next fallback when a local .venv is unavailable."""
     project_dir = tmp_path / "sample-project"
     project_dir.mkdir()
 

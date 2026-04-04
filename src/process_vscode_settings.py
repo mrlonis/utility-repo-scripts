@@ -1,7 +1,6 @@
 """Do processing of the .vscode/settings.json file."""
 
 import json
-import os
 from copy import deepcopy
 from typing import Any, Dict, List, Optional, cast
 
@@ -38,6 +37,7 @@ from src.constants.vscode_settings import (
     PYTHON_ANALYSIS_TYPE_CHECKING_MODE_KEY,
     PYTHON_ANALYSIS_USE_LIBRARY_CODE_FOR_TYPES_KEY,
     PYTHON_DEFAULT_INTERPRETER_KEY,
+    PYTHON_DEFAULT_INTERPRETER_VALUE,
     PYTHON_LANGUAGE_KEY,
     PYTHON_TESTING_PYTEST_ARGS_KEY,
     PYTHON_TESTING_PYTEST_ENABLED_KEY,
@@ -129,9 +129,7 @@ def process_vscode_settings(  # pylint: disable=too-many-positional-arguments
 
 
 def _process_python_default_interpreter(data: Dict[str, Any]):
-    project_name = os.path.basename(os.getenv("PWD", ""))
-    venv_location = f"~/.pyenv/versions/{project_name}"
-    data[PYTHON_DEFAULT_INTERPRETER_KEY] = venv_location
+    data[PYTHON_DEFAULT_INTERPRETER_KEY] = PYTHON_DEFAULT_INTERPRETER_VALUE
 
 
 def _process_python_analysis(data: Dict[str, Any]):
@@ -154,6 +152,8 @@ def _process_python_analysis(data: Dict[str, Any]):
         data[PYTHON_ANALYSIS_EXCLUDE_KEY] = exclude
     if REPO_IGNORE_PATTERN not in exclude:
         exclude.append(REPO_IGNORE_PATTERN)
+    if ".venv/**" not in exclude:
+        exclude.append(".venv/**")
 
     import_format = cast(Optional[str], data.get(PYTHON_ANALYSIS_IMPORT_FORMAT_KEY))
     if import_format is None:
@@ -191,6 +191,7 @@ def _process_search_exclude(data: Dict[str, Any]):
         data[SEARCH_EXCLUDE_KEY] = exclude
 
     exclude[f"{REPO_NAME}/**"] = True
+    exclude[".venv/**"] = True
 
 
 def _process_python_formatter_option(data: Dict[str, Any], python_formatter: str):

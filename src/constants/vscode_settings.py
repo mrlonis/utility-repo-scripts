@@ -61,6 +61,7 @@ PYTHON_ANALYSIS_TYPE_CHECKING_MODE_KEY = "python.analysis.typeCheckingMode"
 PYTHON_ANALYSIS_USE_LIBRARY_CODE_FOR_TYPES_KEY = "python.analysis.useLibraryCodeForTypes"
 
 PYTHON_DEFAULT_INTERPRETER_KEY = "python.defaultInterpreterPath"
+PYTHON_DEFAULT_INTERPRETER_VALUE = "${workspaceFolder}/.venv/bin/python"
 PYTHON_TESTING_PYTEST_ARGS_KEY = "python.testing.pytestArgs"
 PYTHON_TESTING_PYTEST_ENABLED_KEY = "python.testing.pytestEnabled"
 PYTHON_TESTING_UNITTEST_ARGS_KEY = "python.testing.unittestArgs"
@@ -81,7 +82,7 @@ SAMPLE_VSCODE_SETTINGS = {
     PYTHON_ANALYSIS_AUTO_IMPORT_COMPLETIONS_KEY: True,
     PYTHON_ANALYSIS_AUTO_SEARCH_PATHS_KEY: True,
     PYTHON_ANALYSIS_DIAGNOSTIC_MODE_KEY: "workspace",
-    PYTHON_ANALYSIS_EXCLUDE_KEY: ["**/node_modules", "**/__pycache__", ".git", REPO_IGNORE_PATTERN],
+    PYTHON_ANALYSIS_EXCLUDE_KEY: ["**/node_modules", "**/__pycache__", ".git", ".venv", REPO_IGNORE_PATTERN],
     PYTHON_ANALYSIS_IMPORT_FORMAT_KEY: "absolute",
     PYTHON_ANALYSIS_INDEXING_KEY: True,
     PYTHON_ANALYSIS_INLAY_HINTS_FUNCTION_RETURN_TYPES_KEY: True,
@@ -89,7 +90,7 @@ SAMPLE_VSCODE_SETTINGS = {
     PYTHON_ANALYSIS_INLAY_HINTS_VARIABLE_TYPES_KEY: True,
     PYTHON_ANALYSIS_TYPE_CHECKING_MODE_KEY: "basic",
     PYTHON_ANALYSIS_USE_LIBRARY_CODE_FOR_TYPES_KEY: True,
-    PYTHON_DEFAULT_INTERPRETER_KEY: "~/.venvs/<project>/bin/python",
+    PYTHON_DEFAULT_INTERPRETER_KEY: PYTHON_DEFAULT_INTERPRETER_VALUE,
     PYTHON_TESTING_PYTEST_ARGS_KEY: [f"--ignore={REPO_IGNORE_PATTERN}"],
     PYTHON_TESTING_PYTEST_ENABLED_KEY: False,
     PYTHON_TESTING_UNITTEST_ARGS_KEY: ["-v", "-s", ".", "-p", "*test*.py"],
@@ -99,7 +100,9 @@ SAMPLE_VSCODE_SETTINGS = {
         "**/node_modules/**": True,
         "**/__pycache__/**": True,
         ".coverage": True,
+        ".mypy_cache/**": True,
         ".pytest_cache/**": True,
+        ".venv/**": True,
         "htmlcov/**": True,
         "poetry.lock": True,
         f"{REPO_NAME}/**": True,

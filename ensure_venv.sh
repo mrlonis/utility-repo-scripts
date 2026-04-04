@@ -2,10 +2,11 @@
 
 # make sure we're in a virtual environment (useful for running pre-commit hooks from vscode git integration (pylint, etc))
 # If there is no active virtual environment, tries to activate one using the following precedence:
-# 1. $WORKON_HOME/<project_folder_name>
-# 2. ${PYENV_ROOT:-$HOME/.pyenv}/versions/<project_folder_name>
+# 1. $PWD/.venv
+# 2. $WORKON_HOME/<project_folder_name>
+# 3. ${PYENV_ROOT:-$HOME/.pyenv}/versions/<project_folder_name>
 #
-# setup_python_app.sh creates project environments in the pyenv location above, so the fallback works out of the box.
+# setup_python_app.sh creates project environments in the local .venv folder above, so the first option works out of the box.
 # Set WORKON_HOME if your environments live somewhere else.
 #
 # Example
@@ -31,7 +32,7 @@ try_activate_venv() {
 if [ -z "$VIRTUAL_ENV" ]; then
 	venv_name=$(basename "$PWD")
 	pyenv_root="${PYENV_ROOT:-$HOME/.pyenv}"
-	candidate_venv_paths=()
+	candidate_venv_paths=("$PWD/.venv")
 
 	if [ -n "$WORKON_HOME" ]; then
 		candidate_venv_paths+=("$WORKON_HOME/$venv_name")

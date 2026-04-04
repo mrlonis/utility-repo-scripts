@@ -1,7 +1,6 @@
 #!/bin/bash
 #region Variables, Script Dir Validation & Load Functions
 current_dir=$PWD
-project_name=$(basename "$current_dir")
 pylintrc_filename=".pylintrc"
 dash_separator="--------------------" # 20 dashes
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
@@ -233,6 +232,9 @@ if [ "$debug" = 1 ]; then
 	echo "$dash_separator Virtual Environment Setup $dash_separator"
 fi
 
+venv_dir="$current_dir/.venv"
+venv_activate_path="$venv_dir/bin/activate"
+venv_python_path="$venv_dir/bin/python"
 pyenv_installed=0
 if command -v pyenv >/dev/null; then
 	pyenv_installed=1
@@ -242,46 +244,74 @@ if [ "$pyenv_installed" = 1 ]; then
 	eval "$(pyenv init - bash)"
 
 	pyenv install -s "$python_version"
+	pyenv local "$python_version"
 
-	if [ "$package_manager" = "poetry" ]; then
-		# If using this setup script, remove the auto-generated poetry virtual environments
-		poetry env remove --all
-	fi
-
-	if [ "$package_manager" = "pip" ] || [ "$rebuild_venv" = 1 ]; then
+	rebuild_reason=""
+	if [ "$package_manager" = "pip" ]; then
 		# We have to always delete the environment if using pip as package manager since it doesn't
 		# provide a way to synchronize the dependencies within the virtual environment like pip-tools or poetry
 		# We provide an option flag rebuild_venv to force delete the environment if using poetry or pip-tools
-		if [ "$debug" = 1 ]; then
-			echo "Rebuilding virtual environment"
-		fi
-		pyenv virtualenv-delete -f "$project_name"
+		rebuild_reason="pip package manager requires a clean virtual environment"
+	elif [ "$rebuild_venv" = 1 ]; then
+		rebuild_reason="--rebuild_venv is enabled"
+	elif [ ! -x "$venv_python_path" ] || [ ! -f "$venv_activate_path" ]; then
+		rebuild_reason="virtual environment is missing or incomplete"
 	fi
 
-	pyenv virtualenv -f "$python_version" "$project_name"
-	pyenv local "$project_name"
-	export PYENV_VERSION="$project_name"
-	PYENV_VIRTUALENV_DISABLE_PROMPT=1 pyenv shell "$project_name"
-	pyenv activate "$project_name"
+	if [ "$rebuild_reason" != "" ]; then
+		if [ "$debug" = 1 ]; then
+			echo "Preparing virtual environment at $venv_dir"
+			echo "Reason: $rebuild_reason"
+		fi
+		rm -rf "$venv_dir"
+	fi
 
-	pyenv_python=$(pyenv which python)
-	echo "pyenv_python: $pyenv_python"
-	if [ "$pyenv_python" = "" ] || [[ ! "$pyenv_python" == *"$project_name"* ]]; then
-		echo "pyenv virtualenv failed to create a virtual environment for this project."
-		echo ""
-		echo "Possible reasons include:"
-		echo "    - The python executable from pyenv is mapped to a different virtual environment than the one we created."
-		echo "        - This can happen if you haven't set a global pyenv version. Try running 'pyenv global <version>' to set a global version and then re-launch your SHELL."
-		echo "    - The virtual environment already exists and is mapped to a different python version. In this case run ./setup 1 to force a rebuild of the virtual environment. If this doesn't work consider reading the README.md for the utility-repo-scripts repository."
-		echo "    - You might not have pyenv-virtualenv installed. Run 'brew install pyenv-virtualenv' to install it."
+	if [ ! -x "$venv_python_path" ] || [ ! -f "$venv_activate_path" ]; then
+		pyenv_python=$(PYENV_VERSION="$python_version" pyenv which python)
+		echo "pyenv_python: $pyenv_python"
+		if [ "$pyenv_python" = "" ] || [ ! -x "$pyenv_python" ]; then
+			echo "pyenv failed to resolve the requested python version ($python_version)."
+			echo "Please verify the version is installed and try the setup script again."
+			exit 1
+		fi
+
+		"$pyenv_python" -m venv "$venv_dir"
+	elif [ "$debug" = 1 ]; then
+		echo "Reusing existing virtual environment at $venv_dir"
+	fi
+
+	if [ ! -f "$venv_activate_path" ]; then
+		echo "python -m venv failed to create a virtual environment for this project."
+		echo "Expected activation script was not found at $venv_activate_path."
 		echo "Please try the setup script again."
 		exit 1
+	fi
+
+	# shellcheck disable=SC1090
+	source "$venv_activate_path"
+
+	venv_python=$(command -v python)
+	echo "venv_python: $venv_python"
+	if [ "$venv_python" = "" ] || [ "$venv_python" != "$venv_python_path" ]; then
+		echo "The project virtual environment failed to activate from $venv_dir."
+		echo ""
+		echo "Possible reasons include:"
+		echo "    - The activation script did not update your shell PATH as expected."
+		echo "    - The virtual environment already exists and is linked to a different python version."
+		echo "        - In this case run ./setup 1 to force a rebuild of the virtual environment."
+		echo "    - The requested python version could not create virtual environments on this system."
+		echo "Please try the setup script again."
+		exit 1
+	fi
+
+	if [ "$package_manager" = "poetry" ]; then
+		export POETRY_VIRTUALENVS_IN_PROJECT=true
 	fi
 else
 	echo "pyenv not installed! Please install pyenv to use this setup script."
 	echo "To Install run the following command using brew:"
 	echo ""
-	echo "brew install pyenv pyenv-virtualenv"
+	echo "brew install pyenv"
 	echo ""
 	echo "Exiting..."
 	exit 1
@@ -628,5 +658,5 @@ fi
 
 #region Print out the final message
 echo "$dash_separator Project setup complete $dash_separator"
-echo "Either re-launch $SHELL or run 'pyenv shell $project_name' to activate your virtual environment."
+echo "Run 'source .venv/bin/activate' to activate your virtual environment."
 #endregion

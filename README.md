@@ -37,7 +37,6 @@ The root [`setup`](./setup) file in this repository is only a local helper for w
 In order to use [setup_python_app.sh](./setup_python_app.sh), you will need the following:
 
 - [pyenv](https://github.com/pyenv/pyenv)
-- [pyenv-virtualenv](https://github.com/pyenv/pyenv-virtualenv)
 
 Optional but recommended:
 
@@ -65,7 +64,7 @@ git submodule update --init --remote --force
 source utility-repo-scripts/setup_python_app.sh --package_manager="pip"
 ```
 
-To override the default Python version, pass `--python_version` with any version string supported by `pyenv install`, for example `--python_version="3.12.9"`.
+To override the default Python version, pass `--python_version` with any version string supported by `pyenv install`, for example `--python_version="3.12.9"`. The setup script uses that Python version to create a project-local virtual environment at `.venv/`.
 
 ### CLI Flags
 
@@ -77,7 +76,7 @@ The `setup_python_app.sh` script accepts a few flags to customize the setup proc
 | :-------------------------- | :---------------------------------------------------------------------------------------------------------------------- | :------- | :----------------------------------------------------------------------------------------------------------------- |
 | `-d` or `--debug`           | Enables debug echo statements when the flag is present                                                                  | `False`  | Presence-only flag; omit to leave debug disabled                                                                   |
 | `-r` or `--rebuild_venv`    | Controls whether the virtual environment should be deleted and re-created                                               | `0`      | `0`, `1`                                                                                                           |
-| `--python_version`          | Specifies which Python version `pyenv` should install and use for the project virtual environment                       | `3.14.3` | Any non-empty [pyenv install](https://github.com/pyenv/pyenv/blob/master/COMMANDS.md#pyenv-install) version string |
+| `--python_version`          | Specifies which Python version `pyenv` should install and use when creating the project-local `.venv`                   | `3.14.3` | Any non-empty [pyenv install](https://github.com/pyenv/pyenv/blob/master/COMMANDS.md#pyenv-install) version string |
 | `--package_manager`         | Specifies which package manager to use                                                                                  | `poetry` | [`pip`, `pip-tools`, `poetry`]                                                                                     |
 | `--is_package`              | Specifies whether or not the project is a package                                                                       | `False`  |                                                                                                                    |
 | `--include_jumanji_house`   | Specifies whether or not to include the `jumanjihouse` `pre-commit` hooks                                               | `True`   |                                                                                                                    |
@@ -359,18 +358,19 @@ The [`ensure_venv.sh`](./ensure_venv.sh) script is used by the generated local `
 
 When no virtual environment is active, the script tries to activate a virtual environment in the following order:
 
+1. `$PWD/.venv`
 1. `$WORKON_HOME/<project_folder_name>`
 1. `${PYENV_ROOT:-$HOME/.pyenv}/versions/<project_folder_name>`
 
-This matches the environment layout created by [`setup_python_app.sh`](./setup_python_app.sh), which creates project environments under the `pyenv` path by default.
+This matches the environment layout created by [`setup_python_app.sh`](./setup_python_app.sh), which creates project environments inside the repository at `.venv` by default.
 
-If you keep your environments somewhere else, set `WORKON_HOME` to the parent directory that contains your project environments. The script will try that location first and then fall back to the pyenv location if the project environment is missing there or cannot be activated:
+If you keep your environments somewhere else, set `WORKON_HOME` to the parent directory that contains your project environments. The script will try that location after `.venv` and then fall back to the pyenv location if the project environment is missing there or cannot be activated:
 
 ```sh
 export WORKON_HOME="$HOME/.venvs"
 ```
 
-For example, if your project folder is named `my-python-app`, `ensure_venv.sh` will look for either `$WORKON_HOME/my-python-app` or `${PYENV_ROOT:-$HOME/.pyenv}/versions/my-python-app`.
+For example, if your project folder is named `my-python-app`, `ensure_venv.sh` will look for `$PWD/.venv`, then `$WORKON_HOME/my-python-app`, and finally `${PYENV_ROOT:-$HOME/.pyenv}/versions/my-python-app`.
 
 [Back to Top](#utility-repo-scripts)
 
@@ -466,7 +466,7 @@ gem install mdl
 To install `pyenv`, run the following command:
 
 ```shell
-brew install pyenv pyenv-virtualenv
+brew install pyenv
 ```
 
 [Back to Top](#utility-repo-scripts)

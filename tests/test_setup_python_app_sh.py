@@ -32,6 +32,19 @@ def write_fake_tools(bin_dir: Path, unavailable: Collection[str] = ()) -> None:
             #!/bin/bash
             set -eu
             printf '%s\\n' "python $*" >> "$SETUP_PYTHON_APP_TEST_CALLS_FILE"
+            if [ "${1:-}" = "-m" ] && [ "${2:-}" = "venv" ]; then
+                venv_dir="${3:-}"
+                mkdir -p "$venv_dir/bin"
+                venv_dir="$(cd "$venv_dir" && pwd)"
+                cp "$0" "$venv_dir/bin/python"
+                chmod +x "$venv_dir/bin/python"
+                cat > "$venv_dir/bin/activate" <<EOF
+export VIRTUAL_ENV="$venv_dir"
+export PATH="$venv_dir/bin:\\$PATH"
+EOF
+                exit 0
+            fi
+
             if [ "${1:-}" = "-m" ] && [ "${2:-}" = "pip" ]; then
                 exit 0
             fi
@@ -102,11 +115,17 @@ def write_fake_tools(bin_dir: Path, unavailable: Collection[str] = ()) -> None:
             init)
                 printf 'export PYENV_SHELL=bash\\n'
                 ;;
-            install | virtualenv-delete | virtualenv | local | shell | activate)
+            install | virtualenv-delete | virtualenv | shell | activate)
+                exit 0
+                ;;
+            local)
+                if [ -n "${2:-}" ]; then
+                    printf '%s\\n' "${2:-}" > .python-version
+                fi
                 exit 0
                 ;;
             which)
-                printf '%s/.fake-pyenv/versions/%s/bin/python\\n' "$PWD" "$(basename "$PWD")"
+                printf '%s/python\\n' "$SETUP_PYTHON_APP_TEST_BIN_DIR"
                 ;;
             *)
                 echo "unexpected pyenv invocation: $*" >&2
@@ -348,7 +367,7 @@ def test_setup_python_app_requires_pyenv_when_missing(tmp_path: Path) -> None:
 
 
 def test_setup_python_app_poetry_happy_path_uses_mocked_tools(tmp_path: Path) -> None:
-    """The poetry flow should complete while calling only fake external tools."""
+    """The poetry flow should complete while creating an in-repo .venv."""
     project_dir = tmp_path / "sample-project"
     project_dir.mkdir()
     (project_dir / "pyproject.toml").write_text(
@@ -371,16 +390,21 @@ def test_setup_python_app_poetry_happy_path_uses_mocked_tools(tmp_path: Path) ->
     assert (project_dir / ".pre-commit-config.yaml").exists()
     assert (project_dir / ".pylintrc").exists()
     assert (project_dir / ".flake8").exists()
+    assert (project_dir / ".venv" / "bin" / "activate").exists()
     assert (project_dir / ".vscode" / "settings.json").exists()
     assert (project_dir / ".vscode" / "launch.json").read_text(encoding="utf-8") == '{"version":"sample"}\n'
+    assert (project_dir / ".python-version").read_text(encoding="utf-8").strip() == "3.14.3"
     custom_script = home_dir / ".python_after_setup.sh"
     assert custom_script.exists()
     assert os.access(custom_script, os.X_OK)
 
     assert "pyenv install -s 3.14.3" in calls
-    assert "pyenv virtualenv -f 3.14.3 sample-project" in calls
+    assert "pyenv local 3.14.3" in calls
+    assert "pyenv which python" in calls
+    assert f"python -m venv {project_dir / '.venv'}" in calls
+    assert "pyenv virtualenv -f 3.14.3 sample-project" not in calls
     assert "pyenv virtualenv-delete -f sample-project" not in calls
-    assert "poetry env remove --all" in calls
+    assert "poetry env remove --all" not in calls
     assert "poetry sync" in calls
     assert "poetry show -o" in calls
     assert "python " in calls
@@ -413,7 +437,42 @@ def test_setup_python_app_uses_custom_python_version_when_provided(tmp_path: Pat
 
     assert result.returncode == 0
     assert "pyenv install -s 3.12.7" in calls
-    assert "pyenv virtualenv -f 3.12.7 sample-project" in calls
+    assert "pyenv local 3.12.7" in calls
+    assert f"python -m venv {project_dir / '.venv'}" in calls
+    assert (project_dir / ".python-version").read_text(encoding="utf-8").strip() == "3.12.7"
+
+
+def test_setup_python_app_reuses_existing_venv_for_poetry(tmp_path: Path) -> None:
+    """Poetry should reuse an existing project .venv unless a rebuild is requested."""
+    project_dir = tmp_path / "sample-project"
+    project_dir.mkdir()
+    (project_dir / "pyproject.toml").write_text(
+        '[tool.poetry]\nname = "sample-project"\nversion = "0.1.0"\n',
+        encoding="utf-8",
+    )
+    first_tmp_path = tmp_path / "first-run"
+    second_tmp_path = tmp_path / "second-run"
+    first_tmp_path.mkdir()
+    second_tmp_path.mkdir()
+
+    first_result, first_calls, _home_dir = run_setup_python_app(
+        project_dir=project_dir,
+        tmp_path=first_tmp_path,
+        args=["--package_manager=poetry"],
+    )
+    assert first_result.returncode == 0
+    assert f"python -m venv {project_dir / '.venv'}" in first_calls
+
+    second_result, second_calls, _home_dir = run_setup_python_app(
+        project_dir=project_dir,
+        tmp_path=second_tmp_path,
+        args=["--package_manager=poetry"],
+    )
+
+    assert second_result.returncode == 0
+    assert f"python -m venv {project_dir / '.venv'}" not in second_calls
+    assert "pyenv which python" not in second_calls
+    assert "poetry sync" in second_calls
 
 
 def test_setup_python_app_pip_flow_rebuilds_virtualenv_and_installs_requirements(tmp_path: Path) -> None:
@@ -431,7 +490,8 @@ def test_setup_python_app_pip_flow_rebuilds_virtualenv_and_installs_requirements
 
     assert result.returncode == 0
     assert "Project setup complete" in result.stdout
-    assert "pyenv virtualenv-delete -f sample-project" in calls
+    assert f"python -m venv {project_dir / '.venv'}" in calls
+    assert "pyenv virtualenv-delete -f sample-project" not in calls
     assert "python -m pip install --upgrade pip" in calls
     assert "pip install --upgrade setuptools" in calls
     assert "pip install wheel" in calls
@@ -483,8 +543,9 @@ def test_setup_wrapper_forwards_python_version_override(tmp_path: Path) -> None:
 
     assert result.returncode == 0
     assert "pyenv install -s 3.12.7" in calls
-    assert "pyenv virtualenv-delete -f sample-project" in calls
-    assert "pyenv virtualenv -f 3.12.7 sample-project" in calls
+    assert "pyenv local 3.12.7" in calls
+    assert f"python -m venv {project_dir / '.venv'}" in calls
+    assert "pyenv virtualenv-delete -f sample-project" not in calls
 
 
 def test_setup_wrapper_rejects_invalid_positional_rebuild_value(tmp_path: Path) -> None:
