@@ -152,6 +152,8 @@ def _process_python_analysis(data: Dict[str, Any]):
         data[PYTHON_ANALYSIS_EXCLUDE_KEY] = exclude
     if REPO_IGNORE_PATTERN not in exclude:
         exclude.append(REPO_IGNORE_PATTERN)
+    if ".venv/**" not in exclude:
+        exclude.append(".venv/**")
 
     import_format = cast(Optional[str], data.get(PYTHON_ANALYSIS_IMPORT_FORMAT_KEY))
     if import_format is None:
@@ -189,6 +191,7 @@ def _process_search_exclude(data: Dict[str, Any]):
         data[SEARCH_EXCLUDE_KEY] = exclude
 
     exclude[f"{REPO_NAME}/**"] = True
+    exclude[".venv/**"] = True
 
 
 def _process_python_formatter_option(data: Dict[str, Any], python_formatter: str):
