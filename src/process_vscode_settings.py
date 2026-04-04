@@ -1,7 +1,6 @@
 """Do processing of the .vscode/settings.json file."""
 
 import json
-import os
 from copy import deepcopy
 from typing import Any, Dict, List, Optional, cast
 
@@ -38,6 +37,7 @@ from src.constants.vscode_settings import (
     PYTHON_ANALYSIS_TYPE_CHECKING_MODE_KEY,
     PYTHON_ANALYSIS_USE_LIBRARY_CODE_FOR_TYPES_KEY,
     PYTHON_DEFAULT_INTERPRETER_KEY,
+    PYTHON_DEFAULT_INTERPRETER_VALUE,
     PYTHON_LANGUAGE_KEY,
     PYTHON_TESTING_PYTEST_ARGS_KEY,
     PYTHON_TESTING_PYTEST_ENABLED_KEY,
@@ -129,9 +129,7 @@ def process_vscode_settings(  # pylint: disable=too-many-positional-arguments
 
 
 def _process_python_default_interpreter(data: Dict[str, Any]):
-    project_name = os.path.basename(os.getenv("PWD", ""))
-    venv_location = f"~/.pyenv/versions/{project_name}"
-    data[PYTHON_DEFAULT_INTERPRETER_KEY] = venv_location
+    data[PYTHON_DEFAULT_INTERPRETER_KEY] = PYTHON_DEFAULT_INTERPRETER_VALUE
 
 
 def _process_python_analysis(data: Dict[str, Any]):
