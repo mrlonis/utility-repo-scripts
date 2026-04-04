@@ -658,5 +658,5 @@ fi
 
 #region Print out the final message
 echo "$dash_separator Project setup complete $dash_separator"
-echo "Either re-launch $SHELL or run 'source .venv/bin/activate' to activate your virtual environment."
+echo "Run 'source .venv/bin/activate' to activate your virtual environment."
 #endregion
