@@ -150,8 +150,10 @@ fi
 
 if [ "$package_manager" != "pip" ] &&
 	[ "$package_manager" != "pip-tools" ] &&
-	[ "$package_manager" != "poetry" ]; then
-	error "Invalid package_manager option: ($package_manager). Valid values are ['pip', 'pip-tools', 'poetry']"
+	[ "$package_manager" != "poetry" ] &&
+	[ "$package_manager" != "uv-pip" ] &&
+	[ "$package_manager" != "uv" ]; then
+	error "Invalid package_manager option: ($package_manager). Valid values are ['pip', 'pip-tools', 'poetry', 'uv-pip', 'uv']"
 else
 	if [ "$rebuild_venv" != 0 ] && [ "$rebuild_venv" != 1 ]; then
 		error "Invalid rebuild_venv option: ($rebuild_venv). Valid values are [0, 1]"
@@ -224,6 +226,24 @@ fi
 
 if [ "$overwrite_vscode_launch" != 0 ] && [ "$overwrite_vscode_launch" != 1 ]; then
 	error "Invalid overwrite_vscode_launch option: ($overwrite_vscode_launch). Valid values are [0, 1]"
+fi
+
+if [ "$package_manager" = "uv" ] || [ "$package_manager" = "uv-pip" ]; then
+	uv_installed=0
+	if command -v uv >/dev/null; then
+		uv_installed=1
+	fi
+
+	if [ "$uv_installed" != 1 ]; then
+		echo "uv not installed! Please install uv to use this setup script."
+		echo "To Install run one of the following commands:"
+		echo ""
+		echo "curl -LsSf https://astral.sh/uv/install.sh | sh"
+		echo "brew install uv"
+		echo ""
+		echo "Exiting..."
+		exit 1
+	fi
 fi
 #endregion
 
@@ -325,12 +345,14 @@ if [ "$debug" = 1 ]; then
 fi
 
 # Install Common Dependencies
-python -m pip install --upgrade pip
-pip install --upgrade setuptools
-pip install wheel
+if [ "$package_manager" != "uv" ] && [ "$package_manager" != "uv-pip" ]; then
+	python -m pip install --upgrade pip
+	pip install --upgrade setuptools
+	pip install wheel
 
-if [ -f "tox.ini" ]; then
-	pip install tox
+	if [ -f "tox.ini" ]; then
+		pip install tox
+	fi
 fi
 
 # Install requirements
@@ -370,6 +392,24 @@ elif [ "$package_manager" = "pip-tools" ]; then
 		pip-sync requirements.txt
 		req_installed=1
 	fi
+elif [ "$package_manager" = "uv-pip" ]; then
+	[ -f "requirements-dev.txt" ] && dev_requirements=1 || dev_requirements=0
+	[ -f "requirements-test.txt" ] && test_requirements=1 || test_requirements=0
+	[ -f "requirements.txt" ] && requirements=1 || requirements=0
+
+	if [ "$dev_requirements" = 1 ] && [ "$test_requirements" = 1 ] && [ "$requirements" = 1 ]; then
+		uv pip sync requirements-dev.txt requirements-test.txt requirements.txt
+		req_installed=1
+	elif [ "$dev_requirements" = 1 ] && [ "$requirements" = 1 ]; then
+		uv pip sync requirements-dev.txt requirements.txt
+		req_installed=1
+	elif [ "$test_requirements" = 1 ] && [ "$requirements" = 1 ]; then
+		uv pip sync requirements-test.txt requirements.txt
+		req_installed=1
+	elif [ "$requirements" = 1 ]; then
+		uv pip sync requirements.txt
+		req_installed=1
+	fi
 elif [ "$package_manager" = "poetry" ]; then
 	[ -f "pyproject.toml" ] && py_project_toml=1 || py_project_toml=0
 
@@ -386,22 +426,39 @@ elif [ "$package_manager" = "poetry" ]; then
 	poetry show -o
 	echo "Consider running poetry update and using poetry show -o to update your packages."
 	req_installed=1
+elif [ "$package_manager" = "uv" ]; then
+	[ -f "pyproject.toml" ] && py_project_toml=1 || py_project_toml=0
+
+	if [ "$py_project_toml" = 0 ]; then
+		error "pyproject.toml not found. Cannot install requirements via uv"
+	fi
+
+	if [ "$debug" = 1 ]; then
+		echo "Found pyproject.toml. Installing requirements via uv"
+	fi
+
+	uv sync
+	req_installed=1
 fi
 # No need for an else statement since we validate inputs above
 
 # if no requirements files, check for setup.py
 if [ "$req_installed" = "0" ] && [ -f "setup.py" ]; then
-	if [ "$package_manager" = "poetry" ]; then
-		# Poetry does not support setup.py files since it has it's own build system
-		error "Poetry does not support setup.py files. Please use a pyproject.toml file instead for Poetry support"
+	if [ "$package_manager" = "poetry" ] || [ "$package_manager" = "uv" ]; then
+		# Poetry and uv native project support both depend on pyproject.toml
+		error "$package_manager does not support setup.py files. Please use a pyproject.toml file instead for $package_manager support"
 	fi
 
-	pip install -e .
+	if [ "$package_manager" = "uv-pip" ]; then
+		uv pip install -e .
+	else
+		pip install -e .
+	fi
 	req_installed=1
 fi
 
 if [ "$req_installed" = "0" ]; then
-	error "ERROR: Unable to install any dependencies! Consider adding a requirements-dev.txt, requirements-test.txt, and/or requirements.txt. setup.py works as well but is experimental."
+	error "ERROR: Unable to install any dependencies! Consider adding a requirements-dev.txt, requirements-test.txt, requirements.txt, and/or pyproject.toml. setup.py works as well but is experimental."
 fi
 
 echo ""

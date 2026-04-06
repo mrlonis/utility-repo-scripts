@@ -135,7 +135,7 @@ EOF
             """,
         )
 
-    for command_name in ["pip", "pip-sync", "poetry", "pre-commit", "prettier", "sort-json"]:
+    for command_name in ["pip", "pip-sync", "poetry", "pre-commit", "prettier", "sort-json", "uv"]:
         if command_name in unavailable_tools:
             continue
 
@@ -366,6 +366,28 @@ def test_setup_python_app_requires_pyenv_when_missing(tmp_path: Path) -> None:
     assert calls == ""
 
 
+def test_setup_python_app_requires_uv_when_missing_for_uv_modes(tmp_path: Path) -> None:
+    """uv-based package managers should fail fast when the uv CLI is unavailable."""
+    project_dir = tmp_path / "sample-project"
+    project_dir.mkdir()
+    (project_dir / "pyproject.toml").write_text(
+        '[project]\nname = "sample-project"\nversion = "0.1.0"\n',
+        encoding="utf-8",
+    )
+
+    result, calls, _home_dir = run_setup_python_app(
+        project_dir=project_dir,
+        tmp_path=tmp_path,
+        args=["--package_manager=uv"],
+        unavailable_tools={"uv"},
+    )
+
+    assert result.returncode == 1
+    assert "uv not installed!" in result.stdout
+    assert "Please install uv to use this setup script." in result.stdout
+    assert calls == ""
+
+
 def test_setup_python_app_poetry_happy_path_uses_mocked_tools(tmp_path: Path) -> None:
     """The poetry flow should complete while creating an in-repo .venv."""
     project_dir = tmp_path / "sample-project"
@@ -420,6 +442,34 @@ def test_setup_python_app_poetry_happy_path_uses_mocked_tools(tmp_path: Path) ->
     assert "code --install-extension ms-python.black-formatter --force" in calls
 
 
+def test_setup_python_app_uv_happy_path_uses_pyproject_sync(tmp_path: Path) -> None:
+    """The uv flow should sync dependencies from pyproject.toml into .venv."""
+    project_dir = tmp_path / "sample-project"
+    project_dir.mkdir()
+    (project_dir / "pyproject.toml").write_text(
+        '[project]\nname = "sample-project"\nversion = "0.1.0"\ndependencies = ["pydantic"]\n',
+        encoding="utf-8",
+    )
+
+    result, calls, _home_dir = run_setup_python_app(
+        project_dir=project_dir,
+        tmp_path=tmp_path,
+        args=["--package_manager=uv"],
+    )
+
+    assert result.returncode == 0
+    assert "Project setup complete" in result.stdout
+    assert (project_dir / ".venv" / "bin" / "activate").exists()
+    assert "pyenv install -s 3.14.3" in calls
+    assert f"python -m venv {project_dir / '.venv'}" in calls
+    assert "uv sync" in calls
+    assert "uv pip sync" not in calls
+    assert "poetry sync" not in calls
+    assert "python -m pip install --upgrade pip" not in calls
+    assert "pip install --upgrade setuptools" not in calls
+    assert "pip install wheel" not in calls
+
+
 def test_setup_python_app_uses_custom_python_version_when_provided(tmp_path: Path) -> None:
     """The script should pass a provided python version through to pyenv."""
     project_dir = tmp_path / "sample-project"
@@ -440,6 +490,30 @@ def test_setup_python_app_uses_custom_python_version_when_provided(tmp_path: Pat
     assert "pyenv local 3.12.7" in calls
     assert f"python -m venv {project_dir / '.venv'}" in calls
     assert (project_dir / ".python-version").read_text(encoding="utf-8").strip() == "3.12.7"
+
+
+def test_setup_python_app_uv_pip_flow_syncs_requirements(tmp_path: Path) -> None:
+    """The uv-pip flow should sync compiled requirements files with uv pip sync."""
+    project_dir = tmp_path / "sample-project"
+    project_dir.mkdir()
+    (project_dir / "requirements-dev.txt").write_text("-r requirements.txt\npytest\n", encoding="utf-8")
+    (project_dir / "requirements.txt").write_text("pydantic\n", encoding="utf-8")
+
+    result, calls, _home_dir = run_setup_python_app(
+        project_dir=project_dir,
+        tmp_path=tmp_path,
+        args=["--package_manager=uv-pip"],
+    )
+
+    assert result.returncode == 0
+    assert "Project setup complete" in result.stdout
+    assert f"python -m venv {project_dir / '.venv'}" in calls
+    assert "uv pip sync requirements-dev.txt requirements.txt" in calls
+    assert "uv sync" not in calls
+    assert "pip-sync" not in calls
+    assert "python -m pip install --upgrade pip" not in calls
+    assert "pip install --upgrade setuptools" not in calls
+    assert "pip install wheel" not in calls
 
 
 def test_setup_python_app_reuses_existing_venv_for_poetry(tmp_path: Path) -> None:

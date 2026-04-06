@@ -18,6 +18,11 @@ The root [`setup`](./setup) file in this repository is only a local helper for w
         - [pip-tools: Setup](#pip-tools-setup)
         - [pip-tools: Dev, Test \& Prod Requirements](#pip-tools-dev-test--prod-requirements)
         - [pip-tools: Rebuilding Virtual Environment](#pip-tools-rebuilding-virtual-environment)
+      - [uv-pip](#uv-pip)
+        - [uv-pip: Setup](#uv-pip-setup)
+        - [uv-pip: Dev, Test \& Prod Requirements](#uv-pip-dev-test--prod-requirements)
+      - [uv](#uv)
+        - [uv: Setup](#uv-setup)
       - [poetry](#poetry)
         - [Poetry: Setup](#poetry-setup)
         - [poetry: Rebuilding Virtual Environment](#poetry-rebuilding-virtual-environment)
@@ -37,6 +42,7 @@ The root [`setup`](./setup) file in this repository is only a local helper for w
 In order to use [setup_python_app.sh](./setup_python_app.sh), you will need the following:
 
 - [pyenv](https://github.com/pyenv/pyenv)
+- [uv](https://docs.astral.sh/uv/) if you want to use the `uv` or `uv-pip` package manager modes
 
 Optional but recommended:
 
@@ -77,7 +83,7 @@ The `setup_python_app.sh` script accepts a few flags to customize the setup proc
 | `-d` or `--debug`           | Enables debug echo statements when the flag is present                                                                  | `False`  | Presence-only flag; omit to leave debug disabled                                                                   |
 | `-r` or `--rebuild_venv`    | Controls whether the virtual environment should be deleted and re-created                                               | `0`      | `0`, `1`                                                                                                           |
 | `--python_version`          | Specifies which Python version `pyenv` should install and use when creating the project-local `.venv`                   | `3.14.3` | Any non-empty [pyenv install](https://github.com/pyenv/pyenv/blob/master/COMMANDS.md#pyenv-install) version string |
-| `--package_manager`         | Specifies which package manager to use                                                                                  | `poetry` | [`pip`, `pip-tools`, `poetry`]                                                                                     |
+| `--package_manager`         | Specifies which package manager to use                                                                                  | `poetry` | [`pip`, `pip-tools`, `poetry`, `uv-pip`, `uv`]                                                                     |
 | `--is_package`              | Specifies whether or not the project is a package                                                                       | `False`  |                                                                                                                    |
 | `--include_jumanji_house`   | Specifies whether or not to include the `jumanjihouse` `pre-commit` hooks                                               | `True`   |                                                                                                                    |
 | `--include_prettier`        | Specifies whether or not to include the `prettier` `pre-commit` hooks                                                   | `True`   |                                                                                                                    |
@@ -271,6 +277,79 @@ To rebuild with a different Python version at the same time, run:
 ```sh
 ./setup 1 --python_version=3.12.9
 ```
+
+[Back to Top](#utility-repo-scripts)
+
+#### uv-pip
+
+The `uv-pip` mode uses [uv](https://docs.astral.sh/uv/) in pip-compatible mode to manage Python dependencies from requirements files. To use this mode, modify your `setup` script to the following:
+
+```sh
+#!/bin/bash
+git submodule update --init --remote --force
+rebuild_venv=$1
+rebuild_venv="${rebuild_venv:-0}"
+source utility-repo-scripts/setup_python_app.sh \
+    --package_manager="uv-pip" \
+    --rebuild_venv="$rebuild_venv" \
+    --python_formatter="" \
+    --pylint_enabled \
+    --pytest_enabled \
+    --overwrite_vscode_launch \
+    --line_length=125
+```
+
+[Back to Top](#utility-repo-scripts)
+
+##### uv-pip: Setup
+
+To setup a project for the `uv-pip` mode, first install `uv`. To install `uv`, view the [uv installation instructions](https://docs.astral.sh/uv/getting-started/installation/).
+
+This mode works best when your repository already has fully compiled `requirements-dev.txt`, `requirements-test.txt`, and `requirements.txt` files, similar to the `pip-tools` workflow.
+
+[Back to Top](#utility-repo-scripts)
+
+##### uv-pip: Dev, Test & Prod Requirements
+
+The `uv-pip` mode looks for `requirements-dev.txt`, `requirements-test.txt`, and `requirements.txt` and synchronizes the environment using `uv pip sync`.
+
+- If `dev`, `test`, and `prod` requirements are found, the resulting command the `setup` script runs is `uv pip sync requirements-dev.txt requirements-test.txt requirements.txt`.
+- If only `dev` and `prod` requirements are found, the resulting command the `setup` script runs is `uv pip sync requirements-dev.txt requirements.txt`.
+- If only `test` and `prod` requirements are found, the resulting command the `setup` script runs is `uv pip sync requirements-test.txt requirements.txt`.
+- If only `prod` requirements are found, the resulting command the `setup` script runs is `uv pip sync requirements.txt`.
+
+Because this mode uses `uv pip sync`, the requirements files should fully describe the environment you want inside `.venv`. As with the other sync-oriented package manager modes, `.venv` is reused until you pass `--rebuild_venv=1` or the environment is missing.
+
+[Back to Top](#utility-repo-scripts)
+
+#### uv
+
+The `uv` mode uses [uv](https://docs.astral.sh/uv/) in its native project mode to manage Python dependencies from `pyproject.toml`. To use this mode, modify your `setup` script to the following:
+
+```sh
+#!/bin/bash
+git submodule update --init --remote --force
+rebuild_venv=$1
+rebuild_venv="${rebuild_venv:-0}"
+source utility-repo-scripts/setup_python_app.sh \
+    --package_manager="uv" \
+    --rebuild_venv="$rebuild_venv" \
+    --python_formatter="" \
+    --pylint_enabled \
+    --pytest_enabled \
+    --overwrite_vscode_launch \
+    --line_length=125
+```
+
+[Back to Top](#utility-repo-scripts)
+
+##### uv: Setup
+
+To setup a project for the `uv` mode, first install `uv`. To install `uv`, view the [uv installation instructions](https://docs.astral.sh/uv/getting-started/installation/).
+
+This mode expects a `pyproject.toml` file at the root of the repository. You can create one with `uv init`, and then add dependencies with commands such as `uv add <dependency>`.
+
+When `--package_manager="uv"` is selected, the setup script uses the shared project `.venv` and runs `uv sync` to install dependencies from `pyproject.toml`. The `.venv` folder is reused until you pass `--rebuild_venv=1` or the environment is missing.
 
 [Back to Top](#utility-repo-scripts)
 
