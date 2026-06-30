@@ -8,36 +8,36 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
   - package-ecosystem: "pip"
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
     allow:
       - dependency-type: "all"
-    open-pull-requests-limit: 99
+    open-pull-requests-limit: 5
     groups:
       production-version-updates:
         applies-to: version-updates
         dependency-type: production
         update-types:
-          - 'patch'
-          - 'minor'
+          - "patch"
+          - "minor"
       production-security-updates:
         applies-to: security-updates
         dependency-type: production
         update-types:
-          - 'patch'
-          - 'minor'
+          - "patch"
+          - "minor"
       development-version-updates:
         applies-to: version-updates
         dependency-type: development
         update-types:
-          - 'patch'
-          - 'minor'
+          - "patch"
+          - "minor"
       development-security-updates:
         applies-to: security-updates
         dependency-type: development
         update-types:
-          - 'patch'
-          - 'minor'
+          - "patch"
+          - "minor"

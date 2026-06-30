@@ -19,13 +19,13 @@ repos:
       - id: prettier
         args: [--write, --config=.prettierrc]
   - repo: https://github.com/pycqa/isort
-    rev: 8.0.1
+    rev: 9.0.0a3
     hooks:
       - id: isort
         name: isort (python)
         args: [--settings-file=pyproject.toml] # Configure in pyproject.toml
   - repo: https://github.com/psf/black
-    rev: 26.3.1
+    rev: 26.5.1
     hooks:
       - id: black # Configure in pyproject.toml
   - repo: local
